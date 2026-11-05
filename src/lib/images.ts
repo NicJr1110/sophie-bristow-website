@@ -76,6 +76,18 @@ export function picPlaceholder(seed: string, alt: string): Pic {
   };
 }
 
+/**
+ * Sophie's own work (cropped from Instagram) in public/placeholders/, used until Sanity has content.
+ * Each has <name>.jpg (full, ≤1400px) and <name>-400.jpg / <name>-800.jpg (square thumbs).
+ */
+export function picLocal(name: string, alt: string): Pic {
+  return {
+    alt,
+    thumb: (w) => `/placeholders/${name}-${w <= 400 ? 400 : 800}.jpg`,
+    full: () => `/placeholders/${name}.jpg`,
+  };
+}
+
 export function srcset(pic: Pic): string {
   return THUMB_WIDTHS.map((w) => `${pic.thumb(w)} ${w}w`).join(', ');
 }

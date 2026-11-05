@@ -8,7 +8,9 @@
  *   large  ≥ 1024px   3-col grid, horizontal menu, A4-like central channel
  */
 :root {
-  --bg: #faf9f7;
+  --bg: #eeede9; /* Sophie's paper; textured by --paper */
+  --paper: var(--bg) url('/paper.jpg') repeat;
+  --field: rgb(255 255 255 / 0.55);
   --text: #1a1a1a;
   --muted: #6b6b6b;
   --border: #d9d6d0;
@@ -37,7 +39,8 @@ body {
 }
 
 body {
-  background: var(--bg);
+  background: var(--paper);
+  background-size: 512px 512px;
   color: var(--text);
   font-family: var(--font-body);
   line-height: 1.6;
@@ -78,8 +81,8 @@ h3 {
 
 .splash {
   position: fixed;
-  right: 0;
-  bottom: 0;
+  right: 2vw;
+  bottom: 2vh;
   z-index: 0;
   pointer-events: none;
   /* small: larger share of the bottom-right */
@@ -209,7 +212,7 @@ h3 {
 .landing-menu .button {
   min-width: 220px;
   text-align: center;
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
 }
 
 /* ---------- Header + navigation ---------- */
@@ -264,7 +267,7 @@ h3 {
   gap: 5px;
   border: 0;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
   cursor: pointer;
 }
 
@@ -293,7 +296,8 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
+  background: var(--paper);
+  background-size: 512px 512px;
   transform: translateY(-100%);
   visibility: hidden;
   transition: transform 0.35s var(--ease), visibility 0s linear 0.35s;
@@ -350,7 +354,7 @@ h3 {
   aspect-ratio: 1;
   padding: 0;
   border: 0;
-  background: #e9e6e0;
+  background: rgb(0 0 0 / 0.04);
   overflow: hidden;
   cursor: zoom-in;
 }
@@ -395,7 +399,7 @@ h3 {
   flex-shrink: 0;
   padding: 6px 14px;
   border: 1px solid var(--text);
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
   font: inherit;
   cursor: pointer;
@@ -537,7 +541,7 @@ h3 {
   font: inherit;
   padding: 10px 12px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--field);
   color: var(--text);
 }
 
@@ -587,13 +591,13 @@ h3 {
   display: block;
   padding: 12px 10px;
   border: 1px solid var(--text);
-  background: #fff;
+  background: var(--field);
   text-align: center;
   transition: background 0.2s, color 0.2s;
 }
 
 .enquiry-option:hover span {
-  background: var(--bg);
+  background: rgb(255 255 255 / 0.85);
 }
 
 .enquiry-option input:checked + span {

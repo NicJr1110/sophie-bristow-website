@@ -1,5 +1,5 @@
 import { DOC_IDS, SANITY } from './config';
-import { picFromSanity, picPlaceholder, sanityImageUrl, type Pic, type SanityImage } from './images';
+import { picFromSanity, picLocal, picPlaceholder, sanityImageUrl, type Pic, type SanityImage } from './images';
 import { portableTextToHtml } from './portableText';
 
 export type ArtStatus = 'available' | 'sold';
@@ -38,7 +38,7 @@ let settingsPromise: Promise<Settings> | null = null;
 
 export function getSettings(): Promise<Settings> {
   settingsPromise ??= (async () => {
-    const fallback = { backgroundUrl: '/splash-placeholder.svg' };
+    const fallback = { backgroundUrl: '/splash-flower.png' };
     if (!hasSanity) return fallback;
     const s = await query<{ background?: SanityImage } | null>(`*[_id == $id][0]{ background }`, {
       id: DOC_IDS.settings,
@@ -58,7 +58,7 @@ type GalleryDoc = {
 };
 
 export async function getGallery(docId: string, fallbackTitle: string): Promise<Gallery> {
-  if (!hasSanity) return sampleGallery(fallbackTitle);
+  if (!hasSanity) return sampleGallery(docId, fallbackTitle);
   const doc = await query<GalleryDoc | null>(`*[_id == $id][0]{ title, introText, images }`, { id: docId });
   const items: GalleryItem[] = [];
   for (const img of doc?.images ?? []) {
@@ -149,31 +149,61 @@ export async function getEnquiryTypes(): Promise<EnquiryType[]> {
   );
 }
 
-/* ---------- Placeholder content ---------- */
+/* ---------- Placeholder content ----------
+ * Sophie's own work, cropped from her Instagram (public/placeholders/), shown until Sanity is connected.
+ */
 
-function sampleGallery(title: string): Gallery {
-  const slug = title.toLowerCase().replace(/\s+/g, '-');
+const SAMPLE_GALLERIES: Record<string, [string, string][]> = {
+  [DOC_IDS.flash]: [
+    ['flash-sheet', 'Repeatable flash sheet of plants, animals and vessels'],
+    ['flash-apple-horses-birds', 'Line drawings of an apple, horses and swallows'],
+    ['flash-wolf-flowers', 'Running wolf, tulip and daffodil flash'],
+    ['flash-horse-bull-dog', 'Black silhouettes of a horse, bull and dog'],
+    ['flash-rose-book', 'Dotted rose designs in a flashbook'],
+    ['tattoo-hand-designs', 'Hand-poked designs placed on a hand'],
+    ['tattoo-fingers', 'Blue hand-poked finger tattoos'],
+    ['tattoo-hand', 'Blue hand-poked hand tattoos'],
+    ['tattoo-arm', 'Black hand-poked tattoo on an upper arm'],
+    ['tattoo-shoulder', 'Red hand-poked tattoo on a shoulder'],
+  ],
+  [DOC_IDS.markMaking]: [
+    ['marks-1', 'Four ink plant marks'],
+    ['marks-2', 'Three ink seedling marks'],
+    ['marks-3', 'Two ink flower stems'],
+    ['marks-4', 'Two small ink flowers'],
+    ['marks-5', 'Ink poppy and grass marks'],
+    ['marks-6', 'Three ink grass stems'],
+    ['marks-7', 'Two bold ink flowers'],
+  ],
+};
+
+function sampleGallery(docId: string, title: string): Gallery {
+  const items = SAMPLE_GALLERIES[docId] ?? [];
   return {
     title,
     intro: `Placeholder intro text for ${title}. Sophie will write this in the CMS.`,
-    items: Array.from({ length: 9 }, (_, i) => ({
-      id: `${slug}-${i}`,
-      title: `${title} ${i + 1}`,
-      pic: picPlaceholder(`${slug}-${i}`, `${title} piece ${i + 1}`),
-    })),
+    items: items.map(([name, alt]) => ({ id: name, title: '', pic: picLocal(name, alt) })),
   };
 }
 
 function sampleArtwork(): Gallery {
+  const pieces: [string, string, number, ArtStatus][] = [
+    ['marks-1', 'Plant study I', 120, 'available'],
+    ['flash-horse-bull-dog', 'Animals', 150, 'available'],
+    ['marks-5', 'Poppy and grass', 95, 'sold'],
+    ['flash-apple-horses-birds', 'Apple and swallows', 140, 'available'],
+    ['marks-7', 'Two flowers', 110, 'available'],
+    ['flash-wolf-flowers', 'Wolf and tulips', 135, 'available'],
+  ];
   return {
     title: 'Artwork',
     intro: 'Placeholder intro text. Original pieces, each one-of-a-kind.',
-    items: Array.from({ length: 6 }, (_, i) => ({
+    items: pieces.map(([name, title, price, status], i) => ({
       id: `sample-${i}`,
-      title: `Original ${i + 1}`,
-      price: 80 + i * 25,
-      status: (i === 2 ? 'sold' : 'available') as ArtStatus,
-      pic: picPlaceholder(`artwork-${i}`, `Original artwork ${i + 1}`),
+      title,
+      price,
+      status,
+      pic: picLocal(name, title),
     })),
   };
 }

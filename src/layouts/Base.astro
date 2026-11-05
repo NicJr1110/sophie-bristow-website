@@ -13,6 +13,7 @@ interface Props {
 
 const { title, description = 'Tattoo design, artwork and mark making by Sophie Bristow.', showHeader = true } = Astro.props;
 const { backgroundUrl } = await getSettings();
+const isDefaultSplash = backgroundUrl === '/splash-flower.png';
 const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
 const year = new Date().getFullYear();
 ---
@@ -26,11 +27,22 @@ const year = new Date().getFullYear();
     <meta name="description" content={description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://cdn.sanity.io" />
+    <link rel="preload" href="/paper.jpg" as="image" />
   </head>
   <body class:list={{ 'is-landing': !showHeader }}>
     <!-- Splash image: fixed bottom-right cell of the viewport on every page (spec §5) -->
     <div class="splash" aria-hidden="true">
-      <img src={backgroundUrl} alt="" decoding="async" />
+      {isDefaultSplash ? (
+        <img
+          src="/splash-flower.png"
+          srcset="/splash-flower-sm.png 409w, /splash-flower.png 818w"
+          sizes="(min-width: 1024px) 22vh, (min-width: 768px) 22vh, 40vw"
+          alt=""
+          decoding="async"
+        />
+      ) : (
+        <img src={backgroundUrl} alt="" decoding="async" />
+      )}
     </div>
 
     <div class="page">

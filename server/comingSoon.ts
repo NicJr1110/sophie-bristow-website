@@ -65,18 +65,19 @@ export function comingSoonHtml(s: ComingSoonSettings): string {
 <title>Sophie Bristow · ${esc(message)}</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <style>
-  :root { --bg:#faf9f7; --text:#1a1a1a; --muted:#6b6b6b; }
+  :root { --bg:#eeede9; --text:#1a1a1a; --muted:#6b6b6b; }
   * { box-sizing:border-box; }
   html,body { margin:0; height:100%; }
-  body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  body { background:var(--bg) url('/paper.jpg') repeat; background-size:512px 512px; color:var(--text); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
          display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; }
   h1 { font-family:Georgia,'Times New Roman',serif; font-weight:400; font-size:clamp(2.2rem,8vw,3.6rem); margin:0 0 12px; }
   p { margin:0 0 20px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; font-size:.85rem; }
   a { color:var(--text); text-underline-offset:5px; }
-  .splash { position:fixed; right:0; bottom:0; width:85vw; height:32vh; z-index:-1; pointer-events:none;
-            background:url('/splash-placeholder.svg') no-repeat right bottom / contain; }
+  .splash { position:fixed; right:2vw; bottom:2vh; width:85vw; height:32vh; z-index:-1; pointer-events:none;
+            background:url('/splash-flower.png') no-repeat right bottom / contain; }
   @media (min-width:768px){ .splash { width:50vw; height:33.333vh; } }
   @media (min-width:1024px){ .splash { width:33.333vw; } }
+  .splash { opacity:.9; }
 </style>
 </head>
 <body>
