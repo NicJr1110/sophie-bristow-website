@@ -134,10 +134,16 @@ h3 {
 }
 
 @media (min-width: 1024px) {
-  /* large: 3 x 3 → one cell */
+  /* large: a feature — ~2.5x bigger, turned 30° clockwise and bled off the bottom
+     and a little off the right, like a close-up of a drawing on the same sheet */
   .splash {
-    width: 33.333vw;
-    height: 33.333vh;
+    right: 0;
+    bottom: 0;
+    width: min(62vh, 38vw);
+    height: min(92vh, 57vw);
+    transform: translate(-2%, 13%) rotate(30deg);
+    transform-origin: 50% 50%;
+    opacity: 0.8;
   }
 }
 
