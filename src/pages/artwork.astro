@@ -1,0 +1,80 @@
+---
+// Gallery template + Buy buttons (spec §7). Sold status is refreshed live from /api/status on load.
+import Base from '../layouts/Base.astro';
+import Gallery from '../components/Gallery.astro';
+import { getArtworkGallery } from '../lib/content';
+
+const gallery = await getArtworkGallery();
+---
+
+<Base title={gallery.title}>
+  <h1 class="page-title">{gallery.title}</h1>
+  {gallery.intro && <p class="intro">{gallery.intro}</p>}
+  <p class="shop-message" role="status" aria-live="polite" hidden></p>
+  <Gallery items={gallery.items} shop />
+</Base>
+
+<script>
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('button.buy'));
+  const message = document.querySelector<HTMLParagraphElement>('.shop-message')!;
+
+  const setButton = (btn: HTMLButtonElement, status: 'available' | 'sold') => {
+    btn.disabled = status !== 'available';
+    btn.textContent = status === 'available' ? 'Buy' : 'Sold';
+  };
+
+  const say = (text: string) => {
+    message.textContent = text;
+    message.hidden = !text;
+  };
+
+  // Live sold status, so a purchase shows up without a redeploy.
+  async function refreshStatus() {
+    try {
+      const res = await fetch('/api/status', { cache: 'no-store' });
+      if (!res.ok) return;
+      const statuses: Record<string, 'available' | 'sold'> = await res.json();
+      for (const btn of buttons) {
+        const s = statuses[btn.dataset.artworkId ?? ''];
+        if (s) setButton(btn, s);
+      }
+    } catch {
+      /* Keep the build-time status if the API isn't reachable (e.g. `astro dev`). */
+    }
+  }
+
+  for (const btn of buttons) {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.artworkId;
+      if (!id) return;
+      say('');
+      btn.disabled = true;
+      btn.textContent = 'One moment…';
+      try {
+        const res = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ artworkId: id }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.url) {
+          window.location.href = data.url; // Stripe-hosted checkout
+          return;
+        }
+        if (res.status === 409) {
+          setButton(btn, 'sold');
+          say('Sorry, that piece has just sold.');
+          return;
+        }
+        throw new Error(data.error ?? 'checkout_failed');
+      } catch {
+        setButton(btn, 'available');
+        say('Oops, something appears to have gone wrong. Please try again later.');
+      }
+    });
+  }
+
+  refreshStatus();
+  // Coming back from Stripe with the browser back button restores a cached page: refresh it.
+  window.addEventListener('pageshow', (e) => e.persisted && refreshStatus());
+</script>

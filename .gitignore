@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.env
+.dev.vars
+studio/node_modules/
+studio/dist/
+studio/.sanity/
+.DS_Store

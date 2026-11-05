@@ -1,0 +1,9 @@
+name = "sophie-bristow-website"
+compatibility_date = "2026-01-01"
+pages_build_output_dir = "dist"
+
+# Optional: contact-form rate limiting (5 per IP per hour).
+# Create a KV namespace in Cloudflare, then uncomment and paste its ID.
+# [[kv_namespaces]]
+# binding = "RATE_LIMIT"
+# id = "<your-kv-namespace-id>"

@@ -1,0 +1,46 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import { SITE_NAME } from '../lib/config';
+import { getSettings } from '../lib/content';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Landing page hides the header (menu sits in the middle of the page instead). */
+  showHeader?: boolean;
+}
+
+const { title, description = 'Tattoo design, artwork and mark making by Sophie Bristow.', showHeader = true } = Astro.props;
+const { backgroundUrl } = await getSettings();
+const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://cdn.sanity.io" />
+  </head>
+  <body class:list={{ 'is-landing': !showHeader }}>
+    <!-- Splash image: fixed bottom-right cell of the viewport on every page (spec §5) -->
+    <div class="splash" aria-hidden="true">
+      <img src={backgroundUrl} alt="" decoding="async" />
+    </div>
+
+    <div class="page">
+      {showHeader && <Header current={Astro.url.pathname} />}
+      <main class="channel" id="main">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <small>{SITE_NAME} &copy; {year}</small>
+      </footer>
+    </div>
+  </body>
+</html>

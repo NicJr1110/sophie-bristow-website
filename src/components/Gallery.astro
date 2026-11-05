@@ -1,0 +1,116 @@
+---
+import { FULL_WIDTH, srcset } from '../lib/images';
+import type { GalleryItem } from '../lib/content';
+
+interface Props {
+  items: GalleryItem[];
+  /** Artwork page: show title, price and a Buy button under each tile. */
+  shop?: boolean;
+}
+const { items, shop = false } = Astro.props;
+
+const gbp = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
+const formatPrice = (p?: number) => (typeof p === 'number' ? gbp.format(p).replace(/\.00$/, '') : '');
+// Rendered tile width: ~280px in the large channel, ~31vw at medium, ~46vw on phones.
+const sizes = '(min-width: 1024px) 290px, (min-width: 768px) 31vw, 47vw';
+---
+
+{items.length === 0 && <p class="empty">Nothing here yet. Check back soon.</p>}
+
+<ul class="grid" data-gallery>
+  {items.map((item, i) => (
+    <li class="tile">
+      <button
+        class="tile-open"
+        type="button"
+        data-index={i}
+        data-full={item.pic.full(FULL_WIDTH)}
+        data-alt={item.pic.alt}
+        data-caption={item.title ?? ''}
+        aria-label={`View ${item.pic.alt || item.title || 'image'} larger`}
+      >
+        <img
+          src={item.pic.thumb(800)}
+          srcset={srcset(item.pic)}
+          sizes={sizes}
+          alt={item.pic.alt}
+          width="800"
+          height="800"
+          loading={i < 6 ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      </button>
+
+      {shop && (
+        <div class="tile-meta">
+          <div class="tile-text">
+            <span class="tile-title">{item.title}</span>
+            <span class="tile-price">{formatPrice(item.price)}</span>
+          </div>
+          <button
+            class="buy"
+            type="button"
+            data-artwork-id={item.id}
+            disabled={item.status !== 'available'}
+          >
+            {item.status === 'available' ? 'Buy' : 'Sold'}
+          </button>
+        </div>
+      )}
+    </li>
+  ))}
+</ul>
+
+<dialog class="lightbox" aria-label="Image viewer">
+  <button class="lb-btn lb-close" type="button" aria-label="Close">&times;</button>
+  <button class="lb-btn lb-prev" type="button" aria-label="Previous image">&lsaquo;</button>
+  <figure>
+    <img class="lb-img" alt="" />
+    <figcaption class="lb-caption"></figcaption>
+  </figure>
+  <button class="lb-btn lb-next" type="button" aria-label="Next image">&rsaquo;</button>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('dialog.lightbox');
+  const tiles = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-gallery] .tile-open'));
+
+  if (dialog && tiles.length) {
+    const img = dialog.querySelector<HTMLImageElement>('.lb-img')!;
+    const caption = dialog.querySelector<HTMLElement>('.lb-caption')!;
+    let index = 0;
+
+    const show = (i: number) => {
+      index = (i + tiles.length) % tiles.length;
+      const t = tiles[index];
+      img.src = t.dataset.full ?? '';
+      img.alt = t.dataset.alt ?? '';
+      caption.textContent = t.dataset.caption ?? '';
+    };
+
+    tiles.forEach((t, i) =>
+      t.addEventListener('click', () => {
+        show(i);
+        dialog.showModal();
+      }),
+    );
+
+    dialog.querySelector('.lb-close')!.addEventListener('click', () => dialog.close());
+    dialog.querySelector('.lb-prev')!.addEventListener('click', () => show(index - 1));
+    dialog.querySelector('.lb-next')!.addEventListener('click', () => show(index + 1));
+
+    // Click on the dark backdrop (not the image or buttons) closes it. Escape is native to <dialog>.
+    dialog.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target === dialog || target.tagName === 'FIGURE') dialog.close();
+    });
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(index - 1);
+      if (e.key === 'ArrowRight') show(index + 1);
+    });
+    dialog.addEventListener('close', () => {
+      img.removeAttribute('src');
+      tiles[index]?.focus();
+    });
+  }
+</script>

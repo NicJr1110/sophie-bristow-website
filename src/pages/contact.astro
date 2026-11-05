@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Contact">
+  <h1 class="page-title">Contact</h1>
+
+  <form id="contact-form" class="contact-form" method="post" action="/api/contact">
+    <label>
+      Name
+      <input name="name" type="text" required maxlength="200" autocomplete="name" />
+    </label>
+    <label>
+      Email
+      <input name="email" type="email" required maxlength="254" autocomplete="email" />
+    </label>
+    <label>
+      Message
+      <textarea name="message" rows="7" required maxlength="2000"></textarea>
+      <span class="char-count" aria-live="polite">0 / 2000</span>
+    </label>
+
+    <!-- Honeypot: hidden from people, bots fill it in -->
+    <div class="hp" aria-hidden="true">
+      <label>Leave this empty <input name="website" type="text" tabindex="-1" autocomplete="off" /></label>
+    </div>
+
+    <button class="button" type="submit">Send</button>
+    <p class="form-error" role="alert" hidden>Oops, something appears to have gone wrong. Please try again later.</p>
+  </form>
+
+  <p class="form-success" role="status" hidden>Thank you very much, Sophie will be in touch with you shortly.</p>
+</Base>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const success = document.querySelector<HTMLElement>('.form-success')!;
+  const error = form.querySelector<HTMLElement>('.form-error')!;
+  const submit = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+  const message = form.querySelector<HTMLTextAreaElement>('textarea[name=message]')!;
+  const count = form.querySelector<HTMLElement>('.char-count')!;
+
+  message.addEventListener('input', () => (count.textContent = `${message.value.length} / 2000`));
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    error.hidden = true;
+    submit.disabled = true;
+    submit.textContent = 'Sending…';
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      form.hidden = true; // Happy path: form disappears
+      success.hidden = false;
+    } catch {
+      error.hidden = false; // Failure: keep what they typed
+    } finally {
+      submit.disabled = false;
+      submit.textContent = 'Send';
+    }
+  });
+</script>

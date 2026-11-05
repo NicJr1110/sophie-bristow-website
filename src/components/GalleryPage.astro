@@ -1,0 +1,19 @@
+---
+// Shared template for Flash and Mark Making (spec §6).
+import Base from '../layouts/Base.astro';
+import Gallery from './Gallery.astro';
+import { getGallery } from '../lib/content';
+
+interface Props {
+  docId: string;
+  title: string;
+}
+const { docId, title } = Astro.props;
+const gallery = await getGallery(docId, title);
+---
+
+<Base title={gallery.title}>
+  <h1 class="page-title">{gallery.title}</h1>
+  {gallery.intro && <p class="intro">{gallery.intro}</p>}
+  <Gallery items={gallery.items} />
+</Base>

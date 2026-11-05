@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import { getBio } from '../lib/content';
+
+const bio = await getBio();
+---
+
+<Base title="Bio">
+  <article class="bio">
+    {bio.photo && (
+      <img
+        class="bio-photo"
+        src={bio.photo.full(1200)}
+        srcset={`${bio.photo.full(600)} 600w, ${bio.photo.full(1200)} 1200w, ${bio.photo.full(1800)} 1800w`}
+        sizes="(min-width: 1024px) 600px, 90vw"
+        alt={bio.photo.alt}
+        decoding="async"
+      />
+    )}
+    <div class="prose" set:html={bio.html} />
+  </article>
+</Base>

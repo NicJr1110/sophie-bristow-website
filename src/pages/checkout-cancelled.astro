@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Payment cancelled">
+  <div class="notice">
+    <h1 class="page-title">Payment cancelled</h1>
+    <p>No payment was taken.</p>
+    <p><a href="/artwork/">Back to artwork</a></p>
+  </div>
+</Base>
+
+<script>
+  // Release the 30-minute reservation straight away instead of waiting for it to lapse.
+  const params = new URLSearchParams(location.search);
+  const artworkId = params.get('a');
+  const token = params.get('t');
+  if (artworkId && token) {
+    fetch('/api/release', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ artworkId, token }),
+      keepalive: true,
+    }).catch(() => {});
+    history.replaceState(null, '', location.pathname);
+  }
+</script>
