@@ -6,7 +6,7 @@ export const siteSettings = defineType({
   type: 'document',
   groups: [
     { name: 'look', title: 'Look', default: true },
-    { name: 'reply', title: 'Contact auto-reply' },
+    { name: 'away', title: 'Away mode' },
   ],
   fields: [
     defineField({
@@ -18,33 +18,20 @@ export const siteSettings = defineType({
     }),
 
     defineField({
-      name: 'autoReplySubject',
-      title: 'Auto-reply subject',
-      type: 'string',
-      group: 'reply',
-      initialValue: 'Thanks for getting in touch',
-    }),
-    defineField({
-      name: 'autoReplyBody',
-      title: 'Auto-reply message',
-      type: 'text',
-      rows: 6,
-      group: 'reply',
-      description: 'Sent automatically to anyone who uses the contact form.',
-    }),
-    defineField({
       name: 'awayMode',
       title: 'Away mode',
       type: 'boolean',
-      group: 'reply',
+      group: 'away',
       initialValue: false,
-      description: 'Turn on when you’re on holiday. People get the away message below instead.',
+      description:
+        'Turn on when you’re on holiday. Everyone who uses the contact form gets the away message below, whatever enquiry type they picked.',
     }),
     defineField({
       name: 'awayReplySubject',
       title: 'Away subject',
       type: 'string',
-      group: 'reply',
+      group: 'away',
+      initialValue: 'Away at the moment',
       hidden: ({ document }) => !document?.awayMode,
     }),
     defineField({
@@ -52,7 +39,7 @@ export const siteSettings = defineType({
       title: 'Away message',
       type: 'text',
       rows: 6,
-      group: 'reply',
+      group: 'away',
       hidden: ({ document }) => !document?.awayMode,
       validation: (r) =>
         r.custom((value, ctx) =>

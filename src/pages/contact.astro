@@ -1,11 +1,35 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getEnquiryTypes } from '../lib/content';
+
+// Enquiry types come from Sanity; each maps to its own auto-reply template.
+const enquiryTypes = await getEnquiryTypes();
 ---
 
 <Base title="Contact">
   <h1 class="page-title">Contact</h1>
 
   <form id="contact-form" class="contact-form" method="post" action="/api/contact">
+    {enquiryTypes.length > 0 && (
+      <fieldset class="enquiry-types">
+        <legend>What's it about?</legend>
+        <div class:list={['enquiry-grid', { 'is-single': enquiryTypes.length === 1 }]}>
+          {enquiryTypes.map((t, i) => (
+            <label class="enquiry-option">
+              <input
+                type="radio"
+                name="enquiryType"
+                value={t.id}
+                required
+                checked={enquiryTypes.length === 1 && i === 0}
+              />
+              <span>{t.label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    )}
+
     <label>
       Name
       <input name="name" type="text" required maxlength="200" autocomplete="name" />
@@ -44,6 +68,7 @@ import Base from '../layouts/Base.astro';
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    // All fields, including the enquiry type, are required.
     if (!form.reportValidity()) return;
     error.hidden = true;
     submit.disabled = true;

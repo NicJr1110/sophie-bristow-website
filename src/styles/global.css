@@ -545,6 +545,67 @@ h3 {
   resize: vertical;
 }
 
+/* Enquiry type buttons: 2 sit side by side; more fill a 2-column grid left to right. */
+.enquiry-types {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.enquiry-types legend {
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.enquiry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.enquiry-grid.is-single {
+  grid-template-columns: 1fr;
+}
+
+.contact-form .enquiry-option {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+/* Visually hidden but still focusable, so keyboard and validation work. */
+.enquiry-option input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+.enquiry-option span {
+  display: block;
+  padding: 12px 10px;
+  border: 1px solid var(--text);
+  background: #fff;
+  text-align: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.enquiry-option:hover span {
+  background: var(--bg);
+}
+
+.enquiry-option input:checked + span {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.enquiry-option input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 .contact-form .button {
   align-self: flex-start;
 }

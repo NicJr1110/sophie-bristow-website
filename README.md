@@ -43,7 +43,7 @@ Breakpoints: small < 768px (2 columns, burger), medium 768–1023px (3 columns, 
 | `POST /api/stripe-webhook` | Verifies the signature. `completed` → mark sold + email Sophie the order. `expired` → back to available |
 | `POST /api/release` | From the cancel page: expires the Stripe session and frees the piece immediately |
 | `GET /api/status` | `{ id: "available" \| "sold" }`, uncached (reserved shows as sold) |
-| `POST /api/contact` | Validates, rate-limits, emails Sophie (reply-to = sender), sends the Sanity-managed auto-reply (or away reply) |
+| `POST /api/contact` | Validates (all fields + enquiry type required), rate-limits, emails Sophie (reply-to = sender), then sends the auto-reply template mapped to the chosen enquiry type (or the away message) |
 
 ## Setting up the services
 
@@ -65,6 +65,7 @@ At sanity.io/manage:
 - **API → Tokens**: create an **Editor** token and set it as `SANITY_WRITE_TOKEN`. Only the server functions get it.
 - **API → CORS origins**: add `http://localhost:3333` and the deployed studio URL.
 - In the Studio, open each item in the sidebar once and publish it (Flash, Mark Making, Artwork page intro, Bio, Site settings).
+- Under **Contact form**, create email templates first (e.g. "Tattoo reply", "General reply"), then enquiry types ("Tattoo" order 1, "Other" order 2), each pointing at a template. Two types can share one template. Enquiry types show on the form after the next site build.
 
 ### 2. Stripe (Sophie's account, Nic as Developer)
 

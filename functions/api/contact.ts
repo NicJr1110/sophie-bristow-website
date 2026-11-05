@@ -1,25 +1,15 @@
-// POST /api/contact { name, email, message, website } (spec §8)
-// Emails Sophie (reply-to = sender) and sends the sender the auto-reply set in Sanity.
+// POST /api/contact { enquiryType, name, email, message, website } (spec §8)
+// Emails Sophie (reply-to = sender), then sends the sender the auto-reply template
+// mapped to their enquiry type in Sanity (or the away message if away mode is on).
 import { json, type Env } from '../../server/env';
 import { sanityQuery } from '../../server/sanity';
 import { escapeHtml, formatUkDate, layout, oneLine, sendEmail, textToHtml } from '../../server/email';
+import { pickAutoReply, type AwaySettings, type EnquiryLookup } from '../../server/autoReply';
 
 const MAX_MESSAGE = 2000;
 const RATE_LIMIT_PER_HOUR = 5;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-type AutoReply = {
-  autoReplySubject?: string;
-  autoReplyBody?: string;
-  awayMode?: boolean;
-  awayReplySubject?: string;
-  awayReplyBody?: string;
-};
-
-const DEFAULT_REPLY = {
-  subject: 'Thanks for getting in touch',
-  body: "Hi,\n\nThanks for your message. I'll get back to you as soon as I can.\n\nSophie",
-};
+const ID_RE = /^[A-Za-z0-9_.-]{1,128}$/;
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const data = (await request.json().catch(() => null)) as Record<string, unknown> | null;
@@ -31,11 +21,20 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const name = oneLine(String(data.name ?? '')).slice(0, 200);
   const email = oneLine(String(data.email ?? '')).slice(0, 254);
   const message = String(data.message ?? '').trim();
+  const enquiryTypeId = String(data.enquiryType ?? '');
   if (!name || !EMAIL_RE.test(email) || !message || message.length > MAX_MESSAGE) {
+    return json({ error: 'invalid' }, 400);
+  }
+  // All fields are required, including the enquiry type.
+  if (!ID_RE.test(enquiryTypeId) || enquiryTypeId.startsWith('drafts.')) {
     return json({ error: 'invalid' }, 400);
   }
 
   if (await isRateLimited(env, request)) return json({ error: 'rate_limited' }, 429);
+
+  const { settings, enquiry } = await lookup(env, enquiryTypeId);
+  // If Sophie deleted a type just before the site rebuilt, still deliver the message.
+  const enquiryLabel = enquiry?.label ?? 'General';
 
   // 1. Notification to Sophie. Template is fixed in code (Nic edits it if needed).
   const date = formatUkDate();
@@ -43,11 +42,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     await sendEmail(env, {
       to: env.CONTACT_TO_EMAIL,
       replyTo: email,
-      subject: `New message from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nDate: ${date}\n\nMessage:\n${message}\n\nJust hit reply to answer ${name}.`,
+      subject: `New message from ${name} (${enquiryLabel})`,
+      text: `Enquiry type: ${enquiryLabel}\nName: ${name}\nEmail: ${email}\nDate: ${date}\n\nMessage:\n${message}\n\nJust hit reply to answer ${name}.`,
       html: layout(
         `<h2 style="margin-top:0">New message from ${escapeHtml(name)}</h2>
-         <p><strong>Name:</strong> ${escapeHtml(name)}<br>
+         <p><strong>Enquiry type:</strong> ${escapeHtml(enquiryLabel)}<br>
+            <strong>Name:</strong> ${escapeHtml(name)}<br>
             <strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a><br>
             <strong>Date:</strong> ${escapeHtml(date)}</p>
          <div style="border-left:3px solid #d9d6d0;padding-left:14px">${textToHtml(message)}</div>
@@ -59,9 +59,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     return json({ error: 'send_failed' }, 502);
   }
 
-  // 2. Auto-reply to the sender, editable in Sanity (normal or away message). Best effort.
+  // 2. Auto-reply to the sender. Best effort: Sophie already has the message.
   try {
-    const reply = await getAutoReply(env);
+    const reply = pickAutoReply(settings, enquiry);
     await sendEmail(env, {
       to: email,
       replyTo: env.CONTACT_TO_EMAIL,
@@ -76,16 +76,20 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   return json({ ok: true });
 };
 
-async function getAutoReply(env: Env) {
-  if (!env.PUBLIC_SANITY_PROJECT_ID) return DEFAULT_REPLY;
-  const s = await sanityQuery<AutoReply | null>(
+async function lookup(env: Env, enquiryTypeId: string): Promise<{ settings: AwaySettings; enquiry: EnquiryLookup }> {
+  if (!env.PUBLIC_SANITY_PROJECT_ID) return { settings: null, enquiry: null };
+  const result = await sanityQuery<{ settings: AwaySettings; enquiry: EnquiryLookup }>(
     env,
-    `*[_id == "siteSettings"][0]{ autoReplySubject, autoReplyBody, awayMode, awayReplySubject, awayReplyBody }`,
-  ).catch(() => null);
-  if (s?.awayMode && s.awayReplyBody) {
-    return { subject: s.awayReplySubject || DEFAULT_REPLY.subject, body: s.awayReplyBody };
-  }
-  return { subject: s?.autoReplySubject || DEFAULT_REPLY.subject, body: s?.autoReplyBody || DEFAULT_REPLY.body };
+    `{
+      "settings": *[_id == "siteSettings"][0]{ awayMode, awayReplySubject, awayReplyBody },
+      "enquiry": *[_type == "enquiryType" && _id == $id][0]{ label, template->{ subject, body } }
+    }`,
+    { id: enquiryTypeId },
+  ).catch((err) => {
+    console.error('sanity lookup failed', err);
+    return { settings: null, enquiry: null };
+  });
+  return result;
 }
 
 /** ~5 submissions per IP per hour, using the optional RATE_LIMIT KV namespace. */

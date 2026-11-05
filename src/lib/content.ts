@@ -130,6 +130,25 @@ export async function getBio(): Promise<Bio> {
   return { photo: picFromSanity(doc?.photo, 'Sophie Bristow'), html: portableTextToHtml(doc?.body as never) };
 }
 
+/* ---------- Contact form enquiry types ---------- */
+
+export type EnquiryType = { id: string; label: string };
+
+/** Buttons on the contact form, managed by Sophie in Sanity (Contact form → Enquiry types). */
+export async function getEnquiryTypes(): Promise<EnquiryType[]> {
+  if (!hasSanity) {
+    return [
+      { id: 'sample-tattoo', label: 'Tattoo' },
+      { id: 'sample-other', label: 'Other' },
+    ];
+  }
+  return query<EnquiryType[]>(
+    `*[_type == "enquiryType" && !(_id in path("drafts.**")) && defined(label)] | order(order asc, label asc){
+      "id": _id, label
+    }`,
+  );
+}
+
 /* ---------- Placeholder content ---------- */
 
 function sampleGallery(title: string): Gallery {

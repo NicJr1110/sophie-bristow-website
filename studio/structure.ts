@@ -16,6 +16,19 @@ export const structure: StructureResolver = (S) =>
       single(S, 'Artwork page intro', 'galleryPage', 'page-artwork'),
       S.documentTypeListItem('artwork').title('Artworks for sale'),
       S.divider(),
+      S.listItem()
+        .title('Contact form')
+        .id('contact-form')
+        .child(
+          S.list()
+            .title('Contact form')
+            .items([
+              S.documentTypeListItem('enquiryType').title('Enquiry types (form buttons)'),
+              S.documentTypeListItem('emailTemplate').title('Auto-reply email templates'),
+              single(S, 'Away mode', 'siteSettings', 'siteSettings'),
+            ]),
+        ),
+      S.divider(),
       single(S, 'Bio', 'bio', 'bio'),
-      single(S, 'Site settings & auto-reply', 'siteSettings', 'siteSettings'),
+      single(S, 'Site settings', 'siteSettings', 'siteSettings'),
     ]);

@@ -89,3 +89,21 @@ test('bio rich text renders and escapes safely', () => {
     '<h2>About</h2><p><strong>&lt;b&gt;Hi&lt;/b&gt; </strong><a href="https://instagram.com" target="_blank" rel="noopener">insta</a> bad</p><ul><li>one</li><li>two</li></ul>',
   );
 });
+
+import { DEFAULT_REPLY, pickAutoReply } from '../server/autoReply.ts';
+
+test('auto-reply: template per enquiry type, away mode overrides, safe default', () => {
+  const tattoo = { label: 'Tattoo', template: { subject: 'Tattoo enquiry', body: 'Tattoo reply' } };
+  const other = { label: 'Other', template: { subject: 'Thanks', body: 'General reply' } };
+  assert.deepEqual(pickAutoReply(null, tattoo), { subject: 'Tattoo enquiry', body: 'Tattoo reply' });
+  assert.deepEqual(pickAutoReply({ awayMode: false }, other), { subject: 'Thanks', body: 'General reply' });
+  assert.deepEqual(pickAutoReply({ awayMode: true, awayReplySubject: 'Away', awayReplyBody: 'Back on Monday' }, tattoo), {
+    subject: 'Away',
+    body: 'Back on Monday',
+  });
+  // Away mode on but no message written → fall back to the mapped template
+  assert.deepEqual(pickAutoReply({ awayMode: true }, tattoo), { subject: 'Tattoo enquiry', body: 'Tattoo reply' });
+  // Deleted type or missing template → default
+  assert.deepEqual(pickAutoReply(null, null), DEFAULT_REPLY);
+  assert.deepEqual(pickAutoReply(null, { label: 'X', template: null }), DEFAULT_REPLY);
+});
