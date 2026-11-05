@@ -1,5 +1,5 @@
 {
   "version": 1,
   "include": ["/*"],
-  "exclude": ["/_astro/*", "/placeholders/*", "/favicon.svg", "/paper.jpg", "/splash-flower.png", "/splash-flower-sm.png"]
+  "exclude": ["/_astro/*", "/favicon.svg", "/paper.jpg", "/splash-flower.png", "/splash-flower-sm.png"]
 }
