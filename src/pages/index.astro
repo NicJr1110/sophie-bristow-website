@@ -1,16 +1,22 @@
 ---
 import Base from '../layouts/Base.astro';
+import RollLink from '../components/RollLink.astro';
 import { NAV, SITE_NAME } from '../lib/config';
+
+// 3 + 2: the work on the left, about/contact on the right, meeting at the centre line of the page.
+const left = NAV.slice(0, 3); // Flash, Mark Making, Artwork
+const right = NAV.slice(3); // Bio, Contact
 ---
 
 <Base showHeader={false}>
   <div class="landing">
     <h1 class="landing-name">{SITE_NAME}</h1>
     <nav class="landing-menu" aria-label="Main">
-      <ul>
-        {NAV.map((item) => (
-          <li><a class="button" href={item.href}>{item.label}</a></li>
-        ))}
+      <ul class="landing-col landing-col--left">
+        {left.map((item) => <li><RollLink href={item.href} label={item.label} /></li>)}
+      </ul>
+      <ul class="landing-col landing-col--right">
+        {right.map((item) => <li><RollLink href={item.href} label={item.label} /></li>)}
       </ul>
     </nav>
   </div>

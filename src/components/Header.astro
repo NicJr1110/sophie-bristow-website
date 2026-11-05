@@ -1,5 +1,6 @@
 ---
 import { NAV, SITE_NAME } from '../lib/config';
+import RollLink from './RollLink.astro';
 
 interface Props {
   current: string;
@@ -16,7 +17,7 @@ const isCurrent = (href: string) => current.startsWith(href);
     <ul>
       {NAV.map((item) => (
         <li>
-          <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+          <RollLink href={item.href} label={item.label} current={isCurrent(item.href)} />
         </li>
       ))}
     </ul>
@@ -33,7 +34,7 @@ const isCurrent = (href: string) => current.startsWith(href);
     <ul>
       {NAV.map((item) => (
         <li>
-          <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+          <RollLink href={item.href} label={item.label} current={isCurrent(item.href)} />
         </li>
       ))}
     </ul>

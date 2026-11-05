@@ -1,6 +1,7 @@
 /*
- * Placeholder styling: functionality first. Swap these tokens for Sophie's
- * design guidelines (colours, fonts, hover states) when they come back.
+ * Sophie's look: ink on paper. Fraunces (soft, slightly wonky) for headings, Instrument Sans
+ * for body text, crayon underlines, hand-drawn button edges. Adjust tokens when her
+ * design guidelines come back.
  *
  * Breakpoints (spec §4):
  *   small  < 768px    2-col grid, burger menu
@@ -18,8 +19,13 @@
   --accent-text: #faf9f7;
   --hover: #444;
 
-  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-heading: Georgia, 'Times New Roman', serif;
+  --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Fraunces', Georgia, 'Times New Roman', serif;
+  /* Fraunces' soft, slightly hand-cut letterforms */
+  --soft: 'SOFT' 100, 'WONK' 0;
+  --soft-wonky: 'SOFT' 100, 'WONK' 1;
+  /* Irregular corners so boxes look drawn rather than ruled */
+  --hand-radius: 255px 12px 225px 14px / 14px 225px 12px 255px;
 
   --channel: 880px;
   --gutter: 16px;
@@ -51,8 +57,21 @@ body {
   background-size: 512px 512px;
   color: var(--text);
   font-family: var(--font-body);
+  font-size: 1.0625rem;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 html.menu-open {
@@ -81,8 +100,10 @@ h1,
 h2,
 h3 {
   font-family: var(--font-heading);
-  font-weight: 400;
-  line-height: 1.2;
+  font-weight: 650;
+  font-variation-settings: var(--soft);
+  letter-spacing: -0.015em;
+  line-height: 1.1;
 }
 
 /* ---------- Splash background (spec §5) ---------- */
@@ -142,15 +163,26 @@ h3 {
 
 .page-title {
   text-align: center;
-  font-size: clamp(1.6rem, 4vw, 2.2rem);
-  margin: 8px 0 16px;
+  font-size: clamp(2rem, 6vw, 3rem);
+  margin: 12px 0 22px;
+}
+
+/* A crayon stroke under each page title */
+.page-title::after {
+  content: '';
+  display: block;
+  width: 2.4em;
+  height: 0.3em;
+  margin: 0.12em auto 0;
+  background: url('/squiggle.svg') no-repeat center / 100% 100%;
 }
 
 .intro {
-  max-width: 60ch;
-  margin: 0 auto 32px;
+  max-width: 56ch;
+  margin: 0 auto 36px;
   text-align: center;
   color: var(--muted);
+  font-size: 1.1rem;
 }
 
 .site-footer {
@@ -166,8 +198,9 @@ h3 {
 
 .button {
   display: inline-block;
-  padding: 10px 22px;
-  border: 1px solid var(--text);
+  padding: 10px 24px;
+  border: 1.5px solid var(--text);
+  border-radius: var(--hand-radius);
   background: transparent;
   color: var(--text);
   font: inherit;
@@ -179,6 +212,82 @@ h3 {
 .button:hover:not(:disabled) {
   background: var(--accent);
   color: var(--accent-text);
+}
+
+/* ---------- Rolling menu links (RollLink.astro) ----------
+ * Hover: letters roll up, right to left, into their italic wonky twins,
+ * and a crayon underline draws in from the right.
+ */
+
+.roll {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  color: var(--text);
+  font-family: var(--font-heading);
+  font-variation-settings: var(--soft);
+  white-space: nowrap;
+}
+
+.roll:hover {
+  color: var(--text);
+}
+
+.roll-text {
+  display: inline-flex;
+}
+
+.roll-ch {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  /* room for descenders and the italic lean */
+  padding: 0 0.03em 0.14em;
+  margin: 0 -0.03em -0.14em;
+}
+
+.roll-a,
+.roll-b {
+  display: block;
+  transition: transform 0.55s cubic-bezier(0.65, 0, 0.25, 1);
+  /* right-to-left ripple: last letter moves first */
+  transition-delay: calc((var(--n) - 1 - var(--i)) * 32ms);
+}
+
+.roll-b {
+  position: absolute;
+  inset: 0 0.03em 0.14em;
+  font-style: italic;
+  font-variation-settings: var(--soft-wonky);
+  transform: translateY(105%);
+}
+
+.roll:hover .roll-a,
+.roll:focus-visible .roll-a {
+  transform: translateY(-105%);
+}
+
+.roll:hover .roll-b,
+.roll:focus-visible .roll-b {
+  transform: translateY(0);
+}
+
+.roll::after {
+  content: '';
+  position: absolute;
+  left: -0.04em;
+  right: -0.04em;
+  bottom: -0.16em;
+  height: 0.28em;
+  background: url('/squiggle.svg') no-repeat center / 100% 100%;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.25, 1) 0.08s;
+}
+
+.roll:hover::after,
+.roll:focus-visible::after,
+.roll.is-current::after {
+  clip-path: inset(0 0 0 0);
 }
 
 /* ---------- Landing ---------- */
@@ -196,31 +305,47 @@ h3 {
 }
 
 .landing-name {
-  font-size: clamp(2rem, 7vw, 3.4rem);
-  margin: 40px 0 0;
+  font-size: clamp(2.4rem, 9vw, 4.6rem);
+  font-weight: 700;
+  margin: 44px 0 0;
   text-align: center;
 }
 
+/* 3 + 2: two columns meeting at the centre line of the page, centred both ways */
 .landing-menu {
   flex: 1;
-  display: flex;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: clamp(22px, 6vw, 72px);
   align-items: center;
-  padding: 40px 0;
+  padding: 40px 0 15vh;
 }
 
-.landing-menu ul {
+.landing-col {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: clamp(6px, 1.6vw, 14px);
 }
 
-.landing-menu .button {
-  min-width: 220px;
-  text-align: center;
-  background: color-mix(in srgb, var(--bg) 70%, transparent);
+.landing-col--left {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.landing-col--right {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.landing-menu .roll {
+  font-size: clamp(1.3rem, 5.9vw, 3.6rem);
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 /* ---------- Header + navigation ---------- */
@@ -235,7 +360,10 @@ h3 {
 
 .site-name {
   font-family: var(--font-heading);
-  font-size: 1.75rem;
+  font-size: clamp(1.8rem, 5vw, 2.3rem);
+  font-weight: 700;
+  font-variation-settings: var(--soft);
+  letter-spacing: -0.02em;
   text-decoration: none;
 }
 
@@ -249,18 +377,12 @@ h3 {
   padding: 0;
   display: flex;
   justify-content: center;
-  gap: 28px;
+  gap: 30px;
 }
 
-.nav-desktop a,
-.mobile-menu a {
-  text-decoration: none;
-}
-
-.nav-desktop a[aria-current='page'],
-.mobile-menu a[aria-current='page'] {
-  text-decoration: underline;
-  text-underline-offset: 6px;
+.nav-desktop .roll {
+  font-size: 1.2rem;
+  font-weight: 560;
 }
 
 .burger {
@@ -324,9 +446,12 @@ h3 {
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  font-size: 1.6rem;
-  font-family: var(--font-heading);
+  gap: 18px;
+}
+
+.mobile-menu .roll {
+  font-size: clamp(2rem, 9vw, 2.8rem);
+  font-weight: 700;
 }
 
 @media (min-width: 1024px) {
@@ -375,7 +500,7 @@ h3 {
 }
 
 .tile-open:hover img {
-  transform: scale(1.03);
+  transform: scale(1.04) rotate(-0.4deg);
 }
 
 .tile-meta {
@@ -394,6 +519,9 @@ h3 {
 }
 
 .tile-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-variation-settings: var(--soft);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -405,8 +533,9 @@ h3 {
 
 .buy {
   flex-shrink: 0;
-  padding: 6px 14px;
-  border: 1px solid var(--text);
+  padding: 6px 16px;
+  border: 1.5px solid var(--text);
+  border-radius: var(--hand-radius);
   background: transparent;
   color: var(--text);
   font: inherit;
@@ -548,7 +677,8 @@ h3 {
 .contact-form textarea {
   font: inherit;
   padding: 10px 12px;
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
+  border-radius: var(--hand-radius);
   background: var(--field);
   color: var(--text);
 }
@@ -598,7 +728,12 @@ h3 {
 .enquiry-option span {
   display: block;
   padding: 12px 10px;
-  border: 1px solid var(--text);
+  border: 1.5px solid var(--text);
+  border-radius: var(--hand-radius);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.1rem;
+  font-variation-settings: var(--soft);
   background: var(--field);
   text-align: center;
   transition: background 0.2s, color 0.2s;
