@@ -85,6 +85,15 @@ Verify Sophie's domain (DNS records in Cloudflare), create an API key and set it
 - Optional: create a KV namespace, bind it as `RATE_LIMIT`, and the contact form limits to 5 per IP per hour.
 - Add a **Deploy Hook** and paste it into a Sanity webhook (sanity.io/manage → API → Webhooks) so publishing in the Studio rebuilds the site. Sold status doesn't need this, because it's live.
 
+### Coming-soon mode (launch switch)
+
+Sanity → **Site settings → Coming soon**. When it's on, every page shows a holding page (name, message, Instagram link) and `/api/*` keeps working. `functions/_middleware.ts` checks the switch live, with a ~30s cache, so turning it off goes live **without a deploy**. If Sanity can't be reached, it fails open and shows the real site.
+
+- Sophie previews the real site by opening `https://<site>/?preview=<preview key>` once per device (cookie, 30 days). `?preview=off` exits. Changing the key revokes old links.
+- New docs default to **on**. Set `SANITY_STUDIO_SITE_URL` in `studio/.env` so the Studio shows the full preview link.
+- Content edits still need a rebuild to appear, so set up the Sanity → Cloudflare deploy hook (above) before handover.
+- `public/_routes.json` keeps static assets out of the middleware, to save free-tier function calls.
+
 ### Full local test with functions
 
 ```bash

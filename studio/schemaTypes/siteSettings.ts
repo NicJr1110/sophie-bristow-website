@@ -1,14 +1,54 @@
 import { defineField, defineType } from 'sanity';
 
+const SITE_URL = (process.env.SANITY_STUDIO_SITE_URL || 'https://your-website').replace(/\/$/, '');
+const randomKey = () =>
+  Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => b.toString(16).padStart(2, '0')).join('');
+
 export const siteSettings = defineType({
   name: 'siteSettings',
   title: 'Site settings',
   type: 'document',
   groups: [
-    { name: 'look', title: 'Look', default: true },
+    { name: 'launch', title: 'Coming soon', default: true },
+    { name: 'look', title: 'Look' },
     { name: 'away', title: 'Away mode' },
   ],
   fields: [
+    defineField({
+      name: 'comingSoon',
+      title: 'Show "Coming soon" page',
+      type: 'boolean',
+      group: 'launch',
+      initialValue: true,
+      description:
+        'While this is on, visitors only see a simple holding page. Turn it off and publish to go live. It takes effect within a minute, with nothing else to do.',
+    }),
+    defineField({
+      name: 'comingSoonMessage',
+      title: 'Holding page message',
+      type: 'string',
+      group: 'launch',
+      initialValue: 'Coming soon',
+    }),
+    defineField({
+      name: 'instagramHandle',
+      title: 'Instagram handle',
+      type: 'string',
+      group: 'launch',
+      initialValue: 'sophie_bristow',
+      description: 'Shown as a link on the holding page. No @ needed.',
+    }),
+    defineField({
+      name: 'previewKey',
+      title: 'Preview key',
+      type: 'string',
+      group: 'launch',
+      initialValue: randomKey,
+      validation: (r) =>
+        r.regex(/^[A-Za-z0-9_-]{8,128}$/, { name: 'letters, numbers, - or _' }).error('At least 8 letters or numbers.'),
+      description: `To see the real site while "Coming soon" is on, open ${SITE_URL}/?preview=<this key> once on each phone or computer. Change the key to lock out old preview links. Add ?preview=off to leave preview.`,
+    }),
+
     defineField({
       name: 'background',
       title: 'Background splash image',
