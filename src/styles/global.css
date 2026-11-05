@@ -36,6 +36,14 @@
 html,
 body {
   margin: 0;
+  /* No rubber-band bounce past the top/bottom: browsers paint that area flat, not with the paper */
+  overscroll-behavior-y: none;
+}
+
+/* Paper on the root too, so any area the browser paints outside the page is paper, not white */
+html {
+  background: var(--paper);
+  background-size: 512px 512px;
 }
 
 body {

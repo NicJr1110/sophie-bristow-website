@@ -61,13 +61,15 @@ export function comingSoonHtml(s: ComingSoonSettings): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#eeede9">
 <meta name="robots" content="noindex">
 <title>Sophie Bristow · ${esc(message)}</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <style>
   :root { --bg:#eeede9; --text:#1a1a1a; --muted:#6b6b6b; }
   * { box-sizing:border-box; }
-  html,body { margin:0; height:100%; }
+  html,body { margin:0; height:100%; overscroll-behavior-y:none; }
+  html { background:var(--bg) url('/paper.jpg') repeat; background-size:512px 512px; }
   body { background:var(--bg) url('/paper.jpg') repeat; background-size:512px 512px; color:var(--text); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
          display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; }
   h1 { font-family:Georgia,'Times New Roman',serif; font-weight:400; font-size:clamp(2.2rem,8vw,3.6rem); margin:0 0 12px; }
