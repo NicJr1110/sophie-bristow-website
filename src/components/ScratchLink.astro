@@ -1,0 +1,15 @@
+---
+// A menu link with a thin crayon scratch that draws in from the right on hover
+// (and stays under the current page's link).
+interface Props {
+  href: string;
+  label: string;
+  current?: boolean;
+  class?: string;
+}
+const { href, label, current = false, class: className } = Astro.props;
+---
+
+<a href={href} class:list={['scratch', className, { 'is-current': current }]} aria-current={current ? 'page' : undefined}>
+  {label}
+</a>

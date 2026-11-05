@@ -1,6 +1,6 @@
 ---
-import { NAV, SITE_NAME } from '../lib/config';
-import RollLink from './RollLink.astro';
+import { NAV, SITE_NAME, USE_MONOGRAM } from '../lib/config';
+import ScratchLink from './ScratchLink.astro';
 
 interface Props {
   current: string;
@@ -10,14 +10,16 @@ const isCurrent = (href: string) => current.startsWith(href);
 ---
 
 <header class="site-header">
-  <a class="site-name" href="/">{SITE_NAME}</a>
+  <a class="site-name" href="/" aria-label={USE_MONOGRAM ? SITE_NAME : undefined}>
+    {USE_MONOGRAM ? <img class="monogram" src="/sb-monogram.svg" alt="" width="80" height="144" /> : SITE_NAME}
+  </a>
 
   <!-- Large screens: horizontal menu centred under the name -->
   <nav class="nav-desktop" aria-label="Main">
     <ul>
       {NAV.map((item) => (
         <li>
-          <RollLink href={item.href} label={item.label} current={isCurrent(item.href)} />
+          <ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} />
         </li>
       ))}
     </ul>
@@ -34,7 +36,7 @@ const isCurrent = (href: string) => current.startsWith(href);
     <ul>
       {NAV.map((item) => (
         <li>
-          <RollLink href={item.href} label={item.label} current={isCurrent(item.href)} />
+          <ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} />
         </li>
       ))}
     </ul>

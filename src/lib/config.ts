@@ -1,5 +1,8 @@
 export const SITE_NAME = 'Sophie Bristow';
 
+/** Show Sophie's S/B monogram (public/sb-monogram.svg) instead of her name in the header and landing page. */
+export const USE_MONOGRAM = true;
+
 export const SANITY = {
   projectId: (import.meta.env.PUBLIC_SANITY_PROJECT_ID as string | undefined) || '',
   dataset: (import.meta.env.PUBLIC_SANITY_DATASET as string | undefined) || 'production',

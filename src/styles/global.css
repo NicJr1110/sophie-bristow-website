@@ -1,5 +1,5 @@
 /*
- * Sophie's look: ink on paper. Fraunces (soft, slightly wonky) for headings, Instrument Sans
+ * Sophie's look: ink on paper. Handwritten heading font (see /type-test/), Instrument Sans
  * for body text, crayon underlines, hand-drawn button edges. Adjust tokens when her
  * design guidelines come back.
  *
@@ -20,10 +20,10 @@
   --hover: #444;
 
   --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-heading: 'Fraunces', Georgia, 'Times New Roman', serif;
-  /* Fraunces' soft, slightly hand-cut letterforms */
-  --soft: 'SOFT' 100, 'WONK' 0;
-  --soft-wonky: 'SOFT' 100, 'WONK' 1;
+  /* Provisional: compare candidates at /type-test/, then change this and the font link in Base.astro */
+  --font-heading: 'Amatic SC', 'Arial Narrow', sans-serif;
+  --heading-weight: 700;
+  --heading-tracking: 0.02em;
   /* Irregular corners so boxes look drawn rather than ruled */
   --hand-radius: 255px 12px 225px 14px / 14px 225px 12px 255px;
 
@@ -100,10 +100,9 @@ h1,
 h2,
 h3 {
   font-family: var(--font-heading);
-  font-weight: 650;
-  font-variation-settings: var(--soft);
-  letter-spacing: -0.015em;
-  line-height: 1.1;
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
+  line-height: 1.05;
 }
 
 /* ---------- Splash background (spec §5) ---------- */
@@ -163,7 +162,7 @@ h3 {
 
 .page-title {
   text-align: center;
-  font-size: clamp(2rem, 6vw, 3rem);
+  font-size: clamp(2.8rem, 9vw, 4.2rem);
   margin: 12px 0 22px;
 }
 
@@ -174,7 +173,7 @@ h3 {
   width: 2.4em;
   height: 0.3em;
   margin: 0.12em auto 0;
-  background: url('/squiggle.svg') no-repeat center / 100% 100%;
+  background: url('/scratch.svg') no-repeat center / 100% 100%;
 }
 
 .intro {
@@ -214,79 +213,38 @@ h3 {
   color: var(--accent-text);
 }
 
-/* ---------- Rolling menu links (RollLink.astro) ----------
- * Hover: letters roll up, right to left, into their italic wonky twins,
- * and a crayon underline draws in from the right.
+/* ---------- Menu links (ScratchLink.astro) ----------
+ * Hover: a thin crayon scratch draws in from the right under the word.
  */
 
-.roll {
+.scratch {
   position: relative;
   display: inline-block;
   text-decoration: none;
   color: var(--text);
   font-family: var(--font-heading);
-  font-variation-settings: var(--soft);
   white-space: nowrap;
 }
 
-.roll:hover {
+.scratch:hover {
   color: var(--text);
 }
 
-.roll-text {
-  display: inline-flex;
-}
-
-.roll-ch {
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-  /* room for descenders and the italic lean */
-  padding: 0 0.03em 0.14em;
-  margin: 0 -0.03em -0.14em;
-}
-
-.roll-a,
-.roll-b {
-  display: block;
-  transition: transform 0.55s cubic-bezier(0.65, 0, 0.25, 1);
-  /* right-to-left ripple: last letter moves first */
-  transition-delay: calc((var(--n) - 1 - var(--i)) * 32ms);
-}
-
-.roll-b {
-  position: absolute;
-  inset: 0 0.03em 0.14em;
-  font-style: italic;
-  font-variation-settings: var(--soft-wonky);
-  transform: translateY(105%);
-}
-
-.roll:hover .roll-a,
-.roll:focus-visible .roll-a {
-  transform: translateY(-105%);
-}
-
-.roll:hover .roll-b,
-.roll:focus-visible .roll-b {
-  transform: translateY(0);
-}
-
-.roll::after {
+.scratch::after {
   content: '';
   position: absolute;
-  left: -0.04em;
-  right: -0.04em;
-  bottom: -0.16em;
-  height: 0.28em;
-  background: url('/squiggle.svg') no-repeat center / 100% 100%;
+  left: -0.06em;
+  right: -0.06em;
+  bottom: -0.06em;
+  height: 0.22em;
+  background: url('/scratch.svg') no-repeat center / 100% 100%;
   clip-path: inset(0 0 0 100%);
-  transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.25, 1) 0.08s;
+  transition: clip-path 0.55s cubic-bezier(0.65, 0, 0.25, 1);
 }
 
-.roll:hover::after,
-.roll:focus-visible::after,
-.roll.is-current::after {
+.scratch:hover::after,
+.scratch:focus-visible::after,
+.scratch.is-current::after {
   clip-path: inset(0 0 0 0);
 }
 
@@ -305,8 +263,8 @@ h3 {
 }
 
 .landing-name {
-  font-size: clamp(2.4rem, 9vw, 4.6rem);
-  font-weight: 700;
+  font-size: clamp(3rem, 12vw, 6rem);
+  font-weight: var(--heading-weight);
   margin: 44px 0 0;
   text-align: center;
 }
@@ -341,11 +299,25 @@ h3 {
   text-align: left;
 }
 
-.landing-menu .roll {
-  font-size: clamp(1.3rem, 5.9vw, 3.6rem);
-  font-weight: 750;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+.landing-menu .scratch {
+  font-size: clamp(2rem, 9vw, 4.8rem);
+  font-weight: var(--heading-weight);
+  line-height: 1.1;
+  letter-spacing: var(--heading-tracking);
+}
+
+/* Sophie's S/B monogram in place of her name */
+.landing-name .monogram--large {
+  display: block;
+  height: clamp(120px, 20vh, 190px);
+  width: auto;
+  margin: 0 auto;
+}
+
+.site-name .monogram {
+  display: block;
+  height: clamp(58px, 9vw, 76px);
+  width: auto;
 }
 
 /* ---------- Header + navigation ---------- */
@@ -360,10 +332,9 @@ h3 {
 
 .site-name {
   font-family: var(--font-heading);
-  font-size: clamp(1.8rem, 5vw, 2.3rem);
-  font-weight: 700;
-  font-variation-settings: var(--soft);
-  letter-spacing: -0.02em;
+  font-size: clamp(2.4rem, 7vw, 3.2rem);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
   text-decoration: none;
 }
 
@@ -380,9 +351,10 @@ h3 {
   gap: 30px;
 }
 
-.nav-desktop .roll {
-  font-size: 1.2rem;
-  font-weight: 560;
+.nav-desktop .scratch {
+  font-size: 1.7rem;
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
 }
 
 .burger {
@@ -449,9 +421,10 @@ h3 {
   gap: 18px;
 }
 
-.mobile-menu .roll {
-  font-size: clamp(2rem, 9vw, 2.8rem);
-  font-weight: 700;
+.mobile-menu .scratch {
+  font-size: clamp(2.6rem, 12vw, 3.6rem);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
 }
 
 @media (min-width: 1024px) {
@@ -483,6 +456,11 @@ h3 {
 
 .tile-open {
   display: block;
+  /* a sheet resting on the paper: soft contact shadow + faint wider spread */
+  box-shadow:
+    0 1px 1.5px rgb(60 45 30 / 0.14),
+    0 4px 10px -3px rgb(60 45 30 / 0.17);
+  transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
   width: 100%;
   aspect-ratio: 1;
   padding: 0;
@@ -497,6 +475,13 @@ h3 {
   height: 100%;
   object-fit: cover;
   transition: transform 0.4s var(--ease);
+}
+
+.tile-open:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 1px 2px rgb(60 45 30 / 0.12),
+    0 6px 14px -4px rgb(60 45 30 / 0.18);
 }
 
 .tile-open:hover img {
@@ -520,8 +505,9 @@ h3 {
 
 .tile-title {
   font-family: var(--font-heading);
-  font-weight: 600;
-  font-variation-settings: var(--soft);
+  font-weight: var(--heading-weight);
+  font-size: 1.3rem;
+  line-height: 1.1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -650,6 +636,9 @@ h3 {
 
 .bio-photo {
   width: 100%;
+  box-shadow:
+    0 1px 1.5px rgb(60 45 30 / 0.12),
+    0 3px 8px -2px rgb(60 45 30 / 0.12);
   margin: 0 auto 28px;
 }
 
@@ -731,9 +720,9 @@ h3 {
   border: 1.5px solid var(--text);
   border-radius: var(--hand-radius);
   font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 1.1rem;
-  font-variation-settings: var(--soft);
+  font-weight: var(--heading-weight);
+  font-size: 1.5rem;
+  line-height: 1;
   background: var(--field);
   text-align: center;
   transition: background 0.2s, color 0.2s;

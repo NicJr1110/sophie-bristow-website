@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
-import RollLink from '../components/RollLink.astro';
-import { NAV, SITE_NAME } from '../lib/config';
+import ScratchLink from '../components/ScratchLink.astro';
+import { NAV, SITE_NAME, USE_MONOGRAM } from '../lib/config';
 
 // 3 + 2: the work on the left, about/contact on the right, meeting at the centre line of the page.
 const left = NAV.slice(0, 3); // Flash, Mark Making, Artwork
@@ -10,13 +10,19 @@ const right = NAV.slice(3); // Bio, Contact
 
 <Base showHeader={false}>
   <div class="landing">
-    <h1 class="landing-name">{SITE_NAME}</h1>
+    <h1 class="landing-name">
+      {USE_MONOGRAM ? (
+        <img class="monogram monogram--large" src="/sb-monogram.svg" alt={SITE_NAME} width="80" height="144" />
+      ) : (
+        SITE_NAME
+      )}
+    </h1>
     <nav class="landing-menu" aria-label="Main">
       <ul class="landing-col landing-col--left">
-        {left.map((item) => <li><RollLink href={item.href} label={item.label} /></li>)}
+        {left.map((item) => <li><ScratchLink href={item.href} label={item.label} /></li>)}
       </ul>
       <ul class="landing-col landing-col--right">
-        {right.map((item) => <li><RollLink href={item.href} label={item.label} /></li>)}
+        {right.map((item) => <li><ScratchLink href={item.href} label={item.label} /></li>)}
       </ul>
     </nav>
   </div>

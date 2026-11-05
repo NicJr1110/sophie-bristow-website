@@ -1,0 +1,97 @@
+---
+// Hidden page for choosing the heading font. Not linked anywhere; delete once a font is chosen.
+// To switch fonts: change --font-heading (and --heading-weight) in global.css and the Google Fonts link in Base.astro.
+import Base from '../layouts/Base.astro';
+
+const FONTS: { name: string; family: string; weight: number; scale: number; note: string }[] = [
+  { name: 'Amatic SC', family: 'Amatic SC', weight: 700, scale: 1.35, note: 'Tall, narrow brush capitals. Structured, airy. (Current.)' },
+  { name: 'Just Another Hand', family: 'Just Another Hand', weight: 400, scale: 1.45, note: 'Condensed marker hand. Upright and orderly.' },
+  { name: 'Nanum Pen Script', family: 'Nanum Pen Script', weight: 400, scale: 1.4, note: 'Scratchy fine pen, narrow, looks genuinely written.' },
+  { name: 'Reenie Beanie', family: 'Reenie Beanie', weight: 400, scale: 1.35, note: 'Rough ballpoint scrawl. Most scratchy, least tidy.' },
+  { name: 'Mynerve', family: 'Mynerve', weight: 400, scale: 1.05, note: 'Neat handwriting with structure; reads easily.' },
+  { name: 'Covered By Your Grace', family: 'Covered By Your Grace', weight: 400, scale: 1.15, note: 'Felt-tip marker, slightly raw.' },
+  { name: 'Architects Daughter', family: 'Architects Daughter', weight: 400, scale: 1.0, note: 'Draughtsman’s print: structured, hand-lettered.' },
+  { name: 'Special Elite', family: 'Special Elite', weight: 400, scale: 0.95, note: 'Worn typewriter. Scratchy texture, very structured.' },
+  { name: 'Rock Salt', family: 'Rock Salt', weight: 400, scale: 0.8, note: 'Heavy scratchy marker. Strong character.' },
+];
+
+const href =
+  'https://fonts.googleapis.com/css2?' +
+  FONTS.map((f) => `family=${f.family.replace(/ /g, '+')}${f.weight === 700 ? ':wght@700' : ''}`).join('&') +
+  '&display=swap';
+---
+
+<Base title="Font test">
+  <!-- Candidate fonts (a stylesheet link in the body works fine for a test page) -->
+  <link rel="stylesheet" href={href} />
+
+  <h1 class="page-title">Font test</h1>
+  <p class="intro">Each block shows a candidate heading font in place. Body text stays Instrument Sans. Hover the menu words to see the scratch line.</p>
+
+  <div class="type-tests">
+    {FONTS.map((f, i) => (
+      <section class="type-test" style={`--f:'${f.family}';--w:${f.weight};--s:${f.scale}`}>
+        <p class="type-label">{i + 1}. {f.name}</p>
+        <p class="type-note">{f.note}</p>
+        <p class="type-name">Sophie Bristow</p>
+        <p class="type-menu">
+          <a class="scratch is-current" href="#">Flash</a>
+          <a class="scratch" href="#">Mark Making</a>
+          <a class="scratch" href="#">Artwork</a>
+          <a class="scratch" href="#">Bio</a>
+          <a class="scratch" href="#">Contact</a>
+        </p>
+        <p class="type-body">
+          Hand-poked tattoos and original drawings from my little blue flashbook. Taking bookings for November and
+          December, with a London waiting list.
+        </p>
+      </section>
+    ))}
+  </div>
+</Base>
+
+<style>
+  .type-tests {
+    display: grid;
+    gap: 28px;
+  }
+  .type-test {
+    padding: 22px 24px 18px;
+    background: rgb(255 255 255 / 0.35);
+    box-shadow:
+      0 1px 1.5px rgb(60 45 30 / 0.1),
+      0 3px 8px -2px rgb(60 45 30 / 0.1);
+  }
+  .type-label {
+    margin: 0;
+    font-weight: 600;
+  }
+  .type-note {
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .type-name,
+  .type-menu .scratch {
+    font-family: var(--f), sans-serif;
+    font-weight: var(--w);
+  }
+  .type-name {
+    margin: 0 0 6px;
+    font-size: calc(2.6rem * var(--s));
+    line-height: 1.05;
+  }
+  .type-menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    margin: 0 0 14px;
+  }
+  .type-menu .scratch {
+    font-size: calc(1.6rem * var(--s));
+  }
+  .type-body {
+    margin: 0;
+    max-width: 60ch;
+  }
+</style>
