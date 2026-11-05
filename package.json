@@ -7,7 +7,8 @@
     "build": "astro build",
     "preview": "npm run build && wrangler pages dev dist",
     "check": "astro check",
-    "test": "node --experimental-strip-types --test tests/*.test.ts"
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "seed:placeholders": "node --env-file=.env scripts/seed-placeholders.mjs"
   },
   "dependencies": {
     "astro": "^5.0.0"
