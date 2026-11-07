@@ -85,6 +85,13 @@ Verify Sophie's domain (DNS records in Cloudflare), create an API key and set it
 - Optional: create a KV namespace, bind it as `RATE_LIMIT`, and the contact form limits to 5 per IP per hour.
 - Add a **Deploy Hook** and paste it into a Sanity webhook (sanity.io/manage → API → Webhooks) so publishing in the Studio rebuilds the site. Sold status doesn't need this, because it's live.
 
+### Studio auto-deploy (GitHub Actions)
+
+`.github/workflows/deploy-studio.yml` redeploys the Studio whenever anything in `studio/` is pushed to `main`. You can also run it from the **Actions** tab with **Run workflow**. One-off setup under GitHub → Settings → Secrets and variables → Actions:
+
+- **Secret** `SANITY_AUTH_TOKEN`: a Sanity token with the *Deploy Studio* permission.
+- **Variable** `SANITY_STUDIO_PROJECT_ID`: the Sanity project ID.
+
 ### Coming-soon mode (launch switch)
 
 Sanity → **Site settings → Coming soon**. When it's on, every page shows a holding page (name, message, Instagram link) and `/api/*` keeps working. `functions/_middleware.ts` checks the switch live, with a ~30s cache, so turning it off goes live **without a deploy**. If Sanity can't be reached, it fails open and shows the real site.

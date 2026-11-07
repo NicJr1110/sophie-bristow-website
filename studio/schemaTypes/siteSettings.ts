@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-const SITE_URL = (process.env.SANITY_STUDIO_SITE_URL || 'https://your-website').replace(/\/$/, '');
+const SITE_URL = (process.env.SANITY_STUDIO_SITE_URL || 'https://sophiebristow.com').replace(/\/$/, '');
 const randomKey = () =>
   Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => b.toString(16).padStart(2, '0')).join('');
 
