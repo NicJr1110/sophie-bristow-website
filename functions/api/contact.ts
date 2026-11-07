@@ -1,10 +1,10 @@
 // POST /api/contact { enquiryType, name, email, message, website } (spec §8)
 // Emails Sophie (reply-to = sender), then sends the sender the auto-reply template
 // mapped to their enquiry type in Sanity (or the away message if away mode is on).
-import { json, type Env } from '../../server/env';
+import { json, siteOrigin, type Env } from '../../server/env';
 import { sanityQuery } from '../../server/sanity';
 import { escapeHtml, formatUkDate, layout, oneLine, sendEmail, textToHtml } from '../../server/email';
-import { pickAutoReply, type AwaySettings, type EnquiryLookup } from '../../server/autoReply';
+import { pickAutoReply, pickRecipient, type AwaySettings, type EnquiryLookup } from '../../server/autoReply';
 
 const MAX_MESSAGE = 2000;
 const RATE_LIMIT_PER_HOUR = 5;
@@ -35,28 +35,39 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const { settings, enquiry } = await lookup(env, enquiryTypeId);
   // If Sophie deleted a type just before the site rebuilt, still deliver the message.
   const enquiryLabel = enquiry?.label ?? 'General';
+  // Each enquiry type can go to its own inbox (e.g. Tattoo → tattoo Gmail); otherwise the main one.
+  const inbox = pickRecipient(enquiry, env.CONTACT_TO_EMAIL);
+  const origin = siteOrigin(env, request);
 
   // 1. Notification to Sophie. Template is fixed in code (Nic edits it if needed).
   const date = formatUkDate();
+  const notification = {
+    replyTo: email,
+    subject: `New message from ${name} (${enquiryLabel})`,
+    text: `Enquiry type: ${enquiryLabel}\nName: ${name}\nEmail: ${email}\nDate: ${date}\n\nMessage:\n${message}\n\nJust hit reply to answer ${name}.`,
+    html: layout(
+      `<h2 style="margin-top:0">New message from ${escapeHtml(name)}</h2>
+       <p><strong>Enquiry type:</strong> ${escapeHtml(enquiryLabel)}<br>
+          <strong>Name:</strong> ${escapeHtml(name)}<br>
+          <strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a><br>
+          <strong>Date:</strong> ${escapeHtml(date)}</p>
+       <div style="border-left:3px solid #d9d6d0;padding-left:14px">${textToHtml(message)}</div>
+       <p style="color:#6b6b6b;font-size:13px">Just hit reply to answer ${escapeHtml(name)}.</p>`,
+      origin,
+    ),
+  };
   try {
-    await sendEmail(env, {
-      to: env.CONTACT_TO_EMAIL,
-      replyTo: email,
-      subject: `New message from ${name} (${enquiryLabel})`,
-      text: `Enquiry type: ${enquiryLabel}\nName: ${name}\nEmail: ${email}\nDate: ${date}\n\nMessage:\n${message}\n\nJust hit reply to answer ${name}.`,
-      html: layout(
-        `<h2 style="margin-top:0">New message from ${escapeHtml(name)}</h2>
-         <p><strong>Enquiry type:</strong> ${escapeHtml(enquiryLabel)}<br>
-            <strong>Name:</strong> ${escapeHtml(name)}<br>
-            <strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a><br>
-            <strong>Date:</strong> ${escapeHtml(date)}</p>
-         <div style="border-left:3px solid #d9d6d0;padding-left:14px">${textToHtml(message)}</div>
-         <p style="color:#6b6b6b;font-size:13px">Just hit reply to answer ${escapeHtml(name)}.</p>`,
-      ),
-    });
+    await sendEmail(env, { ...notification, to: inbox });
   } catch (err) {
-    console.error('notification failed', err);
-    return json({ error: 'send_failed' }, 502);
+    console.error(`notification to ${inbox} failed`, err);
+    // A mistyped "Send enquiries to" address mustn't lose the message: try the main inbox.
+    if (inbox === env.CONTACT_TO_EMAIL) return json({ error: 'send_failed' }, 502);
+    try {
+      await sendEmail(env, { ...notification, to: env.CONTACT_TO_EMAIL });
+    } catch (err2) {
+      console.error('fallback notification failed', err2);
+      return json({ error: 'send_failed' }, 502);
+    }
   }
 
   // 2. Auto-reply to the sender. Best effort: Sophie already has the message.
@@ -64,10 +75,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const reply = pickAutoReply(settings, enquiry);
     await sendEmail(env, {
       to: email,
-      replyTo: env.CONTACT_TO_EMAIL,
+      replyTo: inbox, // the customer's reply lands in the same inbox as their enquiry
       subject: reply.subject,
       text: reply.body,
-      html: layout(textToHtml(reply.body)),
+      html: layout(textToHtml(reply.body), origin),
     });
   } catch (err) {
     console.error('auto-reply failed', err);
@@ -82,7 +93,7 @@ async function lookup(env: Env, enquiryTypeId: string): Promise<{ settings: Away
     env,
     `{
       "settings": *[_id == "siteSettings"][0]{ awayMode, awayReplySubject, awayReplyBody },
-      "enquiry": *[_type == "enquiryType" && _id == $id][0]{ label, template->{ subject, body } }
+      "enquiry": *[_type == "enquiryType" && _id == $id][0]{ label, sendTo, template->{ subject, body } }
     }`,
     { id: enquiryTypeId },
   ).catch((err) => {

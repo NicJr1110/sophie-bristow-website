@@ -22,6 +22,13 @@ export const enquiryType = defineType({
       validation: (r) => r.required(),
     }),
     defineField({
+      name: 'sendTo',
+      title: 'Send enquiries to',
+      type: 'email',
+      description:
+        'Which inbox gets these enquiries, e.g. your tattoo Gmail. Replies to the auto-reply go here too. Leave empty to use your main inbox.',
+    }),
+    defineField({
       name: 'order',
       title: 'Display order',
       type: 'number',
@@ -31,10 +38,10 @@ export const enquiryType = defineType({
   ],
   orderings: [{ title: 'Display order', name: 'order', by: [{ field: 'order', direction: 'asc' }] }],
   preview: {
-    select: { title: 'label', template: 'template.name', order: 'order' },
-    prepare: ({ title, template, order }) => ({
+    select: { title: 'label', template: 'template.name', sendTo: 'sendTo' },
+    prepare: ({ title, template, sendTo }) => ({
       title,
-      subtitle: `${template ? `Sends: ${template}` : 'No template chosen'}${order != null ? ` · order ${order}` : ''}`,
+      subtitle: `→ ${sendTo || 'main inbox'} · ${template ? `replies with "${template}"` : 'no template chosen'}`,
     }),
   },
 });

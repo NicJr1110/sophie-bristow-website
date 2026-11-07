@@ -1,11 +1,13 @@
 ---
-import { NAV, SITE_NAME, USE_MONOGRAM } from '../lib/config';
+import { SITE_NAME, USE_MONOGRAM } from '../lib/config';
+import { getNav } from '../lib/content';
 import ScratchLink from './ScratchLink.astro';
 
 interface Props {
   current: string;
 }
 const { current } = Astro.props;
+const NAV = await getNav();
 const isCurrent = (href: string) => current.startsWith(href);
 ---
 

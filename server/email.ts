@@ -49,9 +49,15 @@ export async function sendEmail(env: Env, email: Email): Promise<void> {
   if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
 }
 
-/** Wrap content in a minimal, email-client-safe layout. */
-export function layout(inner: string): string {
+/**
+ * Wrap content in a minimal, email-client-safe layout, with Sophie's S/B mark in the
+ * bottom-right corner. Pass the site origin so the logo can load (PNG: Gmail won't show SVG).
+ */
+export function layout(inner: string, origin?: string): string {
+  const logo = origin
+    ? `<div style="text-align:right;margin-top:28px"><img src="${escapeHtml(origin)}/sb-email.png" width="40" height="72" alt="Sophie Bristow" style="display:inline-block;border:0;width:40px;height:72px"></div>`
+    : '';
   return `<!doctype html><html><body style="margin:0;padding:24px;background:#f5f4f1;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;line-height:1.5">
-<div style="max-width:560px;margin:0 auto;background:#fff;padding:28px;border:1px solid #e3e1dc">${inner}</div>
+<div style="max-width:560px;margin:0 auto;background:#fff;padding:28px;border:1px solid #e3e1dc">${inner}${logo}</div>
 </body></html>`;
 }

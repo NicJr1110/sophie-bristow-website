@@ -5,6 +5,7 @@ export type ComingSoonSettings = {
   comingSoonMessage?: string;
   instagramHandle?: string;
   previewKey?: string;
+  showShop?: boolean;
 } | null;
 
 export const PREVIEW_COOKIE = 'sb_preview';
@@ -38,12 +39,36 @@ export function decide(url: URL, cookieHeader: string | null, s: ComingSoonSetti
   const param = url.searchParams.get('preview');
   if (param === 'off') return { kind: 'exit-preview' };
 
-  if (!s?.comingSoon) return { kind: 'site' };
-
-  const key = s.previewKey && KEY_RE.test(s.previewKey) ? s.previewKey : null;
+  // The preview link works whether or not Coming soon is on (it also unlocks a hidden shop).
+  const key = validKey(s);
   if (key && param === key) return { kind: 'enter-preview', key };
-  if (key && readCookie(cookieHeader, PREVIEW_COOKIE) === key) return { kind: 'site' };
+
+  if (!s?.comingSoon) return { kind: 'site' };
+  if (hasPreview(cookieHeader, s)) return { kind: 'site' };
   return { kind: 'coming-soon' };
+}
+
+function validKey(s: ComingSoonSettings): string | null {
+  return s?.previewKey && KEY_RE.test(s.previewKey) ? s.previewKey : null;
+}
+
+export function hasPreview(cookieHeader: string | null, s: ComingSoonSettings): boolean {
+  const key = validKey(s);
+  return Boolean(key && readCookie(cookieHeader, PREVIEW_COOKIE) === key);
+}
+
+const SHOP_PATHS = [/^\/artwork(\/|$)/, /^\/api\/checkout(\/|$)/, /^\/thank-you(\/|$)/, /^\/checkout-cancelled(\/|$)/];
+
+/**
+ * Shop switch ("Show shop" in Site settings). When off, the shop pages and checkout are closed
+ * to the public; anyone with the preview cookie can still use them (for testing Stripe).
+ * Settings missing (no Sanity / outage) → allow, matching Coming soon's fail-open behaviour.
+ */
+export function shopAccess(url: URL, cookieHeader: string | null, s: ComingSoonSettings): 'allow' | 'closed' {
+  if (!SHOP_PATHS.some((re) => re.test(url.pathname))) return 'allow';
+  if (!s || s.showShop) return 'allow';
+  if (hasPreview(cookieHeader, s)) return 'allow';
+  return 'closed';
 }
 
 function esc(s: string): string {

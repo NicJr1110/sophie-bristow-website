@@ -1,4 +1,4 @@
-import { DOC_IDS, SANITY } from './config';
+import { DOC_IDS, NAV, SANITY } from './config';
 import { picFromSanity, picPlaceholder, sanityImageUrl, type Pic, type SanityImage } from './images';
 import { portableTextToHtml } from './portableText';
 
@@ -33,20 +33,28 @@ async function query<T>(groq: string, params: Record<string, unknown> = {}): Pro
 
 /* ---------- Site settings ---------- */
 
-export type Settings = { backgroundUrl: string };
+export type Settings = { backgroundUrl: string; showShop: boolean };
 let settingsPromise: Promise<Settings> | null = null;
 
 export function getSettings(): Promise<Settings> {
   settingsPromise ??= (async () => {
-    const fallback = { backgroundUrl: '/splash-flower.png' };
-    if (!hasSanity) return fallback;
-    const s = await query<{ background?: SanityImage } | null>(`*[_id == $id][0]{ background }`, {
-      id: DOC_IDS.settings,
-    });
+    // Without Sanity (fresh clone) show everything, so the whole site can be worked on.
+    if (!hasSanity) return { backgroundUrl: '/splash-flower.png', showShop: true };
+    const s = await query<{ background?: SanityImage; showShop?: boolean } | null>(
+      `*[_id == $id][0]{ background, showShop }`,
+      { id: DOC_IDS.settings },
+    );
     const url = sanityImageUrl(s?.background, { w: 1600 });
-    return url ? { backgroundUrl: url } : fallback;
+    // Shop is off unless Sophie has switched it on.
+    return { backgroundUrl: url || '/splash-flower.png', showShop: s?.showShop === true };
   })();
   return settingsPromise;
+}
+
+/** Menu items, without Artwork while the shop is switched off. */
+export async function getNav() {
+  const { showShop } = await getSettings();
+  return NAV.filter((item) => showShop || item.href !== '/artwork/');
 }
 
 /* ---------- Galleries (Flash, Mark Making) ---------- */

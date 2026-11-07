@@ -1,7 +1,7 @@
 // POST /api/stripe-webhook. Stripe calls this after checkout.
 // Subscribe the endpoint to: checkout.session.completed,
 // checkout.session.async_payment_succeeded, checkout.session.expired
-import { json, type Env } from '../../server/env';
+import { json, siteOrigin, type Env } from '../../server/env';
 import { sanityQuery, patchArtwork } from '../../server/sanity';
 import { verifyStripeSignature } from '../../server/stripe';
 import { ARTWORK_FIELDS, isValidArtworkId, type ArtworkRecord } from '../../server/artwork';
@@ -49,7 +49,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       if (!res.ok) return json({ error: 'sanity_update_failed' }, 500); // Stripe will retry
 
       try {
-        await sendEmail(env, saleEmail(env, art, session));
+        await sendEmail(env, saleEmail(env, art, session, siteOrigin(env, request)));
       } catch (err) {
         // The sale is recorded and in the Stripe dashboard; don't make Stripe retry for an email.
         console.error('sale email failed', err);
@@ -74,7 +74,7 @@ function formatAddress(a?: Address): string[] {
   return [a.line1, a.line2, a.city, a.state, a.postal_code, a.country].filter(Boolean) as string[];
 }
 
-function saleEmail(env: Env, art: ArtworkRecord, s: Session) {
+function saleEmail(env: Env, art: ArtworkRecord, s: Session, origin: string) {
   const shipping = s.collected_information?.shipping_details ?? s.shipping_details;
   const buyer = s.customer_details ?? {};
   const amount = new Intl.NumberFormat('en-GB', { style: 'currency', currency: (s.currency || 'gbp').toUpperCase() }).format(
@@ -106,6 +106,7 @@ function saleEmail(env: Env, art: ArtworkRecord, s: Session) {
        )
        .join('')}</table>
      <p style="color:#6b6b6b;font-size:13px">The full order is in your Stripe dashboard.</p>`,
+    origin,
   );
 
   return { to: env.CONTACT_TO_EMAIL, subject: `Sold: ${art.title}`, text, html, replyTo: buyer.email };

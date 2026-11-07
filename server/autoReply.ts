@@ -4,6 +4,7 @@ export type AwaySettings = { awayMode?: boolean; awayReplySubject?: string; away
 
 export type EnquiryLookup = {
   label?: string;
+  sendTo?: string;
   template?: { subject?: string; body?: string } | null;
 } | null;
 
@@ -25,4 +26,15 @@ export function pickAutoReply(settings: AwaySettings, enquiry: EnquiryLookup): R
   const t = enquiry?.template;
   if (t?.body) return { subject: t.subject || DEFAULT_REPLY.subject, body: t.body };
   return DEFAULT_REPLY;
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Which inbox gets an enquiry (and replies to its auto-reply): the enquiry type's
+ * "Send enquiries to" address from Sanity, else the main inbox (CONTACT_TO_EMAIL).
+ */
+export function pickRecipient(enquiry: EnquiryLookup, fallback: string): string {
+  const to = enquiry?.sendTo?.trim();
+  return to && EMAIL_RE.test(to) ? to : fallback;
 }

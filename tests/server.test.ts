@@ -107,3 +107,15 @@ test('auto-reply: template per enquiry type, away mode overrides, safe default',
   assert.deepEqual(pickAutoReply(null, null), DEFAULT_REPLY);
   assert.deepEqual(pickAutoReply(null, { label: 'X', template: null }), DEFAULT_REPLY);
 });
+
+import { pickRecipient } from '../server/autoReply.ts';
+
+test('enquiries go to the type\'s own inbox, else the main one', () => {
+  const main = 'sophiebristow95@gmail.co.uk';
+  assert.equal(pickRecipient({ label: 'Tattoo', sendTo: 'sophiebristowtattoo@gmail.com' }, main), 'sophiebristowtattoo@gmail.com');
+  assert.equal(pickRecipient({ label: 'Tattoo', sendTo: '  sophiebristowtattoo@gmail.com ' }, main), 'sophiebristowtattoo@gmail.com');
+  assert.equal(pickRecipient({ label: 'Other' }, main), main);
+  assert.equal(pickRecipient({ label: 'Other', sendTo: '' }, main), main);
+  assert.equal(pickRecipient({ label: 'Typo', sendTo: 'not-an-email' }, main), main);
+  assert.equal(pickRecipient(null, main), main);
+});

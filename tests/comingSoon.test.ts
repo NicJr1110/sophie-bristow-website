@@ -46,3 +46,31 @@ test('reads cookies', () => {
   assert.equal(readCookie('a=1; sb_preview=xyz; b=2', 'sb_preview'), 'xyz');
   assert.equal(readCookie(null, 'sb_preview'), null);
 });
+
+import { shopAccess, hasPreview } from '../server/comingSoon.ts';
+
+test('shop switch: closed to the public while off, open with preview cookie or when on', () => {
+  const off = { comingSoon: false, previewKey: 'abc123def456', showShop: false };
+  const offMissing = { comingSoon: false, previewKey: 'abc123def456' }; // field never set → off
+  const onShop = { ...off, showShop: true };
+  for (const path of ['/artwork/', '/artwork', '/api/checkout', '/thank-you/', '/checkout-cancelled/']) {
+    assert.equal(shopAccess(u(path), null, off), 'closed', path);
+    assert.equal(shopAccess(u(path), null, offMissing), 'closed', path);
+    assert.equal(shopAccess(u(path), 'sb_preview=abc123def456', off), 'allow', path);
+    assert.equal(shopAccess(u(path), null, onShop), 'allow', path);
+  }
+  // Everything else is untouched, and the webhook/status/release keep working
+  for (const path of ['/', '/flash/', '/contact/', '/api/contact', '/api/stripe-webhook', '/api/status', '/artworks-elsewhere/']) {
+    assert.equal(shopAccess(u(path), null, off), 'allow', path);
+  }
+  // No settings (Sanity unreachable) fails open, like Coming soon
+  assert.equal(shopAccess(u('/artwork/'), null, null), 'allow');
+});
+
+test('preview link works even when Coming soon is off (to unlock a hidden shop)', () => {
+  const s = { comingSoon: false, previewKey: 'abc123def456', showShop: false };
+  assert.deepEqual(decide(u('/?preview=abc123def456'), null, s), { kind: 'enter-preview', key: 'abc123def456' });
+  assert.deepEqual(decide(u('/'), null, s), { kind: 'site' });
+  assert.equal(hasPreview('sb_preview=abc123def456', s), true);
+  assert.equal(hasPreview('sb_preview=nope', s), false);
+});

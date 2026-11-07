@@ -10,6 +10,7 @@ export const siteSettings = defineType({
   type: 'document',
   groups: [
     { name: 'launch', title: 'Coming soon', default: true },
+    { name: 'shop', title: 'Shop' },
     { name: 'look', title: 'Look' },
     { name: 'away', title: 'Away mode' },
   ],
@@ -49,6 +50,15 @@ export const siteSettings = defineType({
       description: `To see the real site while "Coming soon" is on, open ${SITE_URL}/?preview=<this key> once on each phone or computer. Change the key to lock out old preview links. Add ?preview=off to leave preview.`,
     }),
 
+    defineField({
+      name: 'showShop',
+      title: 'Show shop (Artwork page)',
+      type: 'boolean',
+      group: 'shop',
+      initialValue: false,
+      description:
+        'Off: the Artwork page and its menu link are hidden, and nothing can be bought. Turn on and publish once Stripe is live. The menu updates after the site rebuilds (a minute or two).',
+    }),
     defineField({
       name: 'background',
       title: 'Background splash image',
