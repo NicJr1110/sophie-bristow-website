@@ -22,3 +22,15 @@ export function json(data: unknown, status = 200, headers: Record<string, string
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...headers },
   });
 }
+
+/** Normalise SITE_URL the same way as astro.config.mjs. Falls back to the request's own origin. */
+export function siteOrigin(env: Env, request: Request): string {
+  let raw = (env.SITE_URL || '').trim().replace(/^["']|["']$/g, '');
+  const scheme = raw.match(/^(https?)[:/]+/i);
+  if (raw) raw = scheme ? `${scheme[1].toLowerCase()}://${raw.slice(scheme[0].length)}` : `https://${raw}`;
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return new URL(request.url).origin;
+  }
+}

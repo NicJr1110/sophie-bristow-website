@@ -1,6 +1,6 @@
 // POST /api/checkout { artworkId } → { url } of a Stripe-hosted Checkout page.
 // Reserves the piece for 31 minutes first, so nobody else can buy it meanwhile (spec §7).
-import { json, type Env } from '../../server/env';
+import { json, siteOrigin, type Env } from '../../server/env';
 import { sanityQuery, sanityMutate, patchArtwork } from '../../server/sanity';
 import { stripeRequest } from '../../server/stripe';
 import { ARTWORK_FIELDS, RESERVATION_MINUTES, isAvailable, isValidArtworkId, toPence, type ArtworkRecord } from '../../server/artwork';
@@ -31,7 +31,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   if (!reserve.ok) return json({ error: 'reserve_failed' }, 502);
 
   // 2. Create the Checkout Session; it expires when the reservation does.
-  const site = env.SITE_URL.replace(/\/$/, '');
+  const site = siteOrigin(env, request);
   const countries = (env.SHIP_COUNTRIES || 'GB').split(',').map((c) => c.trim().toUpperCase()).filter(Boolean);
   const imageUrl = imageForStripe(env, art);
 
