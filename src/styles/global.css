@@ -1310,3 +1310,23 @@ h3 {
     padding: 76px 18px 24px;
   }
 }
+
+
+/* Keep the three-line burger intact; rotate the whole icon 90 degrees when open. */
+@media (max-width: 1024px) {
+  .burger {
+    transform: rotate(0deg);
+    transition: transform 0.3s var(--ease);
+  }
+
+  .burger[aria-expanded='true'] {
+    transform: rotate(90deg);
+  }
+
+  .burger[aria-expanded='true'] span:nth-child(1),
+  .burger[aria-expanded='true'] span:nth-child(2),
+  .burger[aria-expanded='true'] span:nth-child(3) {
+    transform: none;
+    opacity: 1;
+  }
+}
