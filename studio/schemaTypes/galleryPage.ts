@@ -7,6 +7,13 @@ export const galleryPage = defineType({
   fields: [
     defineField({ name: 'title', type: 'string', validation: (r) => r.required() }),
     defineField({
+      name: 'menuSubtitle',
+      title: 'Menu subtitle',
+      type: 'string',
+      description: 'Short text shown beneath this page name on the home page menu card.',
+      validation: (r) => r.max(100).warning('Keep this short so it fits comfortably in the menu card.'),
+    }),
+    defineField({
       name: 'introText',
       title: 'Intro text',
       type: 'text',

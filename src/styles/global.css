@@ -8,7 +8,7 @@
  *   large  ≥ 1024px   3-col grid, horizontal menu, A4-like central channel
  */
 :root {
-  --bg: #eeede9; /* Sophie's paper; textured by --paper */
+  --bg: #fff; /* Clean white; paper texture retained below for easy restoration. */
   --paper: var(--bg) url('/paper.jpg') repeat;
   --field: rgb(255 255 255 / 0.55);
   --text: #1a1a1a;
@@ -49,13 +49,13 @@ body {
 
 /* Paper on the root too, so any area the browser paints outside the page is paper, not white */
 html {
-  background: var(--paper);
-  background-size: 512px 512px;
+  background: #fff;
+  /* background: var(--paper); background-size: 512px 512px; */
 }
 
 body {
-  background: var(--paper);
-  background-size: 512px 512px;
+  background: #fff;
+  /* background: var(--paper); background-size: 512px 512px; */
   color: var(--text);
   font-family: var(--font-body);
   font-size: 1.0625rem;
@@ -276,187 +276,30 @@ h3 {
   text-decoration-color: currentColor;
 }
 
-/* ---------- Landing ----------
- * Big "Sophie / Bristow" (about a quarter of the screen), then a lowercase menu, all
- * left-aligned. Each item reserves space underneath for one of Sophie's lines, drawn
- * in at random on hover across the menu's full width. "shop" opens its tags, right-aligned.
- */
-
-.is-landing .channel {
-  display: flex;
-  flex-direction: column;
-}
-
-.landing {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 26px 0 8vh;
-}
-
-.landing-logo {
-  display: block;
-  align-self: flex-start;
-  height: clamp(68px, 8vw, 84px); /* same size as the header logo */
-  width: auto;
-}
-
-.landing-name {
-  margin: auto 0 clamp(28px, 6vh, 64px);
-  font-weight: 400;
-  /* two lines ≈ 25% of the screen height, limited by width on phones */
-  font-size: min(12.5vh, 21vw);
-  line-height: 0.95;
-  letter-spacing: -0.015em;
-}
-
-.landing-name span {
-  display: block;
-}
-
-.landing-name::after {
-  display: none;
-}
-
-.landing-nav {
-  /* full width on phones; a comfortable length on bigger screens */
-  width: min(100%, 36rem);
-  margin-bottom: auto;
-}
-
-.landing-list,
-.landing-sub {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.landing-item {
-  position: relative;
-  /* space reserved for the line */
-  padding-bottom: clamp(7px, 1vh, 10px);
-  margin-bottom: clamp(0px, 0.25vh, 3px);
-}
-
-/* The line sits under the word only. It's drawn like a crayon stroke: a soft leading edge
-   travels left to right, slow to start, quick through the middle, easing off at the end. */
-@property --draw {
-  syntax: '<percentage>';
-  inherits: false;
-  initial-value: 0%;
-}
-
-.landing-link {
-  position: relative;
-  display: inline-block;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--text);
-  font: inherit;
-  font-size: clamp(1.7rem, min(5.4vh, 8.5vw), 2.7rem);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  line-height: 1.15;
-  text-align: left;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.landing-link::after {
-  --draw: 0%;
-  content: '';
-  position: absolute;
-  left: -0.04em;
-  right: -0.04em;
-  top: 100%;
-  height: clamp(3.5px, 0.55vh, 5.5px); /* half height: a finer pencil stroke */
-  background: var(--line) no-repeat left center / 100% 100%;
-  /* everything left of the pen is drawn; a short feathered edge is the crayon tip */
-  -webkit-mask-image: linear-gradient(to right, #000 calc(var(--draw) - 14%), transparent var(--draw));
-  mask-image: linear-gradient(to right, #000 calc(var(--draw) - 14%), transparent var(--draw));
-  opacity: 0;
-  /* lifting off: a quick fade, then the pen resets out of sight */
-  transition:
-    opacity 0.22s ease-out,
-    --draw 0s linear 0.22s;
-}
-
-.landing-item.is-drawn > .landing-link::after {
-  --draw: 114%;
-  opacity: 1;
-  transition:
-    opacity 0.08s linear,
-    --draw 0.7s cubic-bezier(0.45, 0.05, 0.25, 1);
-}
-
-.landing-link:hover {
-  color: var(--text);
-}
-
-.landing-link:focus-visible {
-  outline-offset: 6px;
-}
-
-/* Shop tags: right-aligned under "shop" */
-.landing-sub {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  padding: 10px 0 4px;
-}
-
-.landing-sub li {
-  animation: sub-in 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  animation-delay: calc(var(--d) * 60ms);
-}
-
-@keyframes sub-in {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-}
-
-.landing-sublink {
-  position: relative;
-  display: inline-block;
-  color: var(--text);
-  text-decoration: none;
-  font-size: clamp(1.15rem, min(3.4vh, 5.4vw), 1.6rem);
-  letter-spacing: -0.01em;
-  line-height: 1.5;
-}
-
-.landing-sublink:hover {
-  color: var(--text);
-}
-
-/* a grass tuft sprouts to the left of the hovered tag */
-.sprout {
-  position: absolute;
-  right: 100%;
-  bottom: 0.3em;
-  width: 1.15em;
-  height: 1em;
-  margin-right: 0.4em;
-  background: var(--grass) no-repeat center bottom / contain;
-  transform: scaleY(0);
-  transform-origin: 50% 100%;
-  opacity: 0;
-  transition:
-    transform 0.25s ease-in,
-    opacity 0.2s;
-}
-
-.landing-sublink:hover .sprout,
-.landing-sublink:focus-visible .sprout {
-  transform: scaleY(1);
-  opacity: 1;
-  transition:
-    transform 0.45s cubic-bezier(0.3, 1.5, 0.5, 1),
-    opacity 0.15s;
+/* ---------- Simple editorial landing + shop chooser ---------- */
+.is-landing .channel { display:flex; flex-direction:column; }
+.simple-home { min-height:100svh; display:flex; flex-direction:column; padding:clamp(34px,7vh,76px) 0 clamp(28px,5vh,54px); color:#111; background:#fff; }
+.simple-brand { text-align:center; margin:0 0 clamp(64px,13vh,132px); }
+.simple-brand h1 { margin:0; font-size:clamp(2rem,5.4vw,3.5rem); line-height:1; letter-spacing:.035em; font-weight:400; text-transform:uppercase; }
+.simple-brand p { margin:12px 0 0; font-size:.62rem; line-height:1.2; letter-spacing:.14em; text-transform:uppercase; }
+.simple-cards { width:100%; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.simple-card { min-height:clamp(230px,34vw,340px); padding:clamp(18px,3vw,36px) 14px; border:1px solid #d8d8d8; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:14px; text-align:center; text-decoration:none; color:#111; background:#fff; }
+.simple-card-title { font-size:clamp(1.5rem,3.4vw,2.55rem); line-height:1.05; font-weight:400; text-transform:uppercase; }
+.simple-card-subtitle { max-width:30ch; font-family:var(--font-body); font-size:.78rem; line-height:1.2; }
+.simple-card-link { margin-top:5px; font-size:.8rem; line-height:1.2; text-transform:uppercase; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:.28em; }
+.simple-card:hover { color:#111; border-color:#999; }
+.simple-home-footer { display:flex; flex-direction:column; align-items:center; margin-top:auto; padding-top:clamp(34px,6vh,66px); }
+.simple-text-link { color:#111; font-size:.76rem; line-height:1.2; letter-spacing:.1em; text-transform:uppercase; text-decoration:none; }
+.simple-text-link:hover { text-decoration:underline; text-underline-offset:.25em; }
+.simple-grass { width:40px; height:36px; object-fit:contain; margin:12px 0; }
+.simple-contact { margin-top:8px; }
+.simple-shop-footer { display:flex; justify-content:center; margin-top:auto; padding-top:clamp(42px,8vh,88px); }
+@media (max-width:600px) {
+  .simple-home { padding-top:42px; }
+  .simple-brand { margin-bottom:56px; }
+  .simple-cards { grid-template-columns:1fr; gap:10px; }
+  .simple-card { min-height:210px; }
+  .simple-shop-footer { padding-top:48px; }
 }
 
 .site-name .monogram {

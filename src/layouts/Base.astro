@@ -44,7 +44,7 @@ const year = new Date().getFullYear();
     <link rel="preload" href="/paper.jpg" as="image" />
   </head>
   <body class:list={{ 'is-landing': !showHeader }}>
-    <!-- Splash image: fixed bottom-right cell of the viewport on every page (spec §5) -->
+    {/* Background splash is intentionally disabled for the clean white design. Restore this block to bring it back.
     {showSplash && <div class="splash" aria-hidden="true">
       {isDefaultSplash ? (
         <img
@@ -58,6 +58,7 @@ const year = new Date().getFullYear();
         <img src={backgroundUrl} alt="" decoding="async" />
       )}
     </div>}
+    */}
 
     <div class="page">
       {showHeader && <Header current={Astro.url.pathname} title={title} />}

@@ -52,6 +52,19 @@ export function getSettings(): Promise<Settings> {
   return settingsPromise;
 }
 
+export type MenuSubtitles = { flash: string; markMaking: string };
+export async function getMenuSubtitles(): Promise<MenuSubtitles> {
+  const fallback = {
+    flash: 'Browse available artworks ready for purchase.',
+    markMaking: 'Commission a unique artwork created specifically for your space.',
+  };
+  if (!hasSanity) return fallback;
+  const [flash, markMaking] = await Promise.all([
+    query<{ menuSubtitle?: string } | null>("*[_id == $id][0]{ menuSubtitle }", { id: DOC_IDS.flash }),
+    query<{ menuSubtitle?: string } | null>("*[_id == $id][0]{ menuSubtitle }", { id: DOC_IDS.markMaking }),
+  ]);
+  return { flash: flash?.menuSubtitle ?? fallback.flash, markMaking: markMaking?.menuSubtitle ?? fallback.markMaking };
+}
 /** Menu items, without Shop while the shop is switched off. */
 export async function getNav() {
   const { showShop } = await getSettings();
