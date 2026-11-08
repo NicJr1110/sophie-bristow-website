@@ -1128,12 +1128,12 @@ h3 {
 /* ---------- Simple editorial landing and shop chooser ---------- */
 .is-landing .channel { width:100%; max-width:none; min-height:calc(100vh - 24px); padding:0 clamp(14px,2vw,28px) 30px; }
 .simple-site-page { width:100%; min-height:calc(100vh - 30px); min-height:calc(100dvh - 30px); display:flex; flex-direction:column; align-items:stretch; padding:clamp(58px,10vh,112px) 0 34px; color:#111; background:#fff; }
-.simple-brand { margin:0 auto clamp(74px,12vh,132px); text-align:center; }
+.simple-brand { width:max-content; max-width:100%; margin:0 auto clamp(74px,12vh,132px); text-align:left; }
 .simple-brand h1 { margin:0; font-size:clamp(2.15rem,5.5vw,4rem); font-weight:700; letter-spacing:.105em; line-height:1; text-transform:uppercase; }
 .simple-brand h1::after { content:none; }
-.simple-brand p { margin:14px 0 0; font-size:clamp(.62rem,1vw,.76rem); line-height:1.2; letter-spacing:.17em; text-transform:uppercase; }
+.simple-brand p { margin:14px 0 0; text-align:left; font-size:clamp(.62rem,1vw,.76rem); line-height:1.2; letter-spacing:.17em; text-transform:uppercase; }
 .simple-choice-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(12px,1.5vw,20px); width:100%; max-width:1480px; margin:0 auto; }
-.simple-choice-card { min-width:0; min-height:clamp(260px,31vw,352px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:clamp(22px,4vw,48px) 18px; border:1px solid #d8d8d8; color:#111; text-align:center; text-decoration:none; background:#f7f7f7; transition:background-color 180ms ease; }
+.simple-choice-card { min-width:0; min-height:clamp(260px,31vw,352px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:clamp(22px,4vw,48px) 18px; border:1px solid #d8d8d8; color:#111; text-align:center; text-decoration:none; background:transparent; transition:background-color 180ms ease; }
 .simple-choice-card:hover,.simple-choice-card:focus-visible { color:#111; border-color:#d8d8d8; background:#f2f2f2; }
 .simple-choice-card h2 { margin:0 0 5px; font-size:clamp(1.75rem,3.3vw,3rem); font-weight:700; letter-spacing:-.015em; line-height:1.05; text-transform:uppercase; }
 .simple-choice-card p { max-width:34ch; min-height:0; margin:0 0 8px; font-size:clamp(.9rem,1.2vw,1.05rem); line-height:1.2; }
