@@ -1,7 +1,6 @@
 /*
  * Sophie's look: ink on paper. One clean gallery sans (Instrument Sans; compare at /type-test/),
- * for body text, crayon underlines, hand-drawn button edges. Adjust tokens when her
- * design guidelines come back.
+ * for body text, crayon underlines, hand-drawn button edges. The site uses Abel throughout.
  *
  * Breakpoints (spec §4):
  *   small  < 768px    2-col grid, burger menu
@@ -19,11 +18,11 @@
   --accent-text: #faf9f7;
   --hover: #444;
 
-  --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Abel', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   /* Headings share the body family: a clean, open gallery sans. Compare options at /type-test/. */
   --font-heading: var(--font-body);
-  --heading-weight: 500;
-  --heading-tracking: -0.02em;
+  --heading-weight: 400;
+  --heading-tracking: -0.01em;
   /* Sophie's own hand-drawn lines (public/marks/lines) used as underlines */
   --line-title: url('/marks/lines/line-08.png');
   /* Irregular corners so boxes look drawn rather than ruled */
@@ -304,11 +303,11 @@ h3 {
 
 .landing-name {
   margin: auto 0 clamp(28px, 6vh, 64px);
-  font-weight: 500;
+  font-weight: 400;
   /* two lines ≈ 25% of the screen height, limited by width on phones */
   font-size: min(12.5vh, 21vw);
   line-height: 0.95;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.015em;
 }
 
 .landing-name span {
@@ -356,8 +355,8 @@ h3 {
   color: var(--text);
   font: inherit;
   font-size: clamp(1.7rem, min(5.4vh, 8.5vw), 2.7rem);
-  font-weight: 450;
-  letter-spacing: -0.02em;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   line-height: 1.15;
   text-align: left;
   text-decoration: none;
@@ -881,8 +880,8 @@ h3 {
 }
 
 .boil-art { position: relative; display: block; }
-.enquiry-grass.boil-art img { animation-duration: 500ms; }
-.lined-flower.boil-art img { animation-duration: 600ms; }
+.enquiry-grass.boil-art img { animation-name: boil-grass-frame; animation-duration: 900ms; }
+.lined-flower.boil-art img { animation-duration: 1080ms; }
 .boil-art img {
   position: absolute;
   inset: 0;
@@ -890,16 +889,20 @@ h3 {
   height: 100%;
   object-fit: contain;
   opacity: 0;
-  animation: boil-frame 600ms steps(1, end) infinite;
+  animation: boil-frame 1080ms steps(1, end) infinite;
 }
-.boil-art img:nth-child(2) { animation-delay: -100ms; }
-.boil-art img:nth-child(3) { animation-delay: -200ms; }
-.boil-art img:nth-child(4) { animation-delay: -300ms; }
-.boil-art img:nth-child(5) { animation-delay: -400ms; }
-.boil-art img:nth-child(6) { animation-delay: -500ms; }
+.boil-art img:nth-child(2) { animation-delay: -180ms; }
+.boil-art img:nth-child(3) { animation-delay: -360ms; }
+.boil-art img:nth-child(4) { animation-delay: -540ms; }
+.boil-art img:nth-child(5) { animation-delay: -720ms; }
+.boil-art img:nth-child(6) { animation-delay: -900ms; }
 @keyframes boil-frame {
   0%, 16.65% { opacity: 1; }
   16.66%, 100% { opacity: 0; }
+}
+@keyframes boil-grass-frame {
+  0%, 19.99% { opacity: 1; }
+  20%, 100% { opacity: 0; }
 }
 
 /* Step 2: no boxes, no fills, just thin lines */

@@ -92,15 +92,15 @@ export function comingSoonHtml(s: ComingSoonSettings): string {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abel&display=swap">
 <style>
   :root { --bg:#eeede9; --text:#1a1a1a; --muted:#6b6b6b; }
   * { box-sizing:border-box; }
   html,body { margin:0; height:100%; overscroll-behavior-y:none; }
   html { background:var(--bg) url('/paper.jpg') repeat; background-size:512px 512px; }
-  body { background:var(--bg) url('/paper.jpg') repeat; background-size:512px 512px; color:var(--text); font-family:'Instrument Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  body { background:var(--bg) url('/paper.jpg') repeat; background-size:512px 512px; color:var(--text); font-family:'Abel',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
          display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; }
-  h1 { font-family:'Instrument Sans',system-ui,sans-serif; font-weight:500; letter-spacing:-.02em; font-size:clamp(2.4rem,8vw,4rem); margin:0 0 12px; }
+  h1 { font-family:'Abel',system-ui,sans-serif; font-weight:400; letter-spacing:-.01em; font-size:clamp(2.4rem,8vw,4rem); margin:0 0 12px; }
   p { margin:0 0 20px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; font-size:.85rem; }
   a { color:var(--text); text-underline-offset:5px; }
   .splash { position:fixed; right:2vw; bottom:2vh; width:85vw; height:32vh; z-index:-1; pointer-events:none;

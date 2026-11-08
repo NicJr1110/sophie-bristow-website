@@ -4,19 +4,11 @@
 import Base from '../layouts/Base.astro';
 
 const FONTS: { name: string; family: string; weight: number; scale: number; note: string }[] = [
-  { name: 'Instrument Sans', family: 'Instrument Sans', weight: 500, scale: 1, note: 'Made by a design studio; crisp and quietly characterful. (Current.)' },
-  { name: 'Hanken Grotesk', family: 'Hanken Grotesk', weight: 500, scale: 1, note: 'Open, Swiss-style grotesk. Calm and gallery-like.' },
-  { name: 'Inter Tight', family: 'Inter Tight', weight: 500, scale: 0.98, note: 'Tighter Inter. Very clean, Helvetica-adjacent.' },
-  { name: 'Schibsted Grotesk', family: 'Schibsted Grotesk', weight: 500, scale: 1, note: 'Editorial grotesk with a little warmth.' },
-  { name: 'Albert Sans', family: 'Albert Sans', weight: 500, scale: 1, note: 'Scandinavian geometric. Airy, modern brochure.' },
-  { name: 'Manrope', family: 'Manrope', weight: 500, scale: 0.96, note: 'Rounded-modern. Friendly, very open.' },
-  { name: 'Figtree', family: 'Figtree', weight: 500, scale: 1, note: 'Clean geometric, slightly softer.' },
+  { name: 'Abel', family: 'Abel', weight: 400, scale: 1, note: 'The selected site typeface.' },
 ];
 
 const href =
-  'https://fonts.googleapis.com/css2?' +
-  FONTS.map((f) => `family=${f.family.replace(/ /g, '+')}:wght@400;500;600`).join('&') +
-  '&display=swap';
+  'https://fonts.googleapis.com/css2?family=Abel&display=swap';
 ---
 
 <Base title="Font test">
