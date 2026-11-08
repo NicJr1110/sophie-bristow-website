@@ -125,11 +125,11 @@ h3 {
 
 .splash {
   position: fixed;
-  left: 0;
+  right: 0;
   bottom: 0;
   z-index: 0;
   pointer-events: none;
-  /* Decorative flower sits in the bottom-left, behind page content. */
+  /* Decorative flower sits in the bottom-right, behind page content. */
   width: min(42vw, 560px);
   height: min(48vh, 460px);
 }
@@ -138,7 +138,7 @@ h3 {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: left bottom;
+  object-position: right bottom;
 }
 
 @media (min-width: 768px) {
@@ -153,12 +153,12 @@ h3 {
   /* large: a feature — ~2.5x bigger, turned 30° clockwise and bled off the bottom
      and a little off the right, like a close-up of a drawing on the same sheet */
   .splash {
-    left: 0;
+    right: 0;
     bottom: 0;
     width: min(48vh, 34vw);
     height: min(72vh, 48vw);
-    transform: translate(-4%, 4%);
-    transform-origin: 0 100%;
+    transform: translate(4%, 4%);
+    transform-origin: 100% 100%;
     opacity: 0.8;
   }
 }
