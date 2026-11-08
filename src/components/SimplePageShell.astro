@@ -57,7 +57,17 @@ const {
   const contactGrass = page?.querySelector<HTMLElement>('.simple-contact-link .simple-grass');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (page && intro && contactGrass && !reduceMotion) {
+  const introSeenKey = 'sophie-bristow:landing-intro-seen';
+  let hasSeenIntro = false;
+
+  try {
+    hasSeenIntro = window.localStorage.getItem(introSeenKey) === '1';
+    if (!hasSeenIntro) window.localStorage.setItem(introSeenKey, '1');
+  } catch {
+    // If browser storage is unavailable, allow the intro rather than blocking the page.
+  }
+
+  if (page && intro && contactGrass && !reduceMotion && !hasSeenIntro) {
     const startWidth = window.matchMedia('(max-width: 640px)').matches
       ? 142
       : Math.min(190, Math.max(150, window.innerWidth * 0.22));
