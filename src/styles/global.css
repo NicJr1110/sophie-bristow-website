@@ -1571,6 +1571,34 @@ h3 {
 
 
 /* ---------- Landing-page grass arrival ---------- */
+
+/* The grass is the sole visible element during the opening movement. Keep the
+   remaining layout in place, then reveal it in a quiet editorial sequence. */
+.simple-landing .simple-brand,
+.simple-landing .simple-page-content,
+.simple-landing .simple-shop-link {
+  visibility: hidden;
+  opacity: 0;
+  animation: landing-feature-arrives 680ms cubic-bezier(.2,.7,.2,1) both;
+}
+.simple-landing .simple-brand { animation-delay: 2.2s; }
+.simple-landing .simple-page-content { animation-delay: 2.35s; }
+.simple-landing .simple-shop-link { animation-delay: 2.5s; }
+
+@keyframes landing-feature-arrives {
+  0% {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  1% { visibility: visible; }
+  100% {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .simple-landing .simple-contact-link {
   position: fixed;
   z-index: 20;
@@ -1615,6 +1643,14 @@ h3 {
 @media (prefers-reduced-motion: reduce) {
   .simple-landing .simple-contact-link {
     position: static;
+    transform: none;
+    animation: none;
+  }
+  .simple-landing .simple-brand,
+  .simple-landing .simple-page-content,
+  .simple-landing .simple-shop-link {
+    visibility: visible;
+    opacity: 1;
     transform: none;
     animation: none;
   }
