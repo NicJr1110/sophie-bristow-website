@@ -222,6 +222,13 @@ h3 {
   font-size: 1.1rem;
 }
 
+.site-footer small {
+  display: block;
+  max-width: 60ch;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
 .site-footer {
   text-align: center;
   padding: 24px var(--gutter);
