@@ -9,7 +9,7 @@
  */
 :root {
   --bg: #fff; /* Clean white; paper texture retained below for easy restoration. */
-  --paper: var(--bg) url('/paper.jpg') repeat;
+  --paper: var(--bg); /* Original texture: var(--bg) url('/paper.jpg') repeat; */
   --field: rgb(255 255 255 / 0.55);
   --text: #1a1a1a;
   --muted: #6b6b6b;
