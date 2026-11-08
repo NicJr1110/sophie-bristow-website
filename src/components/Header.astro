@@ -136,6 +136,14 @@ const isCurrent = (href: string) => current.startsWith(href);
         btn.focus();
       }
     });
+    // The flower boils on hover with a mouse/trackpad, and toggles on tap on touch screens.
+    const menuFlower = menu.querySelector<HTMLElement>('.mobile-menu-flower');
+    const canHoverFlower = matchMedia('(hover: hover) and (pointer: fine)');
+    if (menuFlower) {
+      menuFlower.addEventListener('click', () => {
+        if (!canHoverFlower.matches) menuFlower.classList.toggle('is-animating');
+      });
+    }
     // Reuse Sophie's hand-drawn line artwork for mobile-menu underlines.
     const pad = (n: number) => String(n).padStart(2, '0');
     const pickLine = () => `/marks/lines/line-${pad(1 + Math.floor(Math.random() * 17))}.png`;

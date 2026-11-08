@@ -1251,11 +1251,11 @@ h3 {
 .mobile-menu { position:fixed; }
 .mobile-menu-flower {
   position:absolute;
-  right:0;
+  right:28px;
   bottom:10px;
   width:clamp(128px,40vw,184px);
   aspect-ratio:1;
-  pointer-events:none;
+  cursor:pointer;
   opacity:.9;
 }
 .mobile-menu-flower img {
@@ -1269,6 +1269,13 @@ h3 {
   transform-origin:right bottom;
   opacity:0;
   animation:boil-frame 1080ms steps(1,end) infinite;
+  animation-play-state:paused;
+}
+@media (hover:hover) and (pointer:fine) {
+  .mobile-menu-flower:hover img { animation-play-state:running; }
+}
+@media (hover:none), (pointer:coarse) {
+  .mobile-menu-flower.is-animating img { animation-play-state:running; }
 }
 .mobile-menu-flower img:nth-child(2) { animation-delay:-180ms; }
 .mobile-menu-flower img:nth-child(3) { animation-delay:-360ms; }
@@ -1315,6 +1322,10 @@ h3 {
     max-height: none;
     padding: 76px 18px 24px;
   }
+}
+
+@media (max-width: 380px) {
+  .mobile-menu-flower { right:18px; }
 }
 
 
