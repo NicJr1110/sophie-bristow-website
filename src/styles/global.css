@@ -817,7 +817,7 @@ h3 {
 
 /* Step 2: no boxes, no fills, just thin lines */
 .lined-form {
-  width: min(100%, 560px);
+  width: 100%; /* fills the content column */
   margin: 2vh 0 0;
   display: flex;
   flex-direction: column;
@@ -913,17 +913,18 @@ h3 {
   top: calc(100% + 6px);
 }
 
-/* The flower floats beside the message area (laptop only), bottom-aligned with its line.
-   It's taken out of the flow, so the form stays centred. */
+/* The flower stands outside the content column, beside the message area and bottom-aligned
+   with its line. It's out of the flow, so the form keeps the full column. Only shown when
+   the screen leaves enough margin for it. */
 .lined-flower {
   display: none;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .lined-flower {
     display: block;
     position: absolute;
-    left: calc(100% + 44px);
+    left: calc(100% + var(--gutter) + 28px);
     bottom: -2px;
     height: 100%;
     max-height: 300px;
