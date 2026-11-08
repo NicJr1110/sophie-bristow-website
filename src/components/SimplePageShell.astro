@@ -70,22 +70,34 @@ const {
     intro.style.top = `${startTop}px`;
     intro.style.width = `${startWidth}px`;
     intro.style.height = `${startHeight}px`;
+    intro.style.transformOrigin = 'top left';
+    intro.style.willChange = 'transform';
 
-    const motion = intro.animate([
-      { left: `${startLeft}px`, top: `${startTop}px`, width: `${startWidth}px`, height: `${startHeight}px` },
-      { left: `${target.left}px`, top: `${target.top}px`, width: `${target.width}px`, height: `${target.height}px` },
-    ], {
-      duration: 1050,
-      delay: 1350,
-      easing: 'cubic-bezier(.22,.72,.18,1)',
-      fill: 'forwards',
-    });
+    // Let the grass boil in the centre for a little longer, then freeze its
+    // current frame so the journey into the Contact position feels deliberate.
+    window.setTimeout(() => {
+      intro.querySelectorAll<HTMLImageElement>('img').forEach((frame) => {
+        frame.style.animationPlayState = 'paused';
+      });
 
-    motion.onfinish = () => {
-      intro.hidden = true;
-      page.classList.remove('landing-intro-pending');
-      page.classList.add('landing-intro-complete');
-    };
+      const motion = intro.animate([
+        { transform: 'translate(0, 0) scale(1, 1)' },
+        {
+          transform: `translate(${target.left - startLeft}px, ${target.top - startTop}px) scale(${target.width / startWidth}, ${target.height / startHeight})`,
+        },
+      ], {
+        duration: 1650,
+        easing: 'cubic-bezier(.4, 0, .2, 1)',
+        fill: 'forwards',
+      });
+
+      motion.onfinish = () => {
+        intro.hidden = true;
+        intro.style.willChange = '';
+        page.classList.remove('landing-intro-pending');
+        page.classList.add('landing-intro-complete');
+      };
+    }, 2300);
   } else if (page) {
     page.classList.remove('landing-intro-pending');
     page.classList.add('landing-intro-complete');
