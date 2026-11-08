@@ -11,7 +11,7 @@ const artworkSlug = tags.find((tag) => /artwork/i.test(tag.title + ' ' + tag.slu
 const giftCardSlug = tags.find((tag) => /gift.?cards?/i.test(tag.title + ' ' + tag.slug))?.slug ?? 'gift-cards';
 ---
 
-<Base title="Shop" showHeader={false}>
+<Base title="Shop" showHeader={false} showSplash={false}>
   <SimplePageShell shopHref="/shop/" shopLabel="SHOP ALL">
     <section class="simple-choice-grid" aria-label="Choose what to shop">
       <a class="simple-choice-card" href={'/shop/?tag=' + artworkSlug}>
