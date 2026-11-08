@@ -1244,11 +1244,11 @@ h3 {
 }
 
 
-/* Always-on flower boil tucked into the lower-left corner of the open mobile menu. */
+/* Flower boil aligned to the lower-right, with a taller animation frame. */
 .mobile-menu { position:fixed; }
 .mobile-menu-flower {
   position:absolute;
-  right:14px;
+  right:0;
   bottom:10px;
   width:clamp(128px,40vw,184px);
   aspect-ratio:1;
@@ -1261,6 +1261,9 @@ h3 {
   width:100%;
   height:100%;
   object-fit:contain;
+  object-position:right bottom;
+  transform:scaleY(1.5);
+  transform-origin:right bottom;
   opacity:0;
   animation:boil-frame 1080ms steps(1,end) infinite;
 }
