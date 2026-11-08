@@ -54,6 +54,9 @@ body {
 /* Paper on the root too, so any area the browser paints outside the page is paper, not white */
 html {
   background: #fff;
+  /* Keep the layout width constant when the vertical scrollbar appears or is locked. */
+  scrollbar-gutter: stable;
+  overflow-x: clip;
   /* Original paper texture:
      background: var(--paper);
      background-size: 512px 512px;
@@ -1467,11 +1470,13 @@ h3 {
 
 /* ---------- Restrained editorial motion ---------- */
 @keyframes page-arrive {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
+/* Keep the page itself untransformed: transforms create a containing block for fixed
+   descendants and can make fixed navigation appear to shift with the page. */
 .page {
-  animation: page-arrive 520ms var(--ease) both;
+  animation: page-arrive 520ms ease both;
 }
 
 /* Content reveals are opt-in via the small observer in Base.astro. */
