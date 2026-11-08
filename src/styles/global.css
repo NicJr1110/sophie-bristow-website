@@ -1714,3 +1714,17 @@ h3 {
 .mobile-shop-toggle.mobile-shop-label span {
   flex: 0 0 auto;
 }
+
+
+/* On wide screens the category sits beneath the Shop item in the page heading area. */
+@media (min-width: 1024px) {
+  .shop-category-subtitle {
+    margin: 4px 0 20px;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.1;
+    text-transform: lowercase;
+  }
+}
+@media (max-width: 1023px) {
+  .shop-category-subtitle { display: none; }
+}

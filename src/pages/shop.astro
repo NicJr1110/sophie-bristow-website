@@ -14,6 +14,7 @@ const categoryTitle = selectedSlug
 
 <Base title="Shop" subtitle={categoryTitle}>
   <h1 class="page-title page-title--nav">Shop</h1>
+  <p class="shop-category-subtitle" data-shop-subtitle>{categoryTitle}</p>
   {gallery.intro && <p class="intro">{gallery.intro}</p>}
   {tags.length > 0 && (
     <nav class="shop-tags" aria-label="Filter the shop">
