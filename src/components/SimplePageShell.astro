@@ -74,7 +74,6 @@ const {
       ? 142
       : Math.min(190, Math.max(150, window.innerWidth * 0.22));
     const startHeight = startWidth * (64 / 84);
-    const target = contactGrass.getBoundingClientRect();
     const startLeft = (window.innerWidth - startWidth) / 2;
     const startTop = (window.innerHeight - startHeight) / 2;
 
@@ -84,6 +83,16 @@ const {
     intro.style.height = `${startHeight}px`;
     intro.style.transformOrigin = 'top left';
     intro.style.willChange = 'transform';
+
+    // Measure both elements after the intro has been positioned. Using their
+    // actual viewport rectangles keeps the diagonal journey accurate on mobile,
+    // where the fixed-position containing block can differ from the layout viewport.
+    const startRect = intro.getBoundingClientRect();
+    const target = contactGrass.getBoundingClientRect();
+    const travelX = target.left - startRect.left;
+    const travelY = target.top - startRect.top;
+    const scaleX = target.width / startRect.width;
+    const scaleY = target.height / startRect.height;
 
     // Let the grass boil in the centre for a little longer, then freeze its
     // current frame so the journey into the Contact position feels deliberate.
@@ -95,7 +104,7 @@ const {
       const motion = intro.animate([
         { transform: 'translate(0, 0) scale(1, 1)' },
         {
-          transform: `translate(${target.left - startLeft}px, ${target.top - startTop}px) scale(${target.width / startWidth}, ${target.height / startHeight})`,
+          transform: `translate3d(${travelX}px, ${travelY}px, 0) scale(${scaleX}, ${scaleY})`,
         },
       ], {
         duration: 1650,
