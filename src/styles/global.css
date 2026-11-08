@@ -371,7 +371,7 @@ h3 {
   left: -0.04em;
   right: -0.04em;
   top: 100%;
-  height: clamp(7px, 1.1vh, 11px);
+  height: clamp(3.5px, 0.55vh, 5.5px); /* half height: a finer pencil stroke */
   background: var(--line) no-repeat left center / 100% 100%;
   /* everything left of the pen is drawn; a short feathered edge is the crayon tip */
   -webkit-mask-image: linear-gradient(to right, #000 calc(var(--draw) - 14%), transparent var(--draw));
