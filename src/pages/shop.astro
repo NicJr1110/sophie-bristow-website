@@ -20,6 +20,16 @@ const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
   )}
   <p class="shop-message" role="status" aria-live="polite" hidden></p>
   <Gallery items={gallery.items} shop />
+  <nav class="simple-bottom-links shop-contact-footer" aria-label="Contact">
+    <a class="simple-text-link simple-contact-link" href="/contact/">
+      <span class="simple-grass boil-art" aria-hidden="true">
+        {Array.from({ length: 5 }, (_, i) => (
+          <img src={`/marks/flowers/grass-${String(i + 1).padStart(2, '0')}.png`} alt="" width="84" height="64" />
+        ))}
+      </span>
+      <span>CONTACT</span>
+    </a>
+  </nav>
 </Base>
 
 <script>

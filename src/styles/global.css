@@ -897,7 +897,8 @@ h3 {
 }
 
 .boil-art { position: relative; display: block; }
-.enquiry-grass.boil-art img { animation-name: boil-grass-frame; animation-duration: 900ms; }
+.enquiry-grass.boil-art img { animation-name: boil-grass-frame; animation-duration: 900ms; animation-play-state: paused; }
+.enquiry-grass.boil-art:hover img { animation-play-state: running; }
 .lined-flower.boil-art img { animation-duration: 1080ms; }
 .boil-art img {
   position: absolute;
@@ -1149,14 +1150,16 @@ h3 {
 .simple-choice-browse { display:inline-block; margin-top:0; font-size:.92rem; line-height:1.2; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:.3em; text-decoration-color:currentColor; }
  .simple-bottom-links { display:grid; grid-template-columns:1fr 1fr; align-items:end; width:100%; max-width:none; margin:auto 0 0; padding-top:clamp(34px,5vh,58px); }
 .simple-shop-link { justify-self:start; align-self:end; display:flex; flex-direction:column; align-items:flex-start; gap:5px; }\n.simple-shop-icon { display:block; width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
-.simple-bottom-right { justify-self:end; display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+.simple-bottom-right { justify-self:end; display:flex; flex-direction:column; align-items:center; gap:8px; }
 .simple-text-link { color:#111; font-size:.82rem; line-height:1.2; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; }
 .simple-text-link:hover,.simple-text-link:focus-visible { color:#111; text-decoration:underline; text-underline-offset:.25em; }
-.simple-grass { width:76px; height:58px; object-fit:contain; object-position:right bottom; }
+.simple-grass { width:76px; height:58px; object-fit:contain; object-position:center bottom; }
 .simple-grass.boil-art { position:relative; display:block; }
+.simple-contact-link { display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:8px; font-size:.72rem; letter-spacing:.12em; }
 .simple-grass.boil-art img { animation-name:boil-grass-frame; animation-duration:900ms; animation-play-state:paused; }
-.simple-bottom-right:has(.simple-contact-link:hover, .simple-contact-link:focus-visible) .simple-grass.boil-art img { animation-play-state:running; }
-.simple-contact-link { font-size:.72rem; letter-spacing:.12em; }
+.simple-grass.boil-art:hover img { animation-play-state:running; }
+.shop-contact-footer { display:flex; justify-content:flex-end; padding-top:clamp(34px,5vh,58px); }
+.shop-contact-footer .simple-contact-link { justify-self:auto; }
  .simple-shop-page .simple-brand { margin-bottom:clamp(74px,12vh,132px); }
 
 /* The shop gallery follows the same edge-to-edge 20px editorial gutters as the landing page. */
