@@ -190,6 +190,30 @@ h3 {
   background: var(--line-title) no-repeat center / 100% 100%;
 }
 
+/* Pages that are in the menu (Flash, Mark Making, Shop, Contact): on burger-menu screens the
+   page name sits left-aligned with no line; on laptops the menu already shows it, so it's
+   kept only for screen readers. */
+.page-title--nav {
+  text-align: left;
+  margin: 4px 0 20px;
+}
+
+.page-title--nav::after {
+  content: none;
+}
+
+@media (min-width: 1024px) {
+  .page-title--nav {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
 .intro {
   max-width: 56ch;
   margin: 0 auto 36px;
@@ -755,132 +779,134 @@ h3 {
 
 /* ---------- Contact ---------- */
 
-/* Form on the left, one of Sophie's flowers as a rail down the right */
-.contact-area {
-  display: grid;
-  grid-template-columns: minmax(0, 560px) clamp(44px, 12vw, 64px);
-  justify-content: center;
-  gap: clamp(12px, 3vw, 28px);
+/* Step 1: the enquiry types, as a big list like the landing menu */
+.enquiry-pick {
+  margin: 4vh auto 0;
 }
 
-.contact-rail {
-  background: url('/marks/flowers/flower-04.png') no-repeat center bottom / 100% 100%;
-  opacity: 0.9;
-}
-
-@media (min-width: 768px) {
-  .contact-area {
-    grid-template-columns: minmax(0, 560px) clamp(90px, 10vw, 130px);
-    gap: 48px;
-  }
-}
-
-.contact-form {
+/* Step 2: no boxes, no fills, just thin lines */
+.lined-form {
+  width: min(100%, 560px);
+  margin: 2vh auto 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 30px;
 }
 
-.contact-form label {
+.lined-about {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0 0 -6px;
+  font-size: 0.95rem;
+  color: var(--muted);
 }
 
-.contact-form input,
-.contact-form textarea {
-  font: inherit;
-  padding: 11px 13px;
-  border: 0;
-  border-radius: 4px;
-  background: rgb(26 26 26 / 0.065); /* soft grey, no border */
+.lined-about b {
+  font-weight: 500;
   color: var(--text);
-  transition: background 0.2s;
 }
 
-.contact-form input:focus,
-.contact-form textarea:focus {
-  outline: none;
-  background: rgb(26 26 26 / 0.1);
-  box-shadow: inset 0 -2px 0 var(--text);
-}
-
-.contact-form textarea {
-  resize: vertical;
-}
-
-/* Enquiry type buttons: 2 sit side by side; more fill a 2-column grid left to right. */
-.enquiry-types {
+.lined-change {
+  font: inherit;
+  color: inherit;
+  background: none;
   border: 0;
-  margin: 0;
   padding: 0;
-  min-width: 0;
-}
-
-.enquiry-types legend {
-  padding: 0;
-  margin-bottom: 8px;
-}
-
-.enquiry-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.enquiry-grid.is-single {
-  grid-template-columns: 1fr;
-}
-
-.contact-form .enquiry-option {
-  position: relative;
-  display: block;
+  text-decoration: underline;
+  text-underline-offset: 3px;
   cursor: pointer;
 }
 
-/* Visually hidden but still focusable, so keyboard and validation work. */
-.enquiry-option input {
-  position: absolute;
-  opacity: 0;
-  width: 1px;
-  height: 1px;
-  margin: 0;
+.lined-row {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--text);
+  font-size: 1.15rem;
+  cursor: text;
 }
 
-.enquiry-option span {
-  display: block;
-  padding: 12px 10px;
+.lined-row span {
+  min-width: 3.6em;
+}
+
+.lined-row input,
+.lined-message textarea {
+  font: inherit;
+  font-size: 1.15rem;
+  color: var(--text);
+  background: none;
   border: 0;
-  border-radius: 4px;
-  font-family: var(--font-heading);
-  font-weight: var(--heading-weight);
-  font-size: 1.02rem;
-  line-height: 1.2;
-  background: rgb(26 26 26 / 0.065);
-  text-align: center;
-  transition: background 0.2s, color 0.2s;
+  border-radius: 0;
+  padding: 0;
 }
 
-.enquiry-option:hover span {
-  background: rgb(26 26 26 / 0.11);
+.lined-row input {
+  flex: 1;
+  min-width: 0;
 }
 
-.enquiry-option input:checked + span {
-  background: var(--accent);
-  color: var(--accent-text);
+.lined-message {
+  position: relative;
+  border-bottom: 1px solid var(--text);
 }
 
-.enquiry-option input:focus-visible + span {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
+.lined-message textarea {
+  display: block;
+  width: 100%;
+  padding-bottom: 8px;
+  resize: none;
 }
 
-.contact-form .button {
+.lined-message textarea::placeholder {
+  color: #8a8782;
+  opacity: 1;
+}
+
+/* Focus: the line thickens, so keyboard users can see where they are */
+.lined-row input:focus,
+.lined-message textarea:focus {
+  outline: none;
+}
+
+.lined-row:focus-within,
+.lined-message:focus-within {
+  box-shadow: 0 1px 0 var(--text);
+}
+
+.lined-message .char-count {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+}
+
+/* The flower floats beside the message area (laptop only), bottom-aligned with its line.
+   It's taken out of the flow, so the form stays centred. */
+.lined-flower {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .lined-flower {
+    display: block;
+    position: absolute;
+    left: calc(100% + 44px);
+    bottom: -2px;
+    height: 100%;
+    max-height: 300px;
+    width: auto;
+    pointer-events: none;
+  }
+}
+
+.lined-form .button {
   align-self: flex-start;
+  margin-top: 14px;
 }
 
 .char-count {
-  align-self: flex-end;
   font-size: 0.75rem;
   color: var(--muted);
 }

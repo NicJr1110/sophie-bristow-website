@@ -8,7 +8,7 @@ const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
 ---
 
 <Base title={gallery.title}>
-  <h1 class="page-title">{gallery.title}</h1>
+  <h1 class="page-title page-title--nav">{gallery.title}</h1>
   {gallery.intro && <p class="intro">{gallery.intro}</p>}
   {tags.length > 0 && (
     <nav class="shop-tags" aria-label="Filter the shop">

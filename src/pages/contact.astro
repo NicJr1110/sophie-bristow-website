@@ -1,49 +1,62 @@
 ---
+// Contact, in two steps:
+//   1. What's it about? The enquiry types as a big lowercase list, like the landing menu.
+//   2. The form: "name" and "email" on underlined lines, then a message area. Each enquiry
+//      type has its own auto-reply template and inbox in Sanity.
 import Base from '../layouts/Base.astro';
 import { getEnquiryTypes } from '../lib/content';
 
-// Enquiry types come from Sanity; each maps to its own auto-reply template.
 const enquiryTypes = await getEnquiryTypes();
+// With one type (or none) there's nothing to choose, so go straight to the form.
+const choose = enquiryTypes.length > 1;
+const only = enquiryTypes.length === 1 ? enquiryTypes[0] : null;
+const LINE_COUNT = 17;
 ---
 
 <Base title="Contact" showSplash={false}>
-  <h1 class="page-title">Contact</h1>
+  <h1 class="page-title page-title--nav">Contact</h1>
 
-  <div class="contact-area">
-  <form id="contact-form" class="contact-form" method="post" action="/api/contact">
-    {enquiryTypes.length > 0 && (
-      <fieldset class="enquiry-types">
-        <legend>What's it about?</legend>
-        <div class:list={['enquiry-grid', { 'is-single': enquiryTypes.length === 1 }]}>
-          {enquiryTypes.map((t, i) => (
-            <label class="enquiry-option">
-              <input
-                type="radio"
-                name="enquiryType"
-                value={t.id}
-                required
-                checked={enquiryTypes.length === 1 && i === 0}
-              />
-              <span>{t.label}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+  {choose && (
+    <nav class="enquiry-pick landing-nav" aria-label="What's it about?">
+      <ul class="landing-list">
+        {enquiryTypes.map((t) => (
+          <li class="landing-item">
+            <button class="landing-link" type="button" data-type={t.id} data-label={t.label}>
+              {t.label.toLowerCase()}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )}
+
+  <form id="contact-form" class="lined-form" method="post" action="/api/contact" hidden={choose}>
+    <input type="hidden" name="enquiryType" value={only?.id ?? ''} />
+
+    {choose && (
+      <p class="lined-about">
+        <span>About: <b class="lined-about-label"></b></span>
+        <button class="lined-change" type="button">change</button>
+      </p>
     )}
 
-    <label>
-      Name
+    <label class="lined-row">
+      <span>name</span>
       <input name="name" type="text" required maxlength="200" autocomplete="name" />
     </label>
-    <label>
-      Email
+    <label class="lined-row">
+      <span>email</span>
       <input name="email" type="email" required maxlength="254" autocomplete="email" />
     </label>
-    <label>
-      Message
-      <textarea name="message" rows="7" required maxlength="2000"></textarea>
+
+    <div class="lined-message">
+      <label class="sr-only" for="contact-message">Message</label>
+      <textarea id="contact-message" name="message" rows="9" required maxlength="2000" placeholder="start typing here…"
+      ></textarea>
       <span class="char-count" aria-live="polite">0 / 2000</span>
-    </label>
+      <!-- Laptop only: one of Sophie's flowers stands beside the message area, outside the form's centred column -->
+      <img class="lined-flower" src="/marks/flowers/flower-04.png" alt="" width="358" height="892" />
+    </div>
 
     <!-- Honeypot: hidden from people, bots fill it in -->
     <div class="hp" aria-hidden="true">
@@ -53,9 +66,6 @@ const enquiryTypes = await getEnquiryTypes();
     <button class="button" type="submit">Send</button>
     <p class="form-error" role="alert" hidden>Oops, something appears to have gone wrong. Please try again later.</p>
   </form>
-    <!-- One of Sophie's flowers runs down the right of the form, framing it -->
-    <div class="contact-rail" aria-hidden="true"></div>
-  </div>
 
   <div class="form-success" role="status" tabindex="-1" hidden>
     <p class="form-success-title">Sent</p>
@@ -64,19 +74,75 @@ const enquiryTypes = await getEnquiryTypes();
   </div>
 </Base>
 
+<script define:vars={{ LINE_COUNT }}>
+  // Hovering an enquiry type draws one of Sophie's lines under it (as on the landing page).
+  const pad = (n) => String(n).padStart(2, '0');
+  let last = 0;
+  const nextLine = () => {
+    let n;
+    do n = 1 + Math.floor(Math.random() * LINE_COUNT);
+    while (n === last);
+    last = n;
+    return `url('/marks/lines/line-${pad(n)}.png')`;
+  };
+  document.querySelectorAll('.enquiry-pick .landing-item').forEach((li) => {
+    const draw = () => {
+      if (li.classList.contains('is-drawn')) return;
+      li.style.setProperty('--line', nextLine());
+      li.classList.add('is-drawn');
+    };
+    const undraw = () => {
+      if (li.matches(':hover') || li.contains(document.activeElement)) return;
+      li.classList.remove('is-drawn');
+    };
+    li.addEventListener('mouseenter', draw);
+    li.addEventListener('focusin', draw);
+    li.addEventListener('mouseleave', undraw);
+    li.addEventListener('focusout', () => setTimeout(undraw));
+  });
+</script>
+
 <script>
   const form = document.getElementById('contact-form') as HTMLFormElement;
+  const pick = document.querySelector<HTMLElement>('.enquiry-pick');
+  const typeInput = form.querySelector<HTMLInputElement>('input[name=enquiryType]')!;
+  const aboutLabel = form.querySelector<HTMLElement>('.lined-about-label');
   const success = document.querySelector<HTMLElement>('.form-success')!;
   const error = form.querySelector<HTMLElement>('.form-error')!;
   const submit = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
   const message = form.querySelector<HTMLTextAreaElement>('textarea[name=message]')!;
   const count = form.querySelector<HTMLElement>('.char-count')!;
 
+  // Step 1 → step 2. The choice goes in the URL (?about=…) so Back returns to the list.
+  const showStep = () => {
+    if (!pick) return;
+    const id = new URLSearchParams(location.search).get('about');
+    const btn = id ? pick.querySelector<HTMLButtonElement>(`[data-type="${CSS.escape(id)}"]`) : null;
+    pick.hidden = Boolean(btn);
+    form.hidden = !btn;
+    typeInput.value = btn?.dataset.type ?? '';
+    if (aboutLabel) aboutLabel.textContent = (btn?.dataset.label ?? '').toLowerCase();
+    return btn;
+  };
+  pick?.querySelectorAll<HTMLButtonElement>('[data-type]').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      history.pushState(null, '', `?about=${encodeURIComponent(btn.dataset.type!)}`);
+      showStep();
+      form.querySelector<HTMLInputElement>('input[name=name]')?.focus();
+    }),
+  );
+  form.querySelector('.lined-change')?.addEventListener('click', () => {
+    history.pushState(null, '', location.pathname);
+    showStep();
+    pick?.querySelector<HTMLButtonElement>(`[data-type="${CSS.escape(typeInput.value || '')}"]`)?.focus();
+  });
+  addEventListener('popstate', showStep);
+  showStep();
+
   message.addEventListener('input', () => (count.textContent = `${message.value.length} / 2000`));
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    // All fields, including the enquiry type, are required.
     if (!form.reportValidity()) return;
     error.hidden = true;
     submit.disabled = true;
@@ -89,9 +155,8 @@ const enquiryTypes = await getEnquiryTypes();
         body: JSON.stringify(Object.fromEntries(new FormData(form))),
       });
       if (!res.ok) throw new Error(String(res.status));
-      // Happy path: the whole form (and its heading) goes, leaving just the message, centred.
-      form.closest('.contact-area')?.setAttribute('hidden', '');
-      document.querySelector<HTMLElement>('.page-title')?.setAttribute('hidden', '');
+      // Happy path: the form goes, leaving "Sent", the thank-you and the flowers.
+      form.hidden = true;
       success.hidden = false;
       window.scrollTo({ top: 0 });
       success.focus({ preventScroll: true });
