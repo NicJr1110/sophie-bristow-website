@@ -70,5 +70,29 @@ const year = new Date().getFullYear();
         </footer>
       )}
     </div>
+    <script>
+      // Reveal substantial content as it enters the viewport, with a graceful fallback.
+      const revealTargets = document.querySelectorAll<HTMLElement>(
+        '.simple-choice-card, .grid > li, .bio > *, .enquiry-pick > *, .intro, .shop-tags',
+      );
+
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            (entry.target as HTMLElement).classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          });
+        }, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
+
+        revealTargets.forEach((element, index) => {
+          element.setAttribute('data-reveal', '');
+          if (element.matches('.simple-choice-card, .grid > li')) {
+            element.style.setProperty('--reveal-delay', `${Math.min(index % 6, 5) * 45}ms`);
+          }
+          revealObserver.observe(element);
+        });
+      }
+    </script>
   </body>
 </html>

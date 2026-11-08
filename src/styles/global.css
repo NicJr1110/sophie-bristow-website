@@ -1462,3 +1462,103 @@ h3 {
   color: var(--text);
 }
 .mobile-menu .mobile-shop-submenu .scratch.is-current { opacity: .55; }
+
+
+/* ---------- Restrained editorial motion ---------- */
+@keyframes page-arrive {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page {
+  animation: page-arrive 520ms var(--ease) both;
+}
+
+/* Content reveals are opt-in via the small observer in Base.astro. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 560ms var(--ease), transform 560ms var(--ease);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* A little more tactility on the landing choices without changing their outline. */
+.simple-choice-card {
+  transition: background-color 220ms ease, transform 260ms var(--ease);
+}
+.simple-choice-card:hover,
+.simple-choice-card:focus-visible {
+  transform: translateY(-2px);
+}
+
+/* Artwork should feel like a print lifting slightly from the page, not a zoom effect. */
+.tile-open {
+  transition: box-shadow 320ms var(--ease), transform 320ms var(--ease);
+}
+.tile-open img {
+  transition: transform 520ms var(--ease);
+}
+.tile-open:hover img,
+.tile-open:focus-visible img {
+  transform: scale(1.025);
+}
+.tile-open:hover,
+.tile-open:focus-visible {
+  transform: translateY(-2px);
+}
+
+/* Menu links arrive in a quiet, short stagger; dropdowns use the same soft entrance. */
+@keyframes menu-link-arrive {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.mobile-menu.is-open nav > ul > li {
+  animation: menu-link-arrive 360ms var(--ease) both;
+}
+.mobile-menu.is-open nav > ul > li:nth-child(1) { animation-delay: 35ms; }
+.mobile-menu.is-open nav > ul > li:nth-child(2) { animation-delay: 75ms; }
+.mobile-menu.is-open nav > ul > li:nth-child(3) { animation-delay: 115ms; }
+.mobile-menu.is-open nav > ul > li:nth-child(4) { animation-delay: 155ms; }
+.mobile-menu.is-open nav > ul > li:nth-child(5) { animation-delay: 195ms; }
+
+@keyframes dropdown-arrive {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.desktop-shop-submenu:not([hidden]),
+.mobile-menu .mobile-shop-submenu:not([hidden]) {
+  animation: dropdown-arrive 190ms var(--ease) both;
+}
+
+.button,
+.buy {
+  transition: background-color 180ms ease, color 180ms ease, transform 220ms var(--ease);
+}
+.button:hover:not(:disabled),
+.buy:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page { animation: none; }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .mobile-menu.is-open nav > ul > li,
+  .desktop-shop-submenu:not([hidden]),
+  .mobile-menu .mobile-shop-submenu:not([hidden]) {
+    animation: none;
+  }
+  .simple-choice-card,
+  .tile-open,
+  .tile-open img,
+  .button,
+  .buy {
+    transition: none;
+  }
+}
