@@ -17,17 +17,21 @@ const LINE_COUNT = 17;
   <h1 class="page-title page-title--nav">Contact</h1>
 
   {choose && (
-    <nav class="enquiry-pick landing-nav" aria-label="What's it about?">
-      <ul class="landing-list">
-        {enquiryTypes.map((t) => (
-          <li class="landing-item">
-            <button class="landing-link" type="button" data-type={t.id} data-label={t.label}>
-              {t.label.toLowerCase()}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <div class="enquiry-pick">
+      <nav class="landing-nav" aria-label="What's it about?">
+        <ul class="landing-list">
+          {enquiryTypes.map((t) => (
+            <li class="landing-item">
+              <button class="landing-link" type="button" data-type={t.id} data-label={t.label}>
+                {t.label.toLowerCase()}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <!-- One of Sophie's grass drawings, large, at the foot of the page -->
+      <img class="enquiry-grass" src="/marks/flowers/grass-01.png" alt="" width="347" height="312" />
+    </div>
   )}
 
   <form id="contact-form" class="lined-form" method="post" action="/api/contact" hidden={choose}>

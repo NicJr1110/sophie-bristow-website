@@ -812,7 +812,20 @@ h3 {
 
 /* Step 1: the enquiry types, as a big list like the landing menu */
 .enquiry-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   margin: 4vh 0 0;
+  /* fill the screen so the grass sits at the bottom of the content area */
+  min-height: calc(100svh - 300px);
+}
+
+.enquiry-grass {
+  margin-top: auto;
+  padding-top: 32px;
+  height: clamp(150px, 28vh, 260px);
+  width: auto;
+  opacity: 0.92;
 }
 
 /* Step 2: no boxes, no fills, just thin lines */
