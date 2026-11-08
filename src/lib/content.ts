@@ -53,7 +53,7 @@ export function getSettings(): Promise<Settings> {
     );
     const url = sanityImageUrl(s?.background, { w: 1600 });
     // Shop is off unless Sophie has switched it on.
-    return { backgroundUrl: url || '/splash-flower.png', showShop: s?.showShop === true, flashSubtitle: s?.flashSubtitle ?? DEFAULT_MENU_SUBTITLES.flashSubtitle, markMakingSubtitle: s?.markMakingSubtitle ?? DEFAULT_MENU_SUBTITLES.markMakingSubtitle, artworksSubtitle: s?.artworksSubtitle ?? DEFAULT_MENU_SUBTITLES.artworksSubtitle, giftCardsSubtitle: s?.giftCardsSubtitle ?? DEFAULT_MENU_SUBTITLES.giftCardsSubtitle };
+    return { backgroundUrl: url || '/splash-flower.png', showShop: true, flashSubtitle: s?.flashSubtitle ?? DEFAULT_MENU_SUBTITLES.flashSubtitle, markMakingSubtitle: s?.markMakingSubtitle ?? DEFAULT_MENU_SUBTITLES.markMakingSubtitle, artworksSubtitle: s?.artworksSubtitle ?? DEFAULT_MENU_SUBTITLES.artworksSubtitle, giftCardsSubtitle: s?.giftCardsSubtitle ?? DEFAULT_MENU_SUBTITLES.giftCardsSubtitle };
   })();
   return settingsPromise;
 }

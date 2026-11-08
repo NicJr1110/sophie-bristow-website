@@ -29,9 +29,11 @@ const settings = await getSettings();
     </section>
 
     <nav class="simple-bottom-links" aria-label="More">
-      {settings.showShop && <a class="simple-text-link" href="/shop-options/">SHOP</a>}
-      <img class="simple-grass" src="/marks/flowers/grass-01.png" alt="" width="84" height="64" />
-      <a class="simple-text-link simple-contact-link" href="/contact/">CONTACT</a>
+      {settings.showShop && <a class="simple-text-link simple-shop-link" href="/shop-options/">SHOP</a>}
+      <div class="simple-bottom-right">
+        <img class="simple-grass" src="/marks/flowers/grass-01.png" alt="" width="84" height="64" />
+        <a class="simple-text-link simple-contact-link" href="/contact/">CONTACT</a>
+      </div>
     </nav>
   </div>
 </Base>
