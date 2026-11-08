@@ -30,7 +30,7 @@ const year = new Date().getFullYear();
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#eeede9" />
+    <meta name="theme-color" content="#ffffff" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -41,7 +41,6 @@ const year = new Date().getFullYear();
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Abel&display=swap"
     />
-    <link rel="preload" href="/paper.jpg" as="image" />
   </head>
   <body class:list={{ 'is-landing': !showHeader }}>
     {/* Background splash is intentionally disabled for the clean white design. Restore this block to bring it back.
