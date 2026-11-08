@@ -24,7 +24,7 @@ const isCurrent = (href: string) => current.startsWith(href);
   <a class="site-name" href="/" aria-label={USE_MONOGRAM ? SITE_NAME : undefined}>
     {USE_MONOGRAM ? <img class="monogram" src="/sb-logo.png" alt="" width="326" height="400" /> : SITE_NAME}
   </a>
-  {title && <span class="header-page-title">{title}{subtitle && <span class="header-page-subtitle" data-shop-subtitle>{subtitle}</span>}</span>}
+  {title && <span class="header-page-title">{title}</span>}
 
   <!-- Large screens: horizontal menu centred under the name -->
   <nav class="nav-desktop" aria-label="Main">

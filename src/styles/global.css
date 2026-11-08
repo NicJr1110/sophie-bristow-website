@@ -1728,3 +1728,27 @@ h3 {
 @media (max-width: 1023px) {
   .shop-category-subtitle { display: none; }
 }
+
+
+/* Consistent page-title case across the site. */
+.page-title,
+.header-page-title {
+  text-transform: uppercase;
+}
+
+/* Shop category sits at the start of the content column, just below the header. */
+.shop-category-subtitle {
+  display: block;
+  margin: 0 0 18px;
+  text-align: left;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.15;
+  text-transform: lowercase;
+}
+
+/* Submenu labels stay lowercase in every navigation layout. */
+.desktop-shop-submenu a,
+.mobile-shop-submenu a,
+.landing-sub a {
+  text-transform: lowercase;
+}
