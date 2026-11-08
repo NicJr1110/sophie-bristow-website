@@ -32,6 +32,10 @@ function cleanUrl(url: URL): string {
 
 export const onRequest: PagesFunction<Env> = async ({ request, env, next }) => {
   const url = new URL(request.url);
+  // The shop used to live at /artwork/
+  if (/^\/artwork(\/|$)/.test(url.pathname)) {
+    return new Response(null, { status: 301, headers: { Location: '/shop/' } });
+  }
   const cookie = request.headers.get('Cookie');
   const settings = await getSettings(env);
   const decision = decide(url, cookie, settings);

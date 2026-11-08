@@ -4,20 +4,18 @@
 import Base from '../layouts/Base.astro';
 
 const FONTS: { name: string; family: string; weight: number; scale: number; note: string }[] = [
-  { name: 'Amatic SC', family: 'Amatic SC', weight: 700, scale: 1.35, note: 'Tall, narrow brush capitals. Structured, airy. (Current.)' },
-  { name: 'Just Another Hand', family: 'Just Another Hand', weight: 400, scale: 1.45, note: 'Condensed marker hand. Upright and orderly.' },
-  { name: 'Nanum Pen Script', family: 'Nanum Pen Script', weight: 400, scale: 1.4, note: 'Scratchy fine pen, narrow, looks genuinely written.' },
-  { name: 'Reenie Beanie', family: 'Reenie Beanie', weight: 400, scale: 1.35, note: 'Rough ballpoint scrawl. Most scratchy, least tidy.' },
-  { name: 'Mynerve', family: 'Mynerve', weight: 400, scale: 1.05, note: 'Neat handwriting with structure; reads easily.' },
-  { name: 'Covered By Your Grace', family: 'Covered By Your Grace', weight: 400, scale: 1.15, note: 'Felt-tip marker, slightly raw.' },
-  { name: 'Architects Daughter', family: 'Architects Daughter', weight: 400, scale: 1.0, note: 'Draughtsman’s print: structured, hand-lettered.' },
-  { name: 'Special Elite', family: 'Special Elite', weight: 400, scale: 0.95, note: 'Worn typewriter. Scratchy texture, very structured.' },
-  { name: 'Rock Salt', family: 'Rock Salt', weight: 400, scale: 0.8, note: 'Heavy scratchy marker. Strong character.' },
+  { name: 'Instrument Sans', family: 'Instrument Sans', weight: 500, scale: 1, note: 'Made by a design studio; crisp and quietly characterful. (Current.)' },
+  { name: 'Hanken Grotesk', family: 'Hanken Grotesk', weight: 500, scale: 1, note: 'Open, Swiss-style grotesk. Calm and gallery-like.' },
+  { name: 'Inter Tight', family: 'Inter Tight', weight: 500, scale: 0.98, note: 'Tighter Inter. Very clean, Helvetica-adjacent.' },
+  { name: 'Schibsted Grotesk', family: 'Schibsted Grotesk', weight: 500, scale: 1, note: 'Editorial grotesk with a little warmth.' },
+  { name: 'Albert Sans', family: 'Albert Sans', weight: 500, scale: 1, note: 'Scandinavian geometric. Airy, modern brochure.' },
+  { name: 'Manrope', family: 'Manrope', weight: 500, scale: 0.96, note: 'Rounded-modern. Friendly, very open.' },
+  { name: 'Figtree', family: 'Figtree', weight: 500, scale: 1, note: 'Clean geometric, slightly softer.' },
 ];
 
 const href =
   'https://fonts.googleapis.com/css2?' +
-  FONTS.map((f) => `family=${f.family.replace(/ /g, '+')}${f.weight === 700 ? ':wght@700' : ''}`).join('&') +
+  FONTS.map((f) => `family=${f.family.replace(/ /g, '+')}:wght@400;500;600`).join('&') +
   '&display=swap';
 ---
 
@@ -26,7 +24,7 @@ const href =
   <link rel="stylesheet" href={href} />
 
   <h1 class="page-title">Font test</h1>
-  <p class="intro">Each block shows a candidate heading font in place. Body text stays Instrument Sans. Hover the menu words to see the scratch line.</p>
+  <p class="intro">Each block shows a candidate font for the whole site: name, menu and body text. Hover the menu words to see the scratch line.</p>
 
   <div class="type-tests">
     {FONTS.map((f, i) => (
@@ -72,14 +70,16 @@ const href =
     font-size: 0.9rem;
   }
   .type-name,
-  .type-menu .scratch {
+  .type-menu .scratch,
+  .type-body {
     font-family: var(--f), sans-serif;
     font-weight: var(--w);
   }
   .type-name {
     margin: 0 0 6px;
-    font-size: calc(2.6rem * var(--s));
+    font-size: calc(2.4rem * var(--s));
     line-height: 1.05;
+    letter-spacing: -0.02em;
   }
   .type-menu {
     display: flex;
@@ -88,9 +88,10 @@ const href =
     margin: 0 0 14px;
   }
   .type-menu .scratch {
-    font-size: calc(1.6rem * var(--s));
+    font-size: calc(1.15rem * var(--s));
   }
   .type-body {
+    font-weight: 400;
     margin: 0;
     max-width: 60ch;
   }

@@ -13,7 +13,7 @@ export const structure: StructureResolver = (S) =>
       single(S, 'Flash', 'galleryPage', 'page-flash'),
       single(S, 'Mark Making', 'galleryPage', 'page-mark-making'),
       S.divider(),
-      single(S, 'Artwork page intro', 'galleryPage', 'page-artwork'),
+      single(S, 'Shop page intro', 'galleryPage', 'page-artwork'),
       S.documentTypeListItem('artwork').title('Artworks for sale'),
       S.divider(),
       S.listItem()

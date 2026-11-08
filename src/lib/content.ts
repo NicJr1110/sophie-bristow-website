@@ -51,10 +51,10 @@ export function getSettings(): Promise<Settings> {
   return settingsPromise;
 }
 
-/** Menu items, without Artwork while the shop is switched off. */
+/** Menu items, without Shop while the shop is switched off. */
 export async function getNav() {
   const { showShop } = await getSettings();
-  return NAV.filter((item) => showShop || item.href !== '/artwork/');
+  return NAV.filter((item) => showShop || item.href !== '/shop/');
 }
 
 /* ---------- Galleries (Flash, Mark Making) ---------- */
@@ -118,7 +118,7 @@ export async function getArtworkGallery(): Promise<Gallery> {
       pic,
     });
   }
-  return { title: page?.title || 'Artwork', intro: page?.introText ?? '', items };
+  return { title: page?.title || 'Shop', intro: page?.introText ?? '', items };
 }
 
 /* ---------- Bio ---------- */
@@ -176,7 +176,7 @@ function sampleGallery(_docId: string, title: string): Gallery {
 
 function sampleArtwork(): Gallery {
   return {
-    title: 'Artwork',
+    title: 'Shop',
     intro: 'Placeholder intro text. Connect Sanity to show real pieces.',
     items: Array.from({ length: 6 }, (_, i) => ({
       id: `sample-${i}`,

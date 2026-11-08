@@ -1,5 +1,5 @@
 /*
- * Sophie's look: ink on paper. Handwritten heading font (see /type-test/), Instrument Sans
+ * Sophie's look: ink on paper. One clean gallery sans (Instrument Sans; compare at /type-test/),
  * for body text, crayon underlines, hand-drawn button edges. Adjust tokens when her
  * design guidelines come back.
  *
@@ -20,10 +20,13 @@
   --hover: #444;
 
   --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  /* Provisional: compare candidates at /type-test/, then change this and the font link in Base.astro */
-  --font-heading: 'Amatic SC', 'Arial Narrow', sans-serif;
-  --heading-weight: 700;
-  --heading-tracking: 0.02em;
+  /* Headings share the body family: a clean, open gallery sans. Compare options at /type-test/. */
+  --font-heading: var(--font-body);
+  --heading-weight: 500;
+  --heading-tracking: -0.02em;
+  /* Sophie's own hand-drawn lines (public/marks/lines) used as underlines */
+  --line-underline: url('/marks/lines/line-16.png');
+  --line-title: url('/marks/lines/line-08.png');
   /* Irregular corners so boxes look drawn rather than ruled */
   --hand-radius: 255px 12px 225px 14px / 14px 225px 12px 255px;
 
@@ -173,7 +176,7 @@ h3 {
 
 .page-title {
   text-align: center;
-  font-size: clamp(2.8rem, 9vw, 4.2rem);
+  font-size: clamp(2rem, 5.5vw, 3rem);
   margin: 12px 0 22px;
 }
 
@@ -181,10 +184,10 @@ h3 {
 .page-title::after {
   content: '';
   display: block;
-  width: 2.4em;
-  height: 0.3em;
-  margin: 0.12em auto 0;
-  background: url('/scratch.svg') no-repeat center / 100% 100%;
+  width: 2.6em;
+  height: 0.2em;
+  margin: 0.22em auto 0;
+  background: var(--line-title) no-repeat center / 100% 100%;
 }
 
 .intro {
@@ -225,7 +228,7 @@ h3 {
 }
 
 /* ---------- Menu links (ScratchLink.astro) ----------
- * Hover: a thin crayon scratch draws in from the right under the word.
+ * Hover: one of Sophie's hand-drawn lines draws in from the right under the word.
  */
 
 .scratch {
@@ -246,9 +249,9 @@ h3 {
   position: absolute;
   left: -0.06em;
   right: -0.06em;
-  bottom: -0.06em;
-  height: 0.22em;
-  background: url('/scratch.svg') no-repeat center / 100% 100%;
+  bottom: -0.2em;
+  height: 0.26em;
+  background: var(--line-underline) no-repeat center / 100% 100%;
   clip-path: inset(0 0 0 100%);
   transition: clip-path 0.55s cubic-bezier(0.65, 0, 0.25, 1);
 }
@@ -274,7 +277,7 @@ h3 {
 }
 
 .landing-name {
-  font-size: clamp(3rem, 12vw, 6rem);
+  font-size: clamp(2.4rem, 8vw, 4.4rem);
   font-weight: var(--heading-weight);
   margin: 44px 0 0;
   text-align: center;
@@ -311,7 +314,7 @@ h3 {
 }
 
 .landing-menu .scratch {
-  font-size: clamp(2rem, 9vw, 4.8rem);
+  font-size: clamp(1.5rem, 5.6vw, 3.4rem);
   font-weight: var(--heading-weight);
   line-height: 1.1;
   letter-spacing: var(--heading-tracking);
@@ -343,7 +346,7 @@ h3 {
 
 .site-name {
   font-family: var(--font-heading);
-  font-size: clamp(2.4rem, 7vw, 3.2rem);
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
   font-weight: var(--heading-weight);
   letter-spacing: var(--heading-tracking);
   text-decoration: none;
@@ -363,7 +366,7 @@ h3 {
 }
 
 .nav-desktop .scratch {
-  font-size: 1.7rem;
+  font-size: 1.02rem;
   font-weight: var(--heading-weight);
   letter-spacing: var(--heading-tracking);
 }
@@ -433,7 +436,7 @@ h3 {
 }
 
 .mobile-menu .scratch {
-  font-size: clamp(2.6rem, 12vw, 3.6rem);
+  font-size: clamp(2rem, 9vw, 2.8rem);
   font-weight: var(--heading-weight);
   letter-spacing: var(--heading-tracking);
 }
@@ -517,8 +520,8 @@ h3 {
 .tile-title {
   font-family: var(--font-heading);
   font-weight: var(--heading-weight);
-  font-size: 1.3rem;
-  line-height: 1.1;
+  font-size: 0.98rem;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -732,8 +735,8 @@ h3 {
   border-radius: var(--hand-radius);
   font-family: var(--font-heading);
   font-weight: var(--heading-weight);
-  font-size: 1.5rem;
-  line-height: 1;
+  font-size: 1.02rem;
+  line-height: 1.2;
   background: var(--field);
   text-align: center;
   transition: background 0.2s, color 0.2s;
@@ -792,7 +795,7 @@ h3 {
   font-family: var(--font-heading);
   font-weight: var(--heading-weight);
   letter-spacing: var(--heading-tracking);
-  font-size: clamp(2.2rem, 7vw, 3.4rem);
+  font-size: clamp(1.7rem, 4.6vw, 2.5rem);
   line-height: 1.1;
 }
 

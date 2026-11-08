@@ -52,12 +52,12 @@ export const siteSettings = defineType({
 
     defineField({
       name: 'showShop',
-      title: 'Show shop (Artwork page)',
+      title: 'Show shop',
       type: 'boolean',
       group: 'shop',
       initialValue: false,
       description:
-        'Off: the Artwork page and its menu link are hidden, and nothing can be bought. Turn on and publish once Stripe is live. The menu updates after the site rebuilds (a minute or two).',
+        'Off: the Shop page and its menu link are hidden, and nothing can be bought. Turn on and publish once Stripe is live. The menu updates after the site rebuilds (a minute or two).',
     }),
     defineField({
       name: 'background',

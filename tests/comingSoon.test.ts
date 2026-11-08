@@ -53,14 +53,14 @@ test('shop switch: closed to the public while off, open with preview cookie or w
   const off = { comingSoon: false, previewKey: 'abc123def456', showShop: false };
   const offMissing = { comingSoon: false, previewKey: 'abc123def456' }; // field never set → off
   const onShop = { ...off, showShop: true };
-  for (const path of ['/artwork/', '/artwork', '/api/checkout', '/thank-you/', '/checkout-cancelled/']) {
+  for (const path of ['/shop/', '/shop', '/artwork/', '/artwork', '/api/checkout', '/thank-you/', '/checkout-cancelled/']) {
     assert.equal(shopAccess(u(path), null, off), 'closed', path);
     assert.equal(shopAccess(u(path), null, offMissing), 'closed', path);
     assert.equal(shopAccess(u(path), 'sb_preview=abc123def456', off), 'allow', path);
     assert.equal(shopAccess(u(path), null, onShop), 'allow', path);
   }
   // Everything else is untouched, and the webhook/status/release keep working
-  for (const path of ['/', '/flash/', '/contact/', '/api/contact', '/api/stripe-webhook', '/api/status', '/artworks-elsewhere/']) {
+  for (const path of ['/', '/flash/', '/contact/', '/api/contact', '/api/stripe-webhook', '/api/status', '/artworks-elsewhere/', '/shopping-list/']) {
     assert.equal(shopAccess(u(path), null, off), 'allow', path);
   }
   // No settings (Sanity unreachable) fails open, like Coming soon

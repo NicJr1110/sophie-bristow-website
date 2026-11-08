@@ -7,7 +7,7 @@ import { getNav } from '../lib/content';
 // The work on the left, about/contact on the right, meeting at the centre line of the page:
 // 3 + 2 with the shop on, 2 + 2 while it's off.
 const nav = await getNav();
-const WORK = ['/flash/', '/mark-making/', '/artwork/'];
+const WORK = ['/flash/', '/mark-making/', '/shop/'];
 const left = nav.filter((item) => WORK.includes(item.href));
 const right = nav.filter((item) => !WORK.includes(item.href));
 ---
