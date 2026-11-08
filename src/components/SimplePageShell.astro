@@ -12,12 +12,57 @@ const {
   variant = 'default',
 } = Astro.props;
 ---
-<div class:list={['simple-site-page', { 'simple-shop-gallery': variant === 'gallery', 'simple-landing': variant === 'landing' }]}>
+<div class:list={['simple-site-page', { 'simple-shop-gallery': variant === 'gallery', 'simple-landing': variant === 'landing', 'landing-intro-pending': variant === 'landing' }]}>
+  {variant === 'landing' && <div class="simple-grass-intro boil-art" aria-hidden="true">
+    {Array.from({ length: 5 }, (_, i) => (
+      <img src={`/marks/flowers/grass-${String(i + 1).padStart(2, '0')}.png`} alt="" width="84" height="64" />
+    ))}
+  </div>}
   <header class="simple-brand">
     <div class="simple-brand-copy">
       <h1>SOPHIE BRISTOW</h1>
       <p>ARTIST BASED IN BRISTOL</p>
     </div>
+
+{variant === 'landing' && <script>
+  const page = document.querySelector<HTMLElement>('.simple-site-page.simple-landing');
+  const intro = page?.querySelector<HTMLElement>('.simple-grass-intro');
+  const contactGrass = page?.querySelector<HTMLElement>('.simple-contact-link .simple-grass');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (page && intro && contactGrass && !reduceMotion) {
+    const startWidth = Math.min(190, Math.max(150, window.innerWidth * 0.22));
+    const startHeight = startWidth * (64 / 84);
+    const target = contactGrass.getBoundingClientRect();
+    const startLeft = (window.innerWidth - startWidth) / 2;
+    const startTop = (window.innerHeight - startHeight) / 2;
+
+    intro.style.left = `${startLeft}px`;
+    intro.style.top = `${startTop}px`;
+    intro.style.width = `${startWidth}px`;
+    intro.style.height = `${startHeight}px`;
+
+    const motion = intro.animate([
+      { left: `${startLeft}px`, top: `${startTop}px`, width: `${startWidth}px`, height: `${startHeight}px` },
+      { left: `${target.left}px`, top: `${target.top}px`, width: `${target.width}px`, height: `${target.height}px` },
+    ], {
+      duration: 1050,
+      delay: 1350,
+      easing: 'cubic-bezier(.22,.72,.18,1)',
+      fill: 'forwards',
+    });
+
+    motion.onfinish = () => {
+      intro.hidden = true;
+      page.classList.remove('landing-intro-pending');
+      page.classList.add('landing-intro-complete');
+    };
+  } else if (page) {
+    page.classList.remove('landing-intro-pending');
+    page.classList.add('landing-intro-complete');
+    if (intro) intro.hidden = true;
+  }
+</script>}
     <a class="simple-brand-home" href="/" aria-label="Sophie Bristow home">
       <img class="simple-brand-mark" src="/sb-logo.png" alt="" width="326" height="400" />
     </a>

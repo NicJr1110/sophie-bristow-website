@@ -1572,80 +1572,75 @@ h3 {
 
 /* ---------- Landing-page grass arrival ---------- */
 
-/* The grass is the sole visible element during the opening movement. Keep the
-   remaining layout in place, then reveal it in a quiet editorial sequence. */
+/* The landing contact link remains in its original layout position. A separate
+   intro layer travels to its measured image bounds, then hands off to the real link. */
+.simple-landing .simple-grass-intro {
+  position: fixed;
+  z-index: 30;
+  display: block;
+  pointer-events: none;
+  overflow: hidden;
+}
+.simple-landing .simple-grass-intro img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  animation: boil-frame 1080ms steps(1,end) infinite;
+}
+.simple-landing .simple-grass-intro img:nth-child(2) { animation-delay: -180ms; }
+.simple-landing .simple-grass-intro img:nth-child(3) { animation-delay: -360ms; }
+.simple-landing .simple-grass-intro img:nth-child(4) { animation-delay: -540ms; }
+.simple-landing .simple-grass-intro img:nth-child(5) { animation-delay: -720ms; }
+
+/* Keep the original Contact control exactly where it has always lived. */
+.simple-landing.landing-intro-pending .simple-contact-link {
+  visibility: hidden;
+}
+.simple-landing .simple-contact-link {
+  position: relative;
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+.simple-landing .simple-grass {
+  width: 76px;
+  height: 58px;
+  animation: none;
+}
+.simple-landing .simple-grass.boil-art img {
+  animation-play-state: paused;
+}
+.simple-landing .simple-grass.boil-art:hover img,
+.simple-landing .simple-grass.boil-art:focus-visible img {
+  animation-play-state: running;
+}
+
+/* Other landing content waits until the grass has handed off to the real button. */
 .simple-landing .simple-brand,
 .simple-landing .simple-page-content,
 .simple-landing .simple-shop-link {
   visibility: hidden;
   opacity: 0;
+}
+.simple-landing.landing-intro-complete .simple-brand,
+.simple-landing.landing-intro-complete .simple-page-content,
+.simple-landing.landing-intro-complete .simple-shop-link {
+  visibility: visible;
   animation: landing-feature-arrives 680ms cubic-bezier(.2,.7,.2,1) both;
 }
-.simple-landing .simple-brand { animation-delay: 2.2s; }
-.simple-landing .simple-page-content { animation-delay: 2.35s; }
-.simple-landing .simple-shop-link { animation-delay: 2.5s; }
+.simple-landing.landing-intro-complete .simple-brand { animation-delay: 0ms; }
+.simple-landing.landing-intro-complete .simple-page-content { animation-delay: 150ms; }
+.simple-landing.landing-intro-complete .simple-shop-link { animation-delay: 300ms; }
 
 @keyframes landing-feature-arrives {
-  0% {
-    visibility: hidden;
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  1% { visibility: visible; }
-  100% {
-    visibility: visible;
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
-.simple-landing .simple-contact-link {
-  position: fixed;
-  z-index: 20;
-  top: 50%;
-  left: 50%;
-  width: max-content;
-  margin: 0;
-  transform: translate(-50%, -50%);
-  animation: grass-arrives-at-contact 1.05s cubic-bezier(.22,.72,.18,1) 1.35s both;
-}
-.simple-landing .simple-grass {
-  width: clamp(150px, 22vw, 190px);
-  height: clamp(112px, 16.5vw, 142px);
-  animation: grass-shrinks-to-contact 1.05s cubic-bezier(.22,.72,.18,1) 1.35s both;
-}
-.simple-landing .simple-grass.boil-art img { animation-play-state: running; }
-.simple-landing .simple-contact-link > span:last-child {
-  opacity: 0;
-  animation: contact-label-appears 360ms ease 2.25s both;
-}
-@keyframes grass-arrives-at-contact {
-  0% { transform: translate(-50%, -50%); }
-  100% {
-    transform: translate(calc(50vw - var(--gutter) - 50%), calc(50vh - 22px - 50%));
-  }
-}
-@keyframes grass-shrinks-to-contact {
-  from { width: clamp(150px, 22vw, 190px); height: clamp(112px, 16.5vw, 142px); }
-  to { width: 76px; height: 58px; }
-}
-@keyframes contact-label-appears {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@media (max-width: 640px) {
-  .simple-landing .simple-grass { width: 142px; height: 106px; }
-  @keyframes grass-shrinks-to-contact {
-    from { width: 142px; height: 106px; }
-    to { width: 68px; height: 50px; }
-  }
-}
 @media (prefers-reduced-motion: reduce) {
-  .simple-landing .simple-contact-link {
-    position: static;
-    transform: none;
-    animation: none;
-  }
   .simple-landing .simple-brand,
   .simple-landing .simple-page-content,
   .simple-landing .simple-shop-link {
@@ -1654,14 +1649,6 @@ h3 {
     transform: none;
     animation: none;
   }
-  .simple-landing .simple-grass { width: 68px; height: 50px; animation: none; }
-  .simple-landing .simple-grass.boil-art img {
-    animation: none !important;
-    opacity: 0 !important;
-  }
-  .simple-landing .simple-grass.boil-art img:first-child { opacity: 1 !important; }
-  .simple-landing .simple-contact-link > span:last-child {
-    opacity: 1;
-    animation: none;
-  }
+  .simple-landing .simple-grass-intro { display: none; }
+  .simple-landing .simple-contact-link { visibility: visible; }
 }
