@@ -512,7 +512,7 @@ h3 {
   display: none;
 }
 
-.nav-desktop ul {
+.nav-desktop > ul {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -658,7 +658,7 @@ h3 {
   .nav-desktop {
     display: block;
   }
-  .nav-desktop ul {
+  .nav-desktop > ul {
     justify-content: flex-start;
     gap: 32px;
   }
