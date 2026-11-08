@@ -1483,7 +1483,7 @@ h3 {
   text-transform: uppercase;
 }
 .mobile-menu .mobile-shop-submenu {
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 1px;
   padding: 3px 0 2px;
   margin: 2px 0 0;
@@ -1493,7 +1493,7 @@ h3 {
 .mobile-menu .mobile-shop-submenu li + li {
   width: auto;
   border: 0;
-  text-align: right;
+  text-align: left;
 }
 .mobile-menu .mobile-shop-submenu .scratch {
   display: inline-block;
