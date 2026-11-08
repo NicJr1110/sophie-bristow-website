@@ -909,15 +909,20 @@ h3 {
   opacity: 1;
 }
 
-/* Focus: the line thickens, so keyboard users can see where they are */
+/* All the lines stay the same 1px. Focus shows in the label instead: labels are a soft grey,
+   and the one you're typing in turns black (plus the text cursor). */
 .lined-row input:focus,
 .lined-message textarea:focus {
   outline: none;
 }
 
-.lined-row:focus-within,
-.lined-message:focus-within {
-  box-shadow: 0 1px 0 var(--text);
+.lined-row span {
+  color: var(--muted);
+  transition: color 0.2s;
+}
+
+.lined-row:focus-within span {
+  color: var(--text);
 }
 
 .lined-message .char-count {
