@@ -1153,6 +1153,9 @@ h3 {
 .simple-text-link { color:#111; font-size:.82rem; line-height:1.2; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; }
 .simple-text-link:hover,.simple-text-link:focus-visible { color:#111; text-decoration:underline; text-underline-offset:.25em; }
 .simple-grass { width:76px; height:58px; object-fit:contain; object-position:right bottom; }
+.simple-grass.boil-art { position:relative; display:block; }
+.simple-grass.boil-art img { animation-name:boil-grass-frame; animation-duration:900ms; animation-play-state:paused; }
+.simple-bottom-right:has(.simple-contact-link:hover, .simple-contact-link:focus-visible) .simple-grass.boil-art img { animation-play-state:running; }
 .simple-contact-link { font-size:.72rem; letter-spacing:.12em; }
  .simple-shop-page .simple-brand { margin-bottom:clamp(74px,12vh,132px); }
 

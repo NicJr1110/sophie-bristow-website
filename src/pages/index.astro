@@ -34,7 +34,11 @@ const settings = await getSettings();
         <span>SHOP</span>
       </a>
       <div class="simple-bottom-right">
-        <img class="simple-grass" src="/marks/flowers/grass-01.png" alt="" width="84" height="64" />
+        <span class="simple-grass boil-art" aria-hidden="true">
+          {Array.from({ length: 5 }, (_, i) => (
+            <img src={`/marks/flowers/grass-${String(i + 1).padStart(2, '0')}.png`} alt="" width="84" height="64" />
+          ))}
+        </span>
         <a class="simple-text-link simple-contact-link" href="/contact/">CONTACT</a>
       </div>
     </nav>
