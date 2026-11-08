@@ -8,8 +8,12 @@
  *   large  ≥ 1024px   3-col grid, horizontal menu, A4-like central channel
  */
 :root {
-  --bg: #eeede9; /* Sophie's paper; textured by --paper */
-  --paper: var(--bg) url('/paper.jpg') repeat;
+  --bg: #fff;
+  --paper: #fff;
+  /* Original paper texture, retained for easy restoration:
+     --bg: #eeede9;
+     --paper: var(--bg) url('/paper.jpg') repeat;
+  */
   --field: rgb(255 255 255 / 0.55);
   --text: #1a1a1a;
   --muted: #6b6b6b;
@@ -49,13 +53,19 @@ body {
 
 /* Paper on the root too, so any area the browser paints outside the page is paper, not white */
 html {
-  background: var(--paper);
-  background-size: 512px 512px;
+  background: #fff;
+  /* Original paper texture:
+     background: var(--paper);
+     background-size: 512px 512px;
+  */
 }
 
 body {
-  background: var(--paper);
-  background-size: 512px 512px;
+  background: #fff;
+  /* Original paper texture:
+     background: var(--paper);
+     background-size: 512px 512px;
+  */
   color: var(--text);
   font-family: var(--font-body);
   font-size: 1.0625rem;
@@ -1113,3 +1123,38 @@ h3 {
   text-transform: lowercase;
   font-size: 1.05rem;
 }
+
+
+/* ---------- Simple editorial landing and shop chooser ---------- */
+.is-landing .channel { width:100%; max-width:none; min-height:calc(100vh - 24px); padding:0 clamp(14px,2vw,28px) 30px; }
+.simple-site-page { width:100%; min-height:calc(100vh - 30px); min-height:calc(100dvh - 30px); display:flex; flex-direction:column; align-items:stretch; padding:clamp(58px,10vh,112px) 0 34px; color:#111; background:#fff; }
+.simple-brand { margin:0 auto clamp(74px,12vh,132px); text-align:center; }
+.simple-brand h1 { margin:0; font-size:clamp(2.15rem,5.5vw,4rem); font-weight:400; letter-spacing:.105em; line-height:1; text-transform:uppercase; }
+.simple-brand h1::after { content:none; }
+.simple-brand p { margin:14px 0 0; font-size:clamp(.62rem,1vw,.76rem); line-height:1.2; letter-spacing:.17em; text-transform:uppercase; }
+.simple-choice-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(12px,1.5vw,20px); width:100%; max-width:1480px; margin:0 auto; }
+.simple-choice-card { min-width:0; min-height:clamp(260px,31vw,352px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:clamp(22px,4vw,48px) 18px; border:1px solid #d8d8d8; color:#111; text-align:center; text-decoration:none; background:#fff; transition:border-color 180ms ease; }
+.simple-choice-card:hover,.simple-choice-card:focus-visible { color:#111; border-color:#777; }
+.simple-choice-card h2 { margin:0 0 18px; font-size:clamp(1.75rem,3.3vw,3rem); font-weight:400; letter-spacing:-.015em; line-height:1.05; text-transform:uppercase; }
+.simple-choice-card p { max-width:34ch; min-height:2.7em; margin:0 0 27px; font-size:clamp(.9rem,1.2vw,1.05rem); line-height:1.35; }
+.simple-choice-browse { display:inline-block; font-size:.92rem; line-height:1.2; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:.3em; text-decoration-color:currentColor; }
+.simple-bottom-links { display:flex; flex-direction:column; align-items:center; gap:10px; margin:clamp(34px,5vh,58px) auto 0; }
+.simple-text-link { color:#111; font-size:.82rem; line-height:1.2; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; }
+.simple-text-link:hover,.simple-text-link:focus-visible { color:#111; text-decoration:underline; text-underline-offset:.25em; }
+.simple-grass { width:76px; height:58px; object-fit:contain; object-position:center bottom; }
+.simple-contact-link { margin-top:1px; font-size:.72rem; letter-spacing:.12em; }
+.simple-shop-page .simple-brand { margin-bottom:clamp(74px,12vh,132px); }
+.simple-shop-bottom { margin-top:clamp(62px,8vh,90px); }
+@media(max-width:640px) {
+ .is-landing .channel { padding-right:16px; padding-left:16px; }
+ .simple-site-page { min-height:calc(100dvh - 16px); padding-top:clamp(54px,9vh,82px); }
+ .simple-brand { margin-bottom:clamp(52px,9vh,78px); }
+ .simple-brand h1 { font-size:clamp(1.8rem,8vw,2.6rem); letter-spacing:.075em; }
+ .simple-brand p { margin-top:10px; font-size:.58rem; letter-spacing:.13em; }
+ .simple-choice-grid { grid-template-columns:1fr; gap:12px; }
+ .simple-choice-card { min-height:230px; }
+ .simple-choice-card h2 { font-size:clamp(1.8rem,8vw,2.35rem); }
+ .simple-bottom-links { margin-top:30px; gap:8px; }
+ .simple-grass { width:68px; height:50px; }
+}
+@media(prefers-reduced-motion:reduce) { .simple-choice-card { transition:none; } }

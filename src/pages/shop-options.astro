@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import { getSettings, getShopTags } from '../lib/content';
+
+const settings = await getSettings();
+if (!settings.showShop) return Astro.redirect('/');
+
+const tags = await getShopTags();
+const artworkSlug = tags.find((tag) => /artwork/i.test(tag.title + ' ' + tag.slug))?.slug ?? 'artwork';
+const giftCardSlug = tags.find((tag) => /gift.?cards?/i.test(tag.title + ' ' + tag.slug))?.slug ?? 'gift-cards';
+---
+
+<Base title="Shop" showHeader={false} showSplash={false}>
+  <div class="simple-site-page simple-shop-page">
+    <header class="simple-brand">
+      <h1>SOPHIE BRISTOW</h1>
+      <p>ARTIST BASED IN BRISTOL</p>
+    </header>
+
+    <section class="simple-choice-grid" aria-label="Choose what to shop">
+      <a class="simple-choice-card" href={'/shop/?tag=' + artworkSlug}>
+        <h2>ARTWORKS</h2>
+        <p>{settings.artworksSubtitle}</p>
+        <span class="simple-choice-browse">BROWSE</span>
+      </a>
+      <a class="simple-choice-card" href={'/shop/?tag=' + giftCardSlug}>
+        <h2>GIFT CARDS</h2>
+        <p>{settings.giftCardsSubtitle}</p>
+        <span class="simple-choice-browse">BROWSE</span>
+      </a>
+    </section>
+
+    <nav class="simple-bottom-links simple-shop-bottom" aria-label="Shop">
+      <a class="simple-text-link" href="/shop/">SHOP ALL</a>
+    </nav>
+  </div>
+</Base>
