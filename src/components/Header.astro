@@ -12,10 +12,10 @@ const [NAV, SHOP_TAGS] = await Promise.all([getNav(), getShopTags()]);
 const artworkTag = SHOP_TAGS.find((tag) => /artwork/i.test(tag.title) || /artwork/i.test(tag.slug));
 const giftTag = SHOP_TAGS.find((tag) => /gift/i.test(tag.title) || /gift/i.test(tag.slug));
 const shopLinks = [
-  { label: 'All', href: '/shop/' },
   { label: 'Artworks', href: `/shop/?tag=${artworkTag?.slug ?? 'artwork'}` },
   { label: 'Gift cards', href: `/shop/?tag=${giftTag?.slug ?? 'gift-cards'}` },
 ];
+const mobileShopLinks = [...shopLinks, { label: 'All', href: '/shop/' }];
 const isCurrent = (href: string) => current.startsWith(href);
 ---
 
@@ -63,10 +63,10 @@ const isCurrent = (href: string) => current.startsWith(href);
             <button class="shop-disclosure-toggle mobile-shop-toggle" type="button" aria-expanded="false" aria-controls="mobile-shop-submenu" aria-label="Show shop categories">
               <span aria-hidden="true"></span>
             </button>
-            <span class="scratch mobile-shop-label">Shop</span>
+            <ScratchLink href="/shop/" label="Shop" current={isCurrent('/shop/')} />
           </div>
           <ul id="mobile-shop-submenu" class="mobile-shop-submenu" hidden>
-            {shopLinks.map((link) => (
+            {mobileShopLinks.map((link) => (
               <li><ScratchLink href={link.href} label={link.label} current={Astro.url.pathname === '/shop/' && Astro.url.searchParams.get('tag') === (link.href.split('tag=')[1] ?? '')} /></li>
             ))}
           </ul>
