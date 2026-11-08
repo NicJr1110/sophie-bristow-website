@@ -1242,3 +1242,34 @@ h3 {
   .mobile-menu { inset:8px 8px auto auto; width:min(260px,calc(100vw - 16px)); padding:62px 18px 18px; }
   .burger { top:14px; right:calc(var(--gutter) - 2px); }
 }
+
+
+/* Always-on flower boil tucked into the lower-left corner of the open mobile menu. */
+.mobile-menu { position:fixed; }
+.mobile-menu-flower {
+  position:absolute;
+  left:14px;
+  bottom:10px;
+  width:clamp(64px,20vw,92px);
+  aspect-ratio:1;
+  pointer-events:none;
+  opacity:.9;
+}
+.mobile-menu-flower img {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  opacity:0;
+  animation:boil-frame 1080ms steps(1,end) infinite;
+}
+.mobile-menu-flower img:nth-child(2) { animation-delay:-180ms; }
+.mobile-menu-flower img:nth-child(3) { animation-delay:-360ms; }
+.mobile-menu-flower img:nth-child(4) { animation-delay:-540ms; }
+.mobile-menu-flower img:nth-child(5) { animation-delay:-720ms; }
+.mobile-menu-flower img:nth-child(6) { animation-delay:-900ms; }
+@media(prefers-reduced-motion:reduce) {
+  .mobile-menu-flower img { animation:none; opacity:0; }
+  .mobile-menu-flower img:first-child { opacity:1; }
+}

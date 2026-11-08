@@ -63,6 +63,11 @@ const isCurrent = (href: string) => current.startsWith(href);
       ))}
     </ul>
   </nav>
+  <span class="mobile-menu-flower boil-art" aria-hidden="true">
+    {Array.from({ length: 6 }, (_, i) => (
+      <img src={`/marks/flowers/flower-${String(i + 1).padStart(2, '0')}.png`} alt="" width="120" height="120" />
+    ))}
+  </span>
 </div>
 
 <script>
