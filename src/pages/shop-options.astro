@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import SimplePageShell from '../components/SimplePageShell.astro';
 import { getSettings, getShopTags } from '../lib/content';
 
 const settings = await getSettings();
@@ -10,16 +11,8 @@ const artworkSlug = tags.find((tag) => /artwork/i.test(tag.title + ' ' + tag.slu
 const giftCardSlug = tags.find((tag) => /gift.?cards?/i.test(tag.title + ' ' + tag.slug))?.slug ?? 'gift-cards';
 ---
 
-<Base title="Shop" showHeader={false} >
-  <div class="simple-site-page simple-shop-page">
-    <header class="simple-brand">
-      <div class="simple-brand-copy">
-        <h1>SOPHIE BRISTOW</h1>
-        <p>ARTIST BASED IN BRISTOL</p>
-      </div>
-      <img class="simple-brand-mark" src="/sb-logo.png" alt="" width="326" height="400" />
-    </header>
-
+<Base title="Shop" showHeader={false}>
+  <SimplePageShell shopHref="/shop/" shopLabel="SHOP ALL">
     <section class="simple-choice-grid" aria-label="Choose what to shop">
       <a class="simple-choice-card" href={'/shop/?tag=' + artworkSlug}>
         <h2>ARTWORKS</h2>
@@ -32,22 +25,5 @@ const giftCardSlug = tags.find((tag) => /gift.?cards?/i.test(tag.title + ' ' + t
         <span class="simple-choice-browse">BROWSE</span>
       </a>
     </section>
-
-    <nav class="simple-bottom-links" aria-label="More">
-      <a class="simple-text-link simple-shop-link" href="/shop/">
-        <svg class="simple-shop-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2.5 3h2.2l2.1 11.1a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 1.9-1.5L21 7H6" /><circle cx="9.5" cy="19.5" r="1.25" /><circle cx="18" cy="19.5" r="1.25" /></svg>
-        <span>SHOP ALL</span>
-      </a>
-      <div class="simple-bottom-right">
-        <a class="simple-text-link simple-contact-link" href="/contact/">
-                  <span class="simple-grass boil-art" aria-hidden="true">
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <img src={`/marks/flowers/grass-${String(i + 1).padStart(2, '0')}.png`} alt="" width="84" height="64" />
-                    ))}
-                  </span>
-                  <span>CONTACT</span>
-                </a>
-      </div>
-    </nav>
-  </div>
+  </SimplePageShell>
 </Base>

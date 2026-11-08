@@ -1,35 +1,28 @@
 ---
-// Gallery template + Buy buttons (spec §7). Sold status is refreshed live from /api/status on load.
+ // Gallery template + Buy buttons (spec §7). Sold status is refreshed live from /api/status on load.
 import Base from '../layouts/Base.astro';
+import SimplePageShell from '../components/SimplePageShell.astro';
 import Gallery from '../components/Gallery.astro';
 import { getArtworkGallery, getShopTags } from '../lib/content';
 
 const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
 ---
 
-<Base title={gallery.title} widePage>
-  <h1 class="page-title page-title--nav">{gallery.title}</h1>
-  {gallery.intro && <p class="intro">{gallery.intro}</p>}
-  {tags.length > 0 && (
-    <nav class="shop-tags" aria-label="Filter the shop">
-      {tags.map((t) => (
-        <a class="scratch" href={`/shop/?tag=${t.slug}`} data-tag={t.slug}>{t.title}</a>
-      ))}
-      <a class="scratch" href="/shop/" data-tag="">all</a>
-    </nav>
-  )}
-  <p class="shop-message" role="status" aria-live="polite" hidden></p>
-  <Gallery items={gallery.items} shop />
-  <nav class="simple-bottom-links shop-contact-footer" aria-label="Contact">
-    <a class="simple-text-link simple-contact-link" href="/contact/">
-      <span class="simple-grass boil-art" aria-hidden="true">
-        {Array.from({ length: 5 }, (_, i) => (
-          <img src={`/marks/flowers/grass-${String(i + 1).padStart(2, '0')}.png`} alt="" width="84" height="64" />
+<Base title={gallery.title} showHeader={false}>
+  <SimplePageShell variant="gallery" shopHref="/shop/" shopLabel="SHOP ALL">
+    <h1 class="page-title page-title--nav">{gallery.title}</h1>
+    {gallery.intro && <p class="intro">{gallery.intro}</p>}
+    {tags.length > 0 && (
+      <nav class="shop-tags" aria-label="Filter the shop">
+        {tags.map((t) => (
+          <a class="scratch" href={`/shop/?tag=${t.slug}`} data-tag={t.slug}>{t.title}</a>
         ))}
-      </span>
-      <span>CONTACT</span>
-    </a>
-  </nav>
+        <a class="scratch" href="/shop/" data-tag="">all</a>
+      </nav>
+    )}
+    <p class="shop-message" role="status" aria-live="polite" hidden></p>
+    <Gallery items={gallery.items} shop />
+  </SimplePageShell>
 </Base>
 
 <script>

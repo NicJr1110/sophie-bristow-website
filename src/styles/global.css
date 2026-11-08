@@ -1182,3 +1182,10 @@ h3 {
  .simple-grass { width:68px; height:50px; }
 }
 @media(prefers-reduced-motion:reduce) { .simple-choice-card { transition:none; } }
+
+/* Shared editorial shell used by the landing page, shop chooser and shop gallery. */
+.simple-page-content { width:100%; }
+.simple-shop-gallery .simple-brand { margin-bottom:clamp(48px,8vh,88px); }
+.simple-shop-gallery .simple-page-content { width:100%; }
+.simple-shop-gallery .shop-contact-footer { display:none; }
+.simple-shop-gallery .simple-bottom-links { margin-top:auto; }
