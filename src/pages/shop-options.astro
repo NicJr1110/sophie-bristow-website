@@ -33,8 +33,15 @@ const giftCardSlug = tags.find((tag) => /gift.?cards?/i.test(tag.title + ' ' + t
       </a>
     </section>
 
-    <nav class="simple-bottom-links simple-shop-bottom" aria-label="Shop">
-      <a class="simple-text-link" href="/shop/">SHOP ALL</a>
+    <nav class="simple-bottom-links" aria-label="More">
+      <a class="simple-text-link simple-shop-link" href="/shop/">
+        <svg class="simple-shop-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 8h18l-1.5 12h-15L3 8Z" /><path d="M8 8a4 4 0 0 1 8 0" /></svg>
+        <span>SHOP ALL</span>
+      </a>
+      <div class="simple-bottom-right">
+        <img class="simple-grass" src="/marks/flowers/grass-01.png" alt="" width="84" height="64" />
+        <a class="simple-text-link simple-contact-link" href="/contact/">CONTACT</a>
+      </div>
     </nav>
   </div>
 </Base>
