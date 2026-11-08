@@ -12,6 +12,7 @@ const [NAV, SHOP_TAGS] = await Promise.all([getNav(), getShopTags()]);
 const artworkTag = SHOP_TAGS.find((tag) => /artwork/i.test(tag.title) || /artwork/i.test(tag.slug));
 const giftTag = SHOP_TAGS.find((tag) => /gift/i.test(tag.title) || /gift/i.test(tag.slug));
 const shopLinks = [
+  { label: 'All', href: '/shop/' },
   { label: 'Artworks', href: `/shop/?tag=${artworkTag?.slug ?? 'artwork'}` },
   { label: 'Gift cards', href: `/shop/?tag=${giftTag?.slug ?? 'gift-cards'}` },
 ];
