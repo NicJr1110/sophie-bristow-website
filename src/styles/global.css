@@ -1330,3 +1330,37 @@ h3 {
     opacity: 1;
   }
 }
+
+
+/* Mobile Shop is a disclosure row, styled exactly like the other primary links. */
+.mobile-menu .mobile-shop-heading { gap: 8px; }
+.mobile-menu .mobile-shop-label {
+  display: inline-block;
+  font-size: clamp(1.05rem, 3.5vw, 1.3rem);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
+  line-height: 1.15;
+  text-decoration: none;
+  cursor: default;
+}
+.mobile-menu .mobile-shop-label::after,
+.mobile-menu .mobile-shop-label.is-current::after {
+  content: none;
+  display: none;
+}
+.mobile-menu .mobile-shop-toggle {
+  flex: 0 0 30px;
+}
+.mobile-menu .mobile-shop-submenu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  width: 100%;
+  padding: 8px 0 8px;
+  margin: 0;
+}
+.mobile-menu .mobile-shop-submenu .scratch {
+  font-size: clamp(0.95rem, 3vw, 1.1rem);
+  line-height: 1.2;
+}
