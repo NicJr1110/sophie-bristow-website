@@ -3,7 +3,7 @@ interface Props {
   shopHref?: string;
   shopLabel?: string;
   showShopLink?: boolean;
-  variant?: 'default' | 'gallery';
+  variant?: 'default' | 'gallery' | 'landing';
 }
 const {
   shopHref = '/shop-options/',
@@ -12,7 +12,7 @@ const {
   variant = 'default',
 } = Astro.props;
 ---
-<div class:list={['simple-site-page', { 'simple-shop-gallery': variant === 'gallery' }]}>
+<div class:list={['simple-site-page', { 'simple-shop-gallery': variant === 'gallery', 'simple-landing': variant === 'landing' }]}>
   <header class="simple-brand">
     <div class="simple-brand-copy">
       <h1>SOPHIE BRISTOW</h1>

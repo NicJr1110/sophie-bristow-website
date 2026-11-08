@@ -1562,3 +1562,56 @@ h3 {
     transition: none;
   }
 }
+
+
+/* ---------- Landing-page grass arrival ---------- */
+.simple-landing .simple-contact-link {
+  position: fixed;
+  z-index: 20;
+  top: 50%;
+  left: 50%;
+  width: max-content;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  animation: grass-arrives-at-contact 1.05s cubic-bezier(.22,.72,.18,1) 1.35s both;
+}
+.simple-landing .simple-grass {
+  width: clamp(150px, 22vw, 190px);
+  height: clamp(112px, 16.5vw, 142px);
+  transition: none;
+}
+.simple-landing .simple-grass.boil-art img { animation-play-state: running; }
+.simple-landing .simple-contact-link > span:last-child {
+  opacity: 0;
+  animation: contact-label-appears 360ms ease 2.25s both;
+}
+@keyframes grass-arrives-at-contact {
+  0% { transform: translate(-50%, -50%); }
+  100% {
+    transform: translate(calc(50vw - var(--gutter) - 50%), calc(50vh - 22px - 50%));
+  }
+}
+@keyframes contact-label-appears {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 640px) {
+  .simple-landing .simple-grass { width: 142px; height: 106px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .simple-landing .simple-contact-link {
+    position: static;
+    transform: none;
+    animation: none;
+  }
+  .simple-landing .simple-grass { width: 68px; height: 50px; }
+  .simple-landing .simple-grass.boil-art img {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+  .simple-landing .simple-grass.boil-art img:first-child { opacity: 1 !important; }
+  .simple-landing .simple-contact-link > span:last-child {
+    opacity: 1;
+    animation: none;
+  }
+}
