@@ -310,7 +310,8 @@ h3 {
 .landing-logo {
   display: block;
   align-self: flex-start;
-  height: clamp(34px, 4vw, 42px);
+  /* twice the header logo: about 2cm x 4cm on a laptop */
+  height: clamp(68px, 8vw, 84px);
   width: auto;
 }
 
