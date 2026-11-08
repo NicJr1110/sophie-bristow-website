@@ -64,9 +64,12 @@ const year = new Date().getFullYear();
       <main class="channel" id="main">
         <slot />
       </main>
-      <footer class="site-footer">
-        <small>&copy; {year} {SITE_NAME}. All artwork and designs are Sophie's original work and protected by copyright. Please don't copy, reproduce, print or sell them without her written permission.</small>
-      </footer>
+      {/* No footer on the landing page: kept as clean as possible */}
+      {showHeader && (
+        <footer class="site-footer">
+          <small>&copy; {year} {SITE_NAME}. All rights reserved.</small>
+        </footer>
+      )}
     </div>
   </body>
 </html>

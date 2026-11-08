@@ -175,7 +175,7 @@ h3 {
 }
 
 .page-title {
-  text-align: center;
+  text-align: left;
   font-size: clamp(2rem, 5.5vw, 3rem);
   margin: 12px 0 22px;
 }
@@ -216,21 +216,14 @@ h3 {
 
 .intro {
   max-width: 56ch;
-  margin: 0 auto 36px;
-  text-align: center;
+  margin: 0 0 36px;
+  text-align: left;
   color: var(--muted);
   font-size: 1.1rem;
 }
 
-.site-footer small {
-  display: block;
-  max-width: 60ch;
-  margin: 0 auto;
-  line-height: 1.5;
-}
-
 .site-footer {
-  text-align: center;
+  text-align: left;
   padding: 24px var(--gutter);
   color: var(--muted);
 }
@@ -308,12 +301,18 @@ h3 {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 6vh 0 8vh;
+  padding: 26px 0 8vh;
+}
+
+.landing-logo {
+  display: block;
+  align-self: flex-start;
+  height: clamp(34px, 4vw, 42px);
+  width: auto;
 }
 
 .landing-name {
-  margin: 0 0 clamp(28px, 6vh, 64px);
+  margin: auto 0 clamp(28px, 6vh, 64px);
   font-weight: 500;
   /* two lines ≈ 25% of the screen height, limited by width on phones */
   font-size: min(12.5vh, 21vw);
@@ -332,6 +331,7 @@ h3 {
 .landing-nav {
   /* full width on phones; a comfortable length on bigger screens */
   width: min(100%, 36rem);
+  margin-bottom: auto;
 }
 
 .landing-list,
@@ -463,7 +463,7 @@ h3 {
 .site-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   padding: 28px var(--gutter) 24px;
 }
@@ -535,7 +535,8 @@ h3 {
   z-index: 50;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding: 0 var(--gutter);
   background: var(--paper);
   background-size: 512px 512px;
   transform: translateY(-100%);
@@ -553,7 +554,7 @@ h3 {
   list-style: none;
   margin: 0;
   padding: 0;
-  text-align: center;
+  text-align: left;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -689,12 +690,12 @@ h3 {
 }
 
 .shop-message {
-  text-align: center;
+  text-align: left;
   margin: -12px 0 20px;
 }
 
 .empty {
-  text-align: center;
+  text-align: left;
   color: var(--muted);
 }
 
@@ -780,7 +781,7 @@ h3 {
 
 .bio {
   max-width: 640px;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .bio-photo {
@@ -788,7 +789,7 @@ h3 {
   box-shadow:
     0 1px 1.5px rgb(60 45 30 / 0.12),
     0 3px 8px -2px rgb(60 45 30 / 0.12);
-  margin: 0 auto 28px;
+  margin: 0 0 28px;
 }
 
 .prose p {
@@ -799,13 +800,13 @@ h3 {
 
 /* Step 1: the enquiry types, as a big list like the landing menu */
 .enquiry-pick {
-  margin: 4vh auto 0;
+  margin: 4vh 0 0;
 }
 
 /* Step 2: no boxes, no fills, just thin lines */
 .lined-form {
   width: min(100%, 560px);
-  margin: 2vh auto 0;
+  margin: 2vh 0 0;
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -947,8 +948,8 @@ h3 {
   min-height: calc(100svh - 150px);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
   padding-top: 14vh;
   outline: none;
 }
@@ -970,6 +971,7 @@ h3 {
 }
 
 .form-success-flowers {
+  align-self: center; /* the flowers stay centred at the bottom */
   margin-top: auto;
   padding-top: 40px;
   width: clamp(160px, 26vw, 240px);
@@ -978,8 +980,8 @@ h3 {
 
 .notice {
   max-width: 560px;
-  margin: 24px auto;
-  text-align: center;
+  margin: 24px 0;
+  text-align: left;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -995,7 +997,7 @@ h3 {
 .shop-tags {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px 28px;
   margin: 0 0 32px;
   text-transform: lowercase;
