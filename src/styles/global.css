@@ -559,8 +559,19 @@ h3 {
 }
 
 @media (min-width: 1024px) {
+  /* Full menu: SB logo on the far left, the menu running across beside it */
+  .site-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 44px;
+    padding: 26px var(--gutter) 30px;
+  }
   .nav-desktop {
     display: block;
+  }
+  .nav-desktop ul {
+    justify-content: flex-start;
+    gap: 32px;
   }
   .burger,
   .mobile-menu {
