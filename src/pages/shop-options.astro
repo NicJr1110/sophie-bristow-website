@@ -10,7 +10,7 @@ const artworkSlug = tags.find((tag) => /artwork/i.test(tag.title + ' ' + tag.slu
 const giftCardSlug = tags.find((tag) => /gift.?cards?/i.test(tag.title + ' ' + tag.slug))?.slug ?? 'gift-cards';
 ---
 
-<Base title="Shop" showHeader={false} showSplash={false}>
+<Base title="Shop" showHeader={false} >
   <div class="simple-site-page simple-shop-page">
     <header class="simple-brand">
       <div class="simple-brand-copy">

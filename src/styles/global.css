@@ -125,27 +125,27 @@ h3 {
 
 .splash {
   position: fixed;
-  right: 2vw;
-  bottom: 2vh;
+  left: 0;
+  bottom: 0;
   z-index: 0;
   pointer-events: none;
-  /* small: larger share of the bottom-right */
-  width: 85vw;
-  height: 32vh;
+  /* Decorative flower sits in the bottom-left, behind page content. */
+  width: min(42vw, 560px);
+  height: min(48vh, 460px);
 }
 
 .splash img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: right bottom;
+  object-position: left bottom;
 }
 
 @media (min-width: 768px) {
   /* medium: 2 across x 3 down → one cell */
   .splash {
-    width: 50vw;
-    height: 33.333vh;
+    width: min(42vw, 560px);
+    height: min(48vh, 460px);
   }
 }
 
@@ -153,12 +153,12 @@ h3 {
   /* large: a feature — ~2.5x bigger, turned 30° clockwise and bled off the bottom
      and a little off the right, like a close-up of a drawing on the same sheet */
   .splash {
-    right: 0;
+    left: 0;
     bottom: 0;
-    width: min(62vh, 38vw);
-    height: min(92vh, 57vw);
-    transform: translate(-3%, 9%);
-    transform-origin: 50% 50%;
+    width: min(48vh, 34vw);
+    height: min(72vh, 48vw);
+    transform: translate(-4%, 4%);
+    transform-origin: 0 100%;
     opacity: 0.8;
   }
 }
@@ -1141,20 +1141,26 @@ h3 {
 .simple-brand h1::after { content:none; }
 .simple-brand-mark { display:block; flex:0 0 auto; width:auto; height:calc(clamp(2.15rem,5.5vw,4rem) + 3px + .912rem); object-fit:contain; object-position:right top; }
 .simple-brand p { margin:3px 0 0; text-align:left; font-size:clamp(.62rem,1vw,.76rem); line-height:1.2; letter-spacing:.17em; text-transform:uppercase; }
-.simple-choice-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(12px,1.5vw,20px); width:100%; max-width:1480px; margin:0 auto; }
+ .simple-choice-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(12px,1.5vw,20px); width:100%; max-width:none; margin:0; }
 .simple-choice-card { min-width:0; min-height:clamp(300px,38vw,460px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:clamp(22px,4vw,48px) 18px; border:1px solid #d8d8d8; color:#111; text-align:center; text-decoration:none; background:transparent; transition:background-color 180ms ease; }
 .simple-choice-card:hover,.simple-choice-card:focus-visible { color:#111; border-color:#d8d8d8; background:#f2f2f2; }
 .simple-choice-card h2 { margin:0 0 5px; font-size:clamp(1.75rem,3.3vw,3rem); font-weight:700; letter-spacing:-.015em; line-height:1.05; text-transform:uppercase; }
 .simple-choice-card p { max-width:34ch; min-height:0; margin:0 0 8px; font-size:clamp(.9rem,1.2vw,1.05rem); line-height:1.2; }
 .simple-choice-browse { display:inline-block; margin-top:0; font-size:.92rem; line-height:1.2; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:.3em; text-decoration-color:currentColor; }
-.simple-bottom-links { display:grid; grid-template-columns:1fr 1fr; align-items:end; width:100%; max-width:1480px; margin:auto auto 0; padding-top:clamp(34px,5vh,58px); }
+ .simple-bottom-links { display:grid; grid-template-columns:1fr 1fr; align-items:end; width:100%; max-width:none; margin:auto 0 0; padding-top:clamp(34px,5vh,58px); }
 .simple-shop-link { justify-self:start; align-self:end; display:flex; flex-direction:column; align-items:flex-start; gap:5px; }\n.simple-shop-icon { display:block; width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
 .simple-bottom-right { justify-self:end; display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
 .simple-text-link { color:#111; font-size:.82rem; line-height:1.2; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; }
 .simple-text-link:hover,.simple-text-link:focus-visible { color:#111; text-decoration:underline; text-underline-offset:.25em; }
 .simple-grass { width:76px; height:58px; object-fit:contain; object-position:right bottom; }
 .simple-contact-link { font-size:.72rem; letter-spacing:.12em; }
-.simple-shop-page .simple-brand { margin-bottom:clamp(74px,12vh,132px); }
+ .simple-shop-page .simple-brand { margin-bottom:clamp(74px,12vh,132px); }
+
+/* The shop gallery follows the same edge-to-edge 20px editorial gutters as the landing page. */
+.is-wide .channel { width:100%; max-width:none; padding:0 20px 48px; }
+.is-wide .site-header, .is-wide .site-footer { max-width:none; padding-left:20px; padding-right:20px; }
+.is-wide .shop-tags { gap:8px 28px; }
+.is-wide .grid { width:100%; }
 .simple-shop-bottom { margin-top:clamp(62px,8vh,90px); }
 @media(max-width:640px) {
  .is-landing .channel { padding-right:16px; padding-left:16px; }

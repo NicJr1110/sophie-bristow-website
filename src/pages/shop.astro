@@ -7,7 +7,7 @@ import { getArtworkGallery, getShopTags } from '../lib/content';
 const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
 ---
 
-<Base title={gallery.title}>
+<Base title={gallery.title} widePage>
   <h1 class="page-title page-title--nav">{gallery.title}</h1>
   {gallery.intro && <p class="intro">{gallery.intro}</p>}
   {tags.length > 0 && (
