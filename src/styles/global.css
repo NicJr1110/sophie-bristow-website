@@ -560,39 +560,46 @@ h3 {
 
 .mobile-menu {
   position: fixed;
-  inset: 0;
+  inset: 0 0 0 auto;
   z-index: 50;
   display: flex;
   align-items: flex-start;
-  justify-content: flex-start;
-  padding: 112px var(--gutter) 32px;
+  justify-content: flex-end;
+  width: min(360px, 84vw);
+  padding: 86px 28px 32px;
   background: var(--paper);
   background-size: 512px 512px;
-  transform: translateY(-100%);
+  transform: translateX(100%);
   visibility: hidden;
   transition: transform 0.35s var(--ease), visibility 0s linear 0.35s;
 }
 
 .mobile-menu.is-open {
-  transform: none;
+  transform: translateX(0);
   visibility: visible;
   transition: transform 0.35s var(--ease), visibility 0s;
+}
+
+.mobile-menu nav {
+  width: 100%;
 }
 
 .mobile-menu ul {
   list-style: none;
   margin: 0;
   padding: 0;
-  text-align: left;
+  text-align: right;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: flex-end;
+  gap: 2px;
 }
 
 .mobile-menu .scratch {
-  font-size: clamp(2rem, 9vw, 2.8rem);
+  font-size: clamp(1.15rem, 3.5vw, 1.45rem);
   font-weight: var(--heading-weight);
   letter-spacing: var(--heading-tracking);
+  line-height: 1.15;
   position: relative;
   text-decoration: none;
 }
