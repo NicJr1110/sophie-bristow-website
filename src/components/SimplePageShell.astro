@@ -58,7 +58,9 @@ const {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (page && intro && contactGrass && !reduceMotion) {
-    const startWidth = Math.min(190, Math.max(150, window.innerWidth * 0.22));
+    const startWidth = window.matchMedia('(max-width: 640px)').matches
+      ? 142
+      : Math.min(190, Math.max(150, window.innerWidth * 0.22));
     const startHeight = startWidth * (64 / 84);
     const target = contactGrass.getBoundingClientRect();
     const startLeft = (window.innerWidth - startWidth) / 2;
