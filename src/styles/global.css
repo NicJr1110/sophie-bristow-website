@@ -1364,3 +1364,59 @@ h3 {
   font-size: clamp(0.95rem, 3vw, 1.1rem);
   line-height: 1.2;
 }
+
+
+/* Shared solid block disclosure arrow for Shop on both navigation layouts. */
+.shop-disclosure-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.shop-disclosure-toggle span {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid currentColor;
+  transition: transform .2s var(--ease);
+}
+.shop-disclosure-toggle[aria-expanded='true'] span { transform: rotate(180deg); }
+
+.desktop-shop-item { position: relative; }
+.desktop-shop-heading { display: flex; align-items: center; gap: 5px; }
+.desktop-shop-toggle { width: 16px; height: 22px; }
+.desktop-shop-submenu {
+  position: absolute;
+  z-index: 80;
+  top: calc(100% + 13px);
+  left: -12px;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 0;
+  padding: 13px 16px;
+  border: 1px solid rgb(26 26 26 / .07);
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / .14), 0 2px 6px rgb(0 0 0 / .06);
+  text-align: left;
+}
+.desktop-shop-submenu .scratch { font-size: .98rem; text-decoration: none; }
+.desktop-shop-submenu .scratch:hover,
+.desktop-shop-submenu .scratch:focus-visible,
+.desktop-shop-submenu .scratch.is-current { text-decoration: underline; text-underline-offset: .22em; }
+
+.mobile-menu .mobile-shop-heading { gap: 7px; }
+.mobile-menu .mobile-shop-toggle { order: -1; width: 17px; height: 24px; flex-basis: 17px; }
+.mobile-menu .mobile-shop-label { font-size: clamp(1.05rem, 3.5vw, 1.3rem); }
+.mobile-menu .mobile-shop-submenu { padding-left: 0; padding-right: 0; }

@@ -27,7 +27,21 @@ const isCurrent = (href: string) => current.startsWith(href);
   <!-- Large screens: horizontal menu centred under the name -->
   <nav class="nav-desktop" aria-label="Main">
     <ul>
-      {NAV.map((item) => (
+      {NAV.map((item) => item.href === '/shop/' ? (
+        <li class="desktop-shop-item">
+          <div class="desktop-shop-heading">
+            <ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} />
+            <button class="shop-disclosure-toggle desktop-shop-toggle" type="button" aria-expanded="false" aria-controls="desktop-shop-submenu" aria-label="Show shop categories">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
+          <ul id="desktop-shop-submenu" class="desktop-shop-submenu" hidden>
+            {shopLinks.map((link) => (
+              <li><ScratchLink href={link.href} label={link.label} current={Astro.url.pathname === '/shop/' && Astro.url.searchParams.get('tag') === (link.href.split('tag=')[1] ?? '')} /></li>
+            ))}
+          </ul>
+        </li>
+      ) : (
         <li><ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} /></li>
       ))}
     </ul>
@@ -45,10 +59,10 @@ const isCurrent = (href: string) => current.startsWith(href);
       {NAV.map((item) => item.href === '/shop/' ? (
         <li class="mobile-shop-item">
           <div class="mobile-shop-heading">
-            <span class="scratch mobile-shop-label">Shop</span>
-            <button class="mobile-shop-toggle" type="button" aria-expanded="false" aria-controls="mobile-shop-submenu" aria-label="Show shop categories">
-              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5" /></svg>
+            <button class="shop-disclosure-toggle mobile-shop-toggle" type="button" aria-expanded="false" aria-controls="mobile-shop-submenu" aria-label="Show shop categories">
+              <span aria-hidden="true"></span>
             </button>
+            <span class="scratch mobile-shop-label">Shop</span>
           </div>
           <ul id="mobile-shop-submenu" class="mobile-shop-submenu" hidden>
             {shopLinks.map((link) => (
@@ -83,16 +97,38 @@ const isCurrent = (href: string) => current.startsWith(href);
 
     btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
     menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
-    const shopToggle = menu.querySelector<HTMLButtonElement>('.mobile-shop-toggle');
-    const shopSubmenu = menu.querySelector<HTMLUListElement>('#mobile-shop-submenu');
-    if (shopToggle && shopSubmenu) {
-      shopToggle.addEventListener('click', () => {
+    const shopToggles = document.querySelectorAll<HTMLButtonElement>('.shop-disclosure-toggle');
+    shopToggles.forEach((shopToggle) => {
+      const submenuId = shopToggle.getAttribute('aria-controls');
+      const shopSubmenu = submenuId ? document.getElementById(submenuId) : null;
+      if (!shopSubmenu) return;
+      shopToggle.addEventListener('click', (event) => {
+        event.stopPropagation();
         const expanded = shopToggle.getAttribute('aria-expanded') !== 'true';
+        // Keep the desktop and mobile disclosures in sync.
+        shopToggles.forEach((otherToggle) => {
+          const otherId = otherToggle.getAttribute('aria-controls');
+          const otherMenu = otherId ? document.getElementById(otherId) : null;
+          otherToggle.setAttribute('aria-expanded', 'false');
+          otherToggle.setAttribute('aria-label', 'Show shop categories');
+          if (otherMenu) otherMenu.hidden = true;
+        });
         shopToggle.setAttribute('aria-expanded', String(expanded));
         shopToggle.setAttribute('aria-label', expanded ? 'Hide shop categories' : 'Show shop categories');
         shopSubmenu.hidden = !expanded;
       });
-    }
+    });
+    document.addEventListener('click', (event) => {
+      if (!(event.target instanceof Element) || !event.target.closest('.desktop-shop-item')) {
+        const desktopToggle = document.querySelector<HTMLButtonElement>('.desktop-shop-toggle');
+        const desktopSubmenu = document.getElementById('desktop-shop-submenu');
+        if (desktopToggle) {
+          desktopToggle.setAttribute('aria-expanded', 'false');
+          desktopToggle.setAttribute('aria-label', 'Show shop categories');
+        }
+        if (desktopSubmenu) desktopSubmenu.hidden = true;
+      }
+    });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && menu.classList.contains('is-open')) {
         setOpen(false);
