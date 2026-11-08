@@ -61,8 +61,10 @@ const {
   let hasSeenIntro = false;
 
   try {
-    hasSeenIntro = window.localStorage.getItem(introSeenKey) === '1';
-    if (!hasSeenIntro) window.localStorage.setItem(introSeenKey, '1');
+    // sessionStorage lasts for this browsing session, not across future visits.
+    // It prevents the animation replaying when the visitor returns home mid-session.
+    hasSeenIntro = window.sessionStorage.getItem(introSeenKey) === '1';
+    if (!hasSeenIntro) window.sessionStorage.setItem(introSeenKey, '1');
   } catch {
     // If browser storage is unavailable, allow the intro rather than blocking the page.
   }
