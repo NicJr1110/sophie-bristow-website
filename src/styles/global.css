@@ -1248,9 +1248,9 @@ h3 {
 .mobile-menu { position:fixed; }
 .mobile-menu-flower {
   position:absolute;
-  left:14px;
+  right:14px;
   bottom:10px;
-  width:clamp(64px,20vw,92px);
+  width:clamp(128px,40vw,184px);
   aspect-ratio:1;
   pointer-events:none;
   opacity:.9;
