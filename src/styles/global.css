@@ -1478,6 +1478,32 @@ h3 {
 }
 .mobile-menu .mobile-shop-submenu .scratch.is-current { opacity: .55; }
 
+/* Burger drawer typography and compact, unruled Shop submenu. */
+.mobile-menu {
+  text-transform: uppercase;
+}
+.mobile-menu .mobile-shop-submenu {
+  align-items: flex-end;
+  gap: 1px;
+  padding: 3px 0 2px;
+  margin: 2px 0 0;
+  border: 0;
+}
+.mobile-menu .mobile-shop-submenu li,
+.mobile-menu .mobile-shop-submenu li + li {
+  width: auto;
+  border: 0;
+  text-align: right;
+}
+.mobile-menu .mobile-shop-submenu .scratch {
+  display: inline-block;
+  width: auto;
+  padding: 2px 0;
+  line-height: 1.1;
+  text-align: right;
+}
+
+
 
 /* ---------- Restrained editorial motion ---------- */
 @keyframes page-arrive {

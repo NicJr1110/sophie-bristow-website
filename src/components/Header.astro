@@ -72,7 +72,7 @@ const isCurrent = (href: string) => current.startsWith(href);
           </ul>
         </li>
       ) : (
-        <li><ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} /></li>
+        <li><ScratchLink href={item.href} label={item.href === '/bio/' ? 'About' : item.label} current={isCurrent(item.href)} /></li>
       ))}
     </ul>
   </nav>
