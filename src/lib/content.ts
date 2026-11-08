@@ -34,20 +34,26 @@ async function query<T>(groq: string, params: Record<string, unknown> = {}): Pro
 
 /* ---------- Site settings ---------- */
 
-export type Settings = { backgroundUrl: string; showShop: boolean };
+export type Settings = { backgroundUrl: string; showShop: boolean; flashSubtitle: string; markMakingSubtitle: string; artworksSubtitle: string; giftCardsSubtitle: string };
+const DEFAULT_MENU_SUBTITLES = {
+  flashSubtitle: 'Browse available artworks ready for purchase.',
+  markMakingSubtitle: 'Commission a unique artwork created specifically for your space.',
+  artworksSubtitle: 'Browse our collection of original artworks.',
+  giftCardsSubtitle: 'Give the gift of art.',
+};
 let settingsPromise: Promise<Settings> | null = null;
 
 export function getSettings(): Promise<Settings> {
   settingsPromise ??= (async () => {
     // Without Sanity (fresh clone) show everything, so the whole site can be worked on.
-    if (!hasSanity) return { backgroundUrl: '/splash-flower.png', showShop: true };
-    const s = await query<{ background?: SanityImage; showShop?: boolean } | null>(
-      `*[_id == $id][0]{ background, showShop }`,
+    if (!hasSanity) return { backgroundUrl: '/splash-flower.png', showShop: true, ...DEFAULT_MENU_SUBTITLES };
+    const s = await query<{ background?: SanityImage; showShop?: boolean; flashSubtitle?: string; markMakingSubtitle?: string; artworksSubtitle?: string; giftCardsSubtitle?: string } | null>(
+      `*[_id == $id][0]{ background, showShop, flashSubtitle, markMakingSubtitle, artworksSubtitle, giftCardsSubtitle }`,
       { id: DOC_IDS.settings },
     );
     const url = sanityImageUrl(s?.background, { w: 1600 });
     // Shop is off unless Sophie has switched it on.
-    return { backgroundUrl: url || '/splash-flower.png', showShop: s?.showShop === true };
+    return { backgroundUrl: url || '/splash-flower.png', showShop: s?.showShop === true, flashSubtitle: s?.flashSubtitle ?? DEFAULT_MENU_SUBTITLES.flashSubtitle, markMakingSubtitle: s?.markMakingSubtitle ?? DEFAULT_MENU_SUBTITLES.markMakingSubtitle, artworksSubtitle: s?.artworksSubtitle ?? DEFAULT_MENU_SUBTITLES.artworksSubtitle, giftCardsSubtitle: s?.giftCardsSubtitle ?? DEFAULT_MENU_SUBTITLES.giftCardsSubtitle };
   })();
   return settingsPromise;
 }

@@ -41,23 +41,22 @@ const year = new Date().getFullYear();
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Abel&display=swap"
     />
-    <link rel="preload" href="/paper.jpg" as="image" />
+    {/* <link rel="preload" href="/paper.jpg" as="image" /> */}
   </head>
   <body class:list={{ 'is-landing': !showHeader }}>
-    <!-- Splash image: fixed bottom-right cell of the viewport on every page (spec §5) -->
+    {/* Background splash is intentionally disabled for the clean white design.
+        Restore the commented block below to bring the Sanity-controlled splash artwork back.
+    */}
+    {/*
     {showSplash && <div class="splash" aria-hidden="true">
       {isDefaultSplash ? (
-        <img
-          src="/splash-flower.png"
-          srcset="/splash-flower-sm.png 450w, /splash-flower.png 900w"
-          sizes="(min-width: 1024px) 22vh, (min-width: 768px) 22vh, 40vw"
-          alt=""
-          decoding="async"
-        />
+        <img src="/splash-flower.png" srcset="/splash-flower-sm.png 450w, /splash-flower.png 900w"
+          sizes="(min-width: 1024px) 22vh, (min-width: 768px) 22vh, 40vw" alt="" decoding="async" />
       ) : (
         <img src={backgroundUrl} alt="" decoding="async" />
       )}
     </div>}
+    */}
 
     <div class="page">
       {showHeader && <Header current={Astro.url.pathname} title={title} />}
