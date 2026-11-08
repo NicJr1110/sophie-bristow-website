@@ -33,7 +33,7 @@
   --hand-radius: 255px 12px 225px 14px / 14px 225px 12px 255px;
 
   --channel: 1480px;
-  --gutter: 48px;
+  --gutter: 25px;
   --gap: 10px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
@@ -527,7 +527,7 @@ h3 {
 .burger {
   position: fixed;
   top: 18px;
-  right: 14px;
+  right: var(--gutter);
   z-index: 60;
   width: 44px;
   height: 44px;
@@ -638,8 +638,8 @@ h3 {
   .site-header { min-height: 100px; }
 }
 
-@media (min-width: 1024px) {
-  :root { --gutter: 16px; }
+@media (min-width: 1025px) {
+  :root { --gutter: 40px; }
   .header-page-title { display: none; }
   /* Full menu: SB logo on the far left, the menu running across beside it */
   .site-header {
@@ -1133,7 +1133,7 @@ h3 {
 
 
 /* ---------- Simple editorial landing and shop chooser ---------- */
-.is-landing .channel { width:100%; max-width:none; min-height:calc(100vh - 24px); padding:0 20px 30px; }
+.is-landing .channel { width:100%; max-width:none; min-height:calc(100vh - 24px); padding:0 var(--gutter) 30px; }
 .simple-site-page { width:100%; min-height:calc(100vh - 30px); min-height:calc(100dvh - 30px); display:flex; flex-direction:column; align-items:stretch; padding:clamp(58px,10vh,112px) 0 18px; color:#111; background:#fff; }
 .simple-brand { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; width:100%; max-width:none; margin:0 auto clamp(74px,12vh,132px); text-align:left; }
 .simple-brand-copy { min-width:0; text-align:left; }
@@ -1157,13 +1157,13 @@ h3 {
  .simple-shop-page .simple-brand { margin-bottom:clamp(74px,12vh,132px); }
 
 /* The shop gallery follows the same edge-to-edge 20px editorial gutters as the landing page. */
-.is-wide .channel { width:100%; max-width:none; padding:0 20px 48px; }
-.is-wide .site-header, .is-wide .site-footer { max-width:none; padding-left:20px; padding-right:20px; }
+.is-wide .channel { width:100%; max-width:none; padding:0 var(--gutter) 48px; }
+.is-wide .site-header, .is-wide .site-footer { max-width:none; padding-left:var(--gutter); padding-right:var(--gutter); }
 .is-wide .shop-tags { gap:8px 28px; }
 .is-wide .grid { width:100%; }
 .simple-shop-bottom { margin-top:clamp(62px,8vh,90px); }
 @media(max-width:640px) {
- .is-landing .channel { padding-right:16px; padding-left:16px; }
+ .is-landing .channel { padding-right:var(--gutter); padding-left:var(--gutter); }
  .simple-site-page { min-height:calc(100dvh - 16px); padding-top:clamp(54px,9vh,82px); }
  .simple-brand { margin-bottom:clamp(52px,9vh,78px); }
  .simple-brand-mark { height:calc(clamp(1.8rem,8vw,2.6rem) + 2px + .696rem); }
