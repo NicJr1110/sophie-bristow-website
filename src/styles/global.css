@@ -224,6 +224,9 @@ h3 {
 
 .site-footer {
   text-align: left;
+  width: 100%;
+  max-width: var(--channel);
+  margin: 0 auto;
   padding: 24px var(--gutter);
   color: var(--muted);
 }
@@ -572,6 +575,10 @@ h3 {
     flex-direction: row;
     align-items: center;
     gap: 44px;
+    /* lined up with the content column, not the edge of the screen */
+    width: 100%;
+    max-width: var(--channel);
+    margin: 0 auto;
     padding: 26px var(--gutter) 30px;
   }
   .nav-desktop {
