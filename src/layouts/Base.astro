@@ -6,6 +6,7 @@ import { getSettings } from '../lib/content';
 
 interface Props {
   title?: string;
+  subtitle?: string;
   description?: string;
   /** Landing page hides the header (menu sits in the middle of the page instead). */
   showHeader?: boolean;
@@ -17,6 +18,7 @@ interface Props {
 
 const {
   title,
+  subtitle,
   description = 'Tattoo design, artwork and mark making by Sophie Bristow.',
   showHeader = true,
   showSplash = true,
@@ -59,7 +61,7 @@ const year = new Date().getFullYear();
     </div>}
 
     <div class="page">
-      {showHeader && <Header current={Astro.url.pathname} title={title} />}
+      {showHeader && <Header current={Astro.url.pathname} title={title} subtitle={subtitle} />}
       <main class="channel" id="main">
         <slot />
       </main>

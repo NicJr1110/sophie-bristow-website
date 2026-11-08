@@ -6,8 +6,9 @@ import ScratchLink from './ScratchLink.astro';
 interface Props {
   current: string;
   title?: string;
+  subtitle?: string;
 }
-const { current, title } = Astro.props;
+const { current, title, subtitle } = Astro.props;
 const [NAV, SHOP_TAGS] = await Promise.all([getNav(), getShopTags()]);
 const artworkTag = SHOP_TAGS.find((tag) => /artwork/i.test(tag.title) || /artwork/i.test(tag.slug));
 const giftTag = SHOP_TAGS.find((tag) => /gift/i.test(tag.title) || /gift/i.test(tag.slug));
@@ -23,7 +24,7 @@ const isCurrent = (href: string) => current.startsWith(href);
   <a class="site-name" href="/" aria-label={USE_MONOGRAM ? SITE_NAME : undefined}>
     {USE_MONOGRAM ? <img class="monogram" src="/sb-logo.png" alt="" width="326" height="400" /> : SITE_NAME}
   </a>
-  {title && <span class="header-page-title">{title}</span>}
+  {title && <span class="header-page-title">{title}{subtitle && <span class="header-page-subtitle" data-shop-subtitle>{subtitle}</span>}</span>}
 
   <!-- Large screens: horizontal menu centred under the name -->
   <nav class="nav-desktop" aria-label="Main">
@@ -60,10 +61,9 @@ const isCurrent = (href: string) => current.startsWith(href);
       {NAV.map((item) => item.href === '/shop/' ? (
         <li class="mobile-shop-item">
           <div class="mobile-shop-heading">
-            <button class="shop-disclosure-toggle mobile-shop-toggle" type="button" aria-expanded="false" aria-controls="mobile-shop-submenu" aria-label="Show shop categories">
-              <span aria-hidden="true"></span>
+            <button class="shop-disclosure-toggle mobile-shop-toggle mobile-shop-label" type="button" aria-expanded="false" aria-controls="mobile-shop-submenu" aria-label="Show shop categories">
+              Shop <span aria-hidden="true"></span>
             </button>
-            <ScratchLink href="/shop/" label="Shop" current={isCurrent('/shop/')} />
           </div>
           <ul id="mobile-shop-submenu" class="mobile-shop-submenu" hidden>
             {mobileShopLinks.map((link) => (

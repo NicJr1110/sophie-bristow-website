@@ -5,10 +5,15 @@ import Gallery from '../components/Gallery.astro';
 import { getArtworkGallery, getShopTags } from '../lib/content';
 
 const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
+const selectedSlug = Astro.url.searchParams.get('tag') ?? '';
+const selectedTag = tags.find((tag) => tag.slug === selectedSlug);
+const categoryTitle = selectedSlug
+  ? (selectedTag?.title ?? selectedSlug.replace(/[-_]+/g, ' '))
+  : 'all';
 ---
 
-<Base title={gallery.title}>
-  <h1 class="page-title page-title--nav">{gallery.title}</h1>
+<Base title="Shop" subtitle={categoryTitle}>
+  <h1 class="page-title page-title--nav">Shop</h1>
   {gallery.intro && <p class="intro">{gallery.intro}</p>}
   {tags.length > 0 && (
     <nav class="shop-tags" aria-label="Filter the shop">
@@ -24,8 +29,21 @@ const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
 
 <script>
   // Filter by ?tag= (from the landing page's shop links, or the tag links above the grid).
+  const categoryNames = new Map<string, string>([
+    ...Array.from(document.querySelectorAll<HTMLAnchorElement>('.shop-tags a[data-tag]'))
+      .filter((a) => a.dataset.tag)
+      .map((a) => [a.dataset.tag!, a.textContent?.trim() ?? a.dataset.tag!] as [string, string]),
+    ['', 'all'],
+  ]);
+  const updateCategoryTitle = (tag: string) => {
+    const label = tag ? (categoryNames.get(tag) ?? tag.replace(/[-_]+/g, ' ')) : 'all';
+    document.querySelectorAll<HTMLElement>('[data-shop-subtitle]').forEach((el) => {
+      el.textContent = label;
+    });
+  };
   const filterByTag = () => {
     const tag = new URLSearchParams(location.search).get('tag') ?? '';
+    updateCategoryTitle(tag);
     document.querySelectorAll<HTMLLIElement>('[data-gallery] > li').forEach((li) => {
       li.hidden = Boolean(tag) && !(li.dataset.tags ?? '').split(' ').includes(tag);
     });
@@ -37,6 +55,7 @@ const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
     });
   };
   filterByTag();
+  window.addEventListener('popstate', filterByTag);
   document.querySelectorAll<HTMLAnchorElement>('.shop-tags a').forEach((a) =>
     a.addEventListener('click', (e) => {
       e.preventDefault();

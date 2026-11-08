@@ -1689,3 +1689,28 @@ h3 {
   .simple-landing .simple-grass-intro { display: none; }
   .simple-landing .simple-contact-link { visibility: visible; }
 }
+
+
+/* Shop category subtitle sits directly beneath the Shop heading in the compact header. */
+.header-page-subtitle {
+  display: block;
+  margin-top: 4px;
+  font-size: .62em;
+  font-weight: 400;
+  line-height: 1.1;
+  text-transform: lowercase;
+}
+.mobile-shop-toggle.mobile-shop-label {
+  width: auto;
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font: inherit;
+  font-size: clamp(1.05rem, 3.5vw, 1.3rem);
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+.mobile-shop-toggle.mobile-shop-label span {
+  flex: 0 0 auto;
+}
