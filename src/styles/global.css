@@ -1,5 +1,5 @@
 /*
- * Sophie's look: ink on paper. One clean gallery sans (Instrument Sans; compare at /type-test/),
+ * Sophie's look: ink on paper. One clean gallery sans (Abel),
  * for body text, crayon underlines, hand-drawn button edges. The site uses Abel throughout.
  *
  * Breakpoints (spec §4):
@@ -19,7 +19,7 @@
   --hover: #444;
 
   --font-body: 'Abel', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  /* Headings share the body family: a clean, open gallery sans. Compare options at /type-test/. */
+  /* Headings share the Abel body family. */
   --font-heading: var(--font-body);
   --heading-weight: 400;
   --heading-tracking: -0.01em;
