@@ -30,7 +30,7 @@
   --hand-radius: 255px 12px 225px 14px / 14px 225px 12px 255px;
 
   --channel: 880px;
-  --gutter: 16px;
+  --gutter: 32px;
   --gap: 10px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
@@ -462,18 +462,30 @@ h3 {
 
 .site-name .monogram {
   display: block;
-  height: clamp(68px, 8vw, 84px); /* same size as on the landing page */
+  height: clamp(58px, 8vw, 72px);
   width: auto;
+}
+
+.header-page-title {
+  display: block;
+  margin-top: 1px;
+  font-size: clamp(1.45rem, 4.5vw, 1.9rem);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
+  line-height: 1.05;
 }
 
 /* ---------- Header + navigation ---------- */
 
 .site-header {
+  width: 100%;
+  max-width: var(--channel);
+  margin: 0 auto;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 28px var(--gutter) 24px;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 22px var(--gutter) 20px;
 }
 
 .site-name {
@@ -542,9 +554,9 @@ h3 {
   inset: 0;
   z-index: 50;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
-  padding: 0 var(--gutter);
+  padding: 112px var(--gutter) 32px;
   background: var(--paper);
   background-size: 512px 512px;
   transform: translateY(-100%);
@@ -565,16 +577,54 @@ h3 {
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 10px;
 }
 
 .mobile-menu .scratch {
   font-size: clamp(2rem, 9vw, 2.8rem);
   font-weight: var(--heading-weight);
   letter-spacing: var(--heading-tracking);
+  position: relative;
+  text-decoration: none;
+}
+
+.mobile-menu .scratch::after {
+  content: '';
+  position: absolute;
+  left: -0.03em;
+  right: -0.03em;
+  top: calc(100% + 0.08em);
+  height: clamp(4px, 0.55vh, 6px);
+  background: var(--line, var(--line-title)) no-repeat left center / 100% 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.65s cubic-bezier(0.45, 0.05, 0.25, 1);
+}
+
+.mobile-menu .scratch:hover::after,
+.mobile-menu .scratch:focus-visible::after,
+.mobile-menu .scratch.is-current::after {
+  transform: scaleX(1);
+}
+
+@media (max-width: 1023px) {
+  .page-title--nav {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .site-header { min-height: 100px; }
 }
 
 @media (min-width: 1024px) {
+  :root { --gutter: 16px; }
+  .header-page-title { display: none; }
   /* Full menu: SB logo on the far left, the menu running across beside it */
   .site-header {
     flex-direction: row;
@@ -821,11 +871,33 @@ h3 {
 }
 
 .enquiry-grass {
-  margin-top: auto;
-  padding-top: 32px;
-  height: clamp(150px, 28vh, 260px);
-  width: auto;
+  position: relative;
+  align-self: flex-end;
+  margin: auto 18px 0 0;
+  width: clamp(167px, 24vw, 289px);
+  height: auto;
+  aspect-ratio: 347 / 312;
   opacity: 0.92;
+}
+
+.boil-art { position: relative; display: block; }
+.boil-art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  animation: boil-frame 600ms steps(1, end) infinite;
+}
+.boil-art img:nth-child(2) { animation-delay: -100ms; }
+.boil-art img:nth-child(3) { animation-delay: -200ms; }
+.boil-art img:nth-child(4) { animation-delay: -300ms; }
+.boil-art img:nth-child(5) { animation-delay: -400ms; }
+.boil-art img:nth-child(6) { animation-delay: -500ms; }
+@keyframes boil-frame {
+  0%, 16.65% { opacity: 1; }
+  16.66%, 100% { opacity: 0; }
 }
 
 /* Step 2: no boxes, no fills, just thin lines */
@@ -944,11 +1016,11 @@ h3 {
     position: absolute;
     left: calc(100% + var(--gutter) + 28px);
     bottom: -2px;
-    height: 100%;
-    max-height: 300px;
-    width: auto;
+    height: min(100%, 300px);
+    width: 120px;
     pointer-events: none;
   }
+  .lined-flower img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 }
 
 .lined-form .button {
@@ -1016,6 +1088,8 @@ h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .boil-art img { animation: none !important; opacity: 0 !important; }
+  .boil-art img:first-child { opacity: 1 !important; }
   *,
   *::before,
   *::after {

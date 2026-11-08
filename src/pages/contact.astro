@@ -30,7 +30,11 @@ const LINE_COUNT = 17;
         </ul>
       </nav>
       <!-- One of Sophie's grass drawings, large, at the foot of the page -->
-      <img class="enquiry-grass" src="/marks/flowers/grass-01.png" alt="" width="347" height="312" />
+      <span class="enquiry-grass boil-art" aria-hidden="true">
+        {Array.from({ length: 5 }, (_, i) => (
+          <img src={`/marks/flowers/grass-${String(i + 1).padStart(2, '0')}.png`} alt="" width="347" height="312" />
+        ))}
+      </span>
     </div>
   )}
 
@@ -59,7 +63,11 @@ const LINE_COUNT = 17;
       ></textarea>
       <span class="char-count" aria-live="polite">0 / 2000</span>
       <!-- Laptop only: one of Sophie's flowers stands beside the message area, outside the form's centred column -->
-      <img class="lined-flower" src="/marks/flowers/flower-04.png" alt="" width="358" height="892" />
+      <span class="lined-flower boil-art" aria-hidden="true">
+          {Array.from({ length: 6 }, (_, i) => (
+            <img src={`/marks/flowers/flower-${String(i + 1).padStart(2, '0')}.png`} alt="" width="358" height="892" />
+          ))}
+        </span>
     </div>
 
     <!-- Honeypot: hidden from people, bots fill it in -->

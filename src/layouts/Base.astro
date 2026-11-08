@@ -60,7 +60,7 @@ const year = new Date().getFullYear();
     </div>}
 
     <div class="page">
-      {showHeader && <Header current={Astro.url.pathname} />}
+      {showHeader && <Header current={Astro.url.pathname} title={title} />}
       <main class="channel" id="main">
         <slot />
       </main>
