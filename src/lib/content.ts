@@ -8,8 +8,9 @@ export type GalleryItem = {
   id: string;
   title?: string;
   pic: Pic;
-  // Artwork page only
+  // Shop only
   price?: number;
+  tags?: string[];
   status?: ArtStatus;
   description?: string;
 };
@@ -86,6 +87,7 @@ type ArtworkDoc = {
   status?: 'available' | 'reserved' | 'sold';
   reservedUntil?: string;
   image?: SanityImage;
+  tags?: (string | null)[];
 };
 
 /** Reserved pieces show as Sold; an expired reservation counts as available again. */
@@ -101,7 +103,7 @@ export async function getArtworkGallery(): Promise<Gallery> {
     query<GalleryDoc | null>(`*[_id == $id][0]{ title, introText }`, { id: DOC_IDS.artwork }),
     query<ArtworkDoc[]>(
       `*[_type == "artwork" && !(_id in path("drafts.**"))] | order(order asc, _createdAt desc){
-        _id, title, description, price, status, reservedUntil, image
+        _id, title, description, price, status, reservedUntil, image, "tags": tags[]->slug.current
       }`,
     ),
   ]);
@@ -115,10 +117,30 @@ export async function getArtworkGallery(): Promise<Gallery> {
       description: d.description,
       price: d.price,
       status: displayStatus(d.status, d.reservedUntil),
+      tags: (d.tags ?? []).filter((t): t is string => Boolean(t)),
       pic,
     });
   }
   return { title: page?.title || 'Shop', intro: page?.introText ?? '', items };
+}
+
+/* ---------- Shop tags ---------- */
+
+export type ShopTag = { title: string; slug: string };
+
+/** Shop tags in display order, only those used by at least one published shop item. */
+export async function getShopTags(): Promise<ShopTag[]> {
+  if (!hasSanity) {
+    return [
+      { title: 'artwork', slug: 'artwork' },
+      { title: 'gift cards', slug: 'gift-cards' },
+    ];
+  }
+  return query<ShopTag[]>(
+    `*[_type == "shopTag" && !(_id in path("drafts.**")) && defined(slug.current)
+       && count(*[_type == "artwork" && !(_id in path("drafts.**")) && references(^._id)]) > 0
+     ] | order(order asc, title asc){ title, "slug": slug.current }`,
+  );
 }
 
 /* ---------- Bio ---------- */
@@ -180,7 +202,8 @@ function sampleArtwork(): Gallery {
     intro: 'Placeholder intro text. Connect Sanity to show real pieces.',
     items: Array.from({ length: 6 }, (_, i) => ({
       id: `sample-${i}`,
-      title: `Original ${i + 1}`,
+      title: i < 2 ? `Gift card ${i + 1}` : `Original ${i + 1}`,
+      tags: [i < 2 ? 'gift-cards' : 'artwork'],
       price: 80 + i * 25,
       status: (i === 2 ? 'sold' : 'available') as ArtStatus,
       pic: picPlaceholder(`artwork-${i}`, `Placeholder artwork ${i + 1}`),

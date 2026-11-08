@@ -25,6 +25,12 @@ export const artwork = defineType({
     }),
     defineField({ name: 'description', type: 'text', rows: 3, description: 'Optional: size, medium, framing…' }),
     defineField({
+      name: 'tags',
+      type: 'array',
+      description: 'Which shop sections this appears in, e.g. artwork or gift cards. Manage the list under Shop → Shop tags.',
+      of: [{ type: 'reference', to: [{ type: 'shopTag' }] }],
+    }),
+    defineField({
       name: 'price',
       title: 'Price (£)',
       type: 'number',

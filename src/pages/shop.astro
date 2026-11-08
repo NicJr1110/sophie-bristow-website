@@ -2,19 +2,49 @@
 // Gallery template + Buy buttons (spec §7). Sold status is refreshed live from /api/status on load.
 import Base from '../layouts/Base.astro';
 import Gallery from '../components/Gallery.astro';
-import { getArtworkGallery } from '../lib/content';
+import { getArtworkGallery, getShopTags } from '../lib/content';
 
-const gallery = await getArtworkGallery();
+const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
 ---
 
 <Base title={gallery.title}>
   <h1 class="page-title">{gallery.title}</h1>
   {gallery.intro && <p class="intro">{gallery.intro}</p>}
+  {tags.length > 0 && (
+    <nav class="shop-tags" aria-label="Filter the shop">
+      {tags.map((t) => (
+        <a class="scratch" href={`/shop/?tag=${t.slug}`} data-tag={t.slug}>{t.title}</a>
+      ))}
+      <a class="scratch" href="/shop/" data-tag="">all</a>
+    </nav>
+  )}
   <p class="shop-message" role="status" aria-live="polite" hidden></p>
   <Gallery items={gallery.items} shop />
 </Base>
 
 <script>
+  // Filter by ?tag= (from the landing page's shop links, or the tag links above the grid).
+  const filterByTag = () => {
+    const tag = new URLSearchParams(location.search).get('tag') ?? '';
+    document.querySelectorAll<HTMLLIElement>('[data-gallery] > li').forEach((li) => {
+      li.hidden = Boolean(tag) && !(li.dataset.tags ?? '').split(' ').includes(tag);
+    });
+    document.querySelectorAll<HTMLAnchorElement>('.shop-tags a').forEach((a) => {
+      const on = a.dataset.tag === tag;
+      a.classList.toggle('is-current', on);
+      if (on) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+  };
+  filterByTag();
+  document.querySelectorAll<HTMLAnchorElement>('.shop-tags a').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      history.replaceState(null, '', a.href);
+      filterByTag();
+    }),
+  );
+
   const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('button.buy'));
   const message = document.querySelector<HTMLParagraphElement>('.shop-message')!;
 

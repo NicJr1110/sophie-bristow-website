@@ -4,5 +4,6 @@ import { bio } from './bio';
 import { siteSettings } from './siteSettings';
 import { enquiryType } from './enquiryType';
 import { emailTemplate } from './emailTemplate';
+import { shopTag } from './shopTag';
 
-export const schemaTypes = [galleryPage, artwork, bio, siteSettings, enquiryType, emailTemplate];
+export const schemaTypes = [galleryPage, artwork, shopTag, bio, siteSettings, enquiryType, emailTemplate];

@@ -1,6 +1,6 @@
 export const SITE_NAME = 'Sophie Bristow';
 
-/** Show Sophie's S/B monogram (public/sb-monogram.svg) instead of her name in the header and landing page. */
+/** Show Sophie's S/B monogram (public/sb-logo.png), small, instead of her name in the header. The landing page shows her name in full. */
 export const USE_MONOGRAM = true;
 
 export const SANITY = {

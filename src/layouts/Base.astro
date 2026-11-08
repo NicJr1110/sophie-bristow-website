@@ -9,9 +9,16 @@ interface Props {
   description?: string;
   /** Landing page hides the header (menu sits in the middle of the page instead). */
   showHeader?: boolean;
+  /** Show the flower in the bottom-right corner (off on the landing page). */
+  showSplash?: boolean;
 }
 
-const { title, description = 'Tattoo design, artwork and mark making by Sophie Bristow.', showHeader = true } = Astro.props;
+const {
+  title,
+  description = 'Tattoo design, artwork and mark making by Sophie Bristow.',
+  showHeader = true,
+  showSplash = true,
+} = Astro.props;
 const { backgroundUrl } = await getSettings();
 const isDefaultSplash = backgroundUrl === '/splash-flower.png';
 const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
@@ -38,11 +45,11 @@ const year = new Date().getFullYear();
   </head>
   <body class:list={{ 'is-landing': !showHeader }}>
     <!-- Splash image: fixed bottom-right cell of the viewport on every page (spec §5) -->
-    <div class="splash" aria-hidden="true">
+    {showSplash && <div class="splash" aria-hidden="true">
       {isDefaultSplash ? (
         <img
           src="/splash-flower.png"
-          srcset="/splash-flower-sm.png 409w, /splash-flower.png 818w"
+          srcset="/splash-flower-sm.png 450w, /splash-flower.png 900w"
           sizes="(min-width: 1024px) 22vh, (min-width: 768px) 22vh, 40vw"
           alt=""
           decoding="async"
@@ -50,7 +57,7 @@ const year = new Date().getFullYear();
       ) : (
         <img src={backgroundUrl} alt="" decoding="async" />
       )}
-    </div>
+    </div>}
 
     <div class="page">
       {showHeader && <Header current={Astro.url.pathname} />}

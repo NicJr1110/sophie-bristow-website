@@ -6,9 +6,10 @@ import { getEnquiryTypes } from '../lib/content';
 const enquiryTypes = await getEnquiryTypes();
 ---
 
-<Base title="Contact">
+<Base title="Contact" showSplash={false}>
   <h1 class="page-title">Contact</h1>
 
+  <div class="contact-area">
   <form id="contact-form" class="contact-form" method="post" action="/api/contact">
     {enquiryTypes.length > 0 && (
       <fieldset class="enquiry-types">
@@ -52,9 +53,14 @@ const enquiryTypes = await getEnquiryTypes();
     <button class="button" type="submit">Send</button>
     <p class="form-error" role="alert" hidden>Oops, something appears to have gone wrong. Please try again later.</p>
   </form>
+    <!-- One of Sophie's flowers runs down the right of the form, framing it -->
+    <div class="contact-rail" aria-hidden="true"></div>
+  </div>
 
   <div class="form-success" role="status" tabindex="-1" hidden>
-    <p>Thank you very much, Sophie will be in touch with you shortly.</p>
+    <p class="form-success-title">Sent</p>
+    <p class="form-success-note">Thank you very much, Sophie will be in touch with you shortly.</p>
+    <img class="form-success-flowers" src="/splash-flower-sm.png" alt="" width="450" height="532" />
   </div>
 </Base>
 
@@ -84,7 +90,7 @@ const enquiryTypes = await getEnquiryTypes();
       });
       if (!res.ok) throw new Error(String(res.status));
       // Happy path: the whole form (and its heading) goes, leaving just the message, centred.
-      form.hidden = true;
+      form.closest('.contact-area')?.setAttribute('hidden', '');
       document.querySelector<HTMLElement>('.page-title')?.setAttribute('hidden', '');
       success.hidden = false;
       window.scrollTo({ top: 0 });

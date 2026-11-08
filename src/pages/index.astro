@@ -1,33 +1,111 @@
 ---
+// Landing: big "Sophie / Bristow", then a lowercase menu. Hovering an item draws one of
+// Sophie's own lines (picked at random) under it. "shop" opens its tags, right-aligned;
+// hovering a tag sprouts one of her grass drawings beside it.
 import Base from '../layouts/Base.astro';
-import ScratchLink from '../components/ScratchLink.astro';
-import { SITE_NAME, USE_MONOGRAM } from '../lib/config';
-import { getNav } from '../lib/content';
+import { getNav, getShopTags } from '../lib/content';
 
-// The work on the left, about/contact on the right, meeting at the centre line of the page:
-// 3 + 2 with the shop on, 2 + 2 while it's off.
-const nav = await getNav();
-const WORK = ['/flash/', '/mark-making/', '/shop/'];
-const left = nav.filter((item) => WORK.includes(item.href));
-const right = nav.filter((item) => !WORK.includes(item.href));
+const LINE_COUNT = 17; // public/marks/lines/line-01..17.png
+const GRASS_COUNT = 5; // public/marks/flowers/grass-01..05.png
+
+// Flash, Mark Making, Shop (only while the shop is switched on), Contact.
+const items = (await getNav()).filter((item) => item.href !== '/bio/');
+const tags = await getShopTags();
 ---
 
 <Base showHeader={false}>
   <div class="landing">
     <h1 class="landing-name">
-      {USE_MONOGRAM ? (
-        <img class="monogram monogram--large" src="/sb-monogram.svg" alt={SITE_NAME} width="80" height="144" />
-      ) : (
-        SITE_NAME
-      )}
+      <span>Sophie</span>
+      <span>Bristow</span>
     </h1>
-    <nav class="landing-menu" aria-label="Main">
-      <ul class="landing-col landing-col--left">
-        {left.map((item) => <li><ScratchLink href={item.href} label={item.label} /></li>)}
-      </ul>
-      <ul class="landing-col landing-col--right">
-        {right.map((item) => <li><ScratchLink href={item.href} label={item.label} /></li>)}
+
+    <nav class="landing-nav" aria-label="Main">
+      <ul class="landing-list">
+        {items.map((item) =>
+          item.href === '/shop/' && tags.length > 0 ? (
+            <li class="landing-item has-sub">
+              <button class="landing-link" type="button" aria-expanded="false" aria-controls="landing-shop">
+                {item.label.toLowerCase()}
+              </button>
+              <ul class="landing-sub" id="landing-shop" hidden>
+                {[...tags.map((t) => ({ label: t.title, href: `/shop/?tag=${t.slug}` })), { label: 'all', href: '/shop/' }].map(
+                  (sub, i) => (
+                    <li style={`--d:${i}`}>
+                      <a class="landing-sublink" href={sub.href}>
+                        <span class="sprout" aria-hidden="true"></span>
+                        {sub.label.toLowerCase()}
+                      </a>
+                    </li>
+                  ),
+                )}
+              </ul>
+            </li>
+          ) : (
+            <li class="landing-item">
+              <a class="landing-link" href={item.href}>{item.label.toLowerCase()}</a>
+            </li>
+          ),
+        )}
       </ul>
     </nav>
   </div>
 </Base>
+
+<script define:vars={{ LINE_COUNT, GRASS_COUNT }}>
+  const pad = (n) => String(n).padStart(2, '0');
+  // A different drawing each time, never the same one twice in a row.
+  const picker = (count, path) => {
+    let last = 0;
+    return () => {
+      let n;
+      do n = 1 + Math.floor(Math.random() * count);
+      while (count > 1 && n === last);
+      last = n;
+      return `url('${path}-${pad(n)}.png')`;
+    };
+  };
+  const nextLine = picker(LINE_COUNT, '/marks/lines/line');
+  const nextGrass = picker(GRASS_COUNT, '/marks/flowers/grass');
+
+  // Preload the drawings so the first hover isn't blank
+  for (let i = 1; i <= LINE_COUNT; i++) new Image().src = `/marks/lines/line-${pad(i)}.png`;
+  for (let i = 1; i <= GRASS_COUNT; i++) new Image().src = `/marks/flowers/grass-${pad(i)}.png`;
+
+  // Menu items: draw a random line underneath on hover / keyboard focus
+  document.querySelectorAll('.landing-item').forEach((li) => {
+    const draw = () => {
+      if (li.classList.contains('is-drawn')) return;
+      li.style.setProperty('--line', nextLine());
+      li.classList.add('is-drawn');
+    };
+    const undraw = () => {
+      if (li.classList.contains('is-open') || li.matches(':hover') || li.contains(document.activeElement)) return;
+      li.classList.remove('is-drawn');
+    };
+    li.addEventListener('mouseenter', draw);
+    li.addEventListener('focusin', draw);
+    li.addEventListener('mouseleave', undraw);
+    li.addEventListener('focusout', () => setTimeout(undraw));
+  });
+
+  // "shop" opens and closes its tags
+  const shopBtn = document.querySelector('.has-sub > .landing-link');
+  const shopItem = shopBtn?.closest('.landing-item');
+  const sub = document.getElementById('landing-shop');
+  shopBtn?.addEventListener('click', () => {
+    const open = shopBtn.getAttribute('aria-expanded') !== 'true';
+    shopBtn.setAttribute('aria-expanded', String(open));
+    sub.hidden = !open;
+    shopItem.classList.toggle('is-open', open);
+    if (open) shopItem.classList.add('is-drawn');
+  });
+
+  // Tags: a random grass tuft sprouts to the left of the word
+  document.querySelectorAll('.landing-sublink').forEach((a) => {
+    const sprout = a.querySelector('.sprout');
+    const grow = () => sprout.style.setProperty('--grass', nextGrass());
+    a.addEventListener('mouseenter', grow);
+    a.addEventListener('focus', grow);
+  });
+</script>

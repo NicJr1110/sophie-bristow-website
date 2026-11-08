@@ -14,7 +14,8 @@ export const structure: StructureResolver = (S) =>
       single(S, 'Mark Making', 'galleryPage', 'page-mark-making'),
       S.divider(),
       single(S, 'Shop page intro', 'galleryPage', 'page-artwork'),
-      S.documentTypeListItem('artwork').title('Artworks for sale'),
+      S.documentTypeListItem('artwork').title('Shop items'),
+      S.documentTypeListItem('shopTag').title('Shop tags'),
       S.divider(),
       S.listItem()
         .title('Contact form')

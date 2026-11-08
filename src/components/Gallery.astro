@@ -4,7 +4,7 @@ import type { GalleryItem } from '../lib/content';
 
 interface Props {
   items: GalleryItem[];
-  /** Artwork page: show title, price and a Buy button under each tile. */
+  /** Shop page: show title, price and a Buy button under each tile. */
   shop?: boolean;
 }
 const { items, shop = false } = Astro.props;
@@ -19,7 +19,7 @@ const sizes = '(min-width: 1024px) 290px, (min-width: 768px) 31vw, 47vw';
 
 <ul class="grid" data-gallery>
   {items.map((item, i) => (
-    <li class="tile">
+    <li class="tile" data-tags={item.tags?.join(' ')}>
       <button
         class="tile-open"
         type="button"
@@ -78,26 +78,33 @@ const sizes = '(min-width: 1024px) 290px, (min-width: 768px) 31vw, 47vw';
   if (dialog && tiles.length) {
     const img = dialog.querySelector<HTMLImageElement>('.lb-img')!;
     const caption = dialog.querySelector<HTMLElement>('.lb-caption')!;
-    let index = 0;
+    let current: HTMLButtonElement | null = null;
+    // Only step through tiles that are showing (the shop can be filtered by tag).
+    const visible = () => tiles.filter((t) => !t.closest('li')?.hidden);
 
-    const show = (i: number) => {
-      index = (i + tiles.length) % tiles.length;
-      const t = tiles[index];
+    const show = (t: HTMLButtonElement) => {
+      current = t;
       img.src = t.dataset.full ?? '';
       img.alt = t.dataset.alt ?? '';
       caption.textContent = t.dataset.caption ?? '';
     };
 
-    tiles.forEach((t, i) =>
+    const step = (by: number) => {
+      const list = visible();
+      const i = current ? list.indexOf(current) : 0;
+      show(list[(i + by + list.length) % list.length]);
+    };
+
+    tiles.forEach((t) =>
       t.addEventListener('click', () => {
-        show(i);
+        show(t);
         dialog.showModal();
       }),
     );
 
     dialog.querySelector('.lb-close')!.addEventListener('click', () => dialog.close());
-    dialog.querySelector('.lb-prev')!.addEventListener('click', () => show(index - 1));
-    dialog.querySelector('.lb-next')!.addEventListener('click', () => show(index + 1));
+    dialog.querySelector('.lb-prev')!.addEventListener('click', () => step(-1));
+    dialog.querySelector('.lb-next')!.addEventListener('click', () => step(1));
 
     // Click on the dark backdrop (not the image or buttons) closes it. Escape is native to <dialog>.
     dialog.addEventListener('click', (e) => {
@@ -105,12 +112,12 @@ const sizes = '(min-width: 1024px) 290px, (min-width: 768px) 31vw, 47vw';
       if (target === dialog || target.tagName === 'FIGURE') dialog.close();
     });
     dialog.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') show(index - 1);
-      if (e.key === 'ArrowRight') show(index + 1);
+      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 'ArrowRight') step(1);
     });
     dialog.addEventListener('close', () => {
       img.removeAttribute('src');
-      tiles[index]?.focus();
+      current?.focus();
     });
   }
 </script>
