@@ -1189,3 +1189,56 @@ h3 {
 .simple-shop-gallery .simple-page-content { width:100%; }
 .simple-shop-gallery .shop-contact-footer { display:none; }
 .simple-shop-gallery .simple-bottom-links { margin-top:auto; }
+
+
+/* Compact mobile navigation panel with depth over the page. */
+.mobile-menu {
+  inset: 12px 12px auto auto;
+  width: min(290px, calc(100vw - 24px));
+  max-height: min(72dvh, 560px);
+  overflow-y: auto;
+  justify-content: flex-start;
+  padding: 68px 22px 22px;
+  border: 1px solid rgb(26 26 26 / 0.08);
+  box-shadow: 0 12px 34px rgb(0 0 0 / 0.18), 0 2px 8px rgb(0 0 0 / 0.08);
+  transform: translateY(-8px);
+  border-radius: 2px;
+}
+.mobile-menu.is-open { transform: translateY(0); }
+.mobile-menu ul { gap: 5px; }
+.mobile-menu .scratch { font-size: clamp(1.05rem, 3.5vw, 1.3rem); }
+.mobile-shop-item { display:flex; flex-direction:column; align-items:flex-end; }
+.mobile-shop-heading { display:flex; align-items:center; justify-content:flex-end; gap:9px; }
+.mobile-shop-label {
+  font-size: clamp(1.05rem, 3.5vw, 1.3rem);
+  line-height:1.15;
+  color:var(--text);
+}
+.mobile-shop-label.is-current { text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:.3em; }
+.mobile-shop-toggle {
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:var(--text);
+  cursor:pointer;
+}
+.mobile-shop-toggle svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.5; transition:transform .25s var(--ease); }
+.mobile-shop-toggle[aria-expanded='true'] svg { transform:rotate(180deg); }
+.mobile-menu .mobile-shop-submenu {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:3px;
+  padding:7px 14px 5px 0;
+  margin:0;
+}
+.mobile-menu .mobile-shop-submenu .scratch { font-size:1rem; color:var(--muted); }
+.mobile-menu .mobile-shop-submenu .scratch.is-current { color:var(--text); }
+@media (max-width:380px) {
+  .mobile-menu { inset:8px 8px auto auto; width:min(260px,calc(100vw - 16px)); padding:62px 18px 18px; }
+  .burger { top:14px; right:calc(var(--gutter) - 2px); }
+}

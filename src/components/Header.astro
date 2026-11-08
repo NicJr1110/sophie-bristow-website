@@ -1,6 +1,6 @@
 ---
 import { SITE_NAME, USE_MONOGRAM } from '../lib/config';
-import { getNav } from '../lib/content';
+import { getNav, getShopTags } from '../lib/content';
 import ScratchLink from './ScratchLink.astro';
 
 interface Props {
@@ -8,7 +8,13 @@ interface Props {
   title?: string;
 }
 const { current, title } = Astro.props;
-const NAV = await getNav();
+const [NAV, SHOP_TAGS] = await Promise.all([getNav(), getShopTags()]);
+const artworkTag = SHOP_TAGS.find((tag) => /artwork/i.test(tag.title) || /artwork/i.test(tag.slug));
+const giftTag = SHOP_TAGS.find((tag) => /gift/i.test(tag.title) || /gift/i.test(tag.slug));
+const shopLinks = [
+  { label: 'Artworks', href: `/shop/?tag=${artworkTag?.slug ?? 'artwork'}` },
+  { label: 'Gift cards', href: `/shop/?tag=${giftTag?.slug ?? 'gift-cards'}` },
+];
 const isCurrent = (href: string) => current.startsWith(href);
 ---
 
@@ -21,10 +27,22 @@ const isCurrent = (href: string) => current.startsWith(href);
   <!-- Large screens: horizontal menu centred under the name -->
   <nav class="nav-desktop" aria-label="Main">
     <ul>
-      {NAV.map((item) => (
-        <li>
-          <ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} />
+      {NAV.map((item) => item.href === '/shop/' ? (
+        <li class="mobile-shop-item">
+          <div class="mobile-shop-heading">
+            <span class:list={['mobile-shop-label', { 'is-current': isCurrent('/shop/') }]}>Shop</span>
+            <button class="mobile-shop-toggle" type="button" aria-expanded="false" aria-controls="mobile-shop-submenu" aria-label="Show shop categories">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5" /></svg>
+            </button>
+          </div>
+          <ul id="mobile-shop-submenu" class="mobile-shop-submenu" hidden>
+            {shopLinks.map((link) => (
+              <li><ScratchLink href={link.href} label={link.label} current={Astro.url.pathname === '/shop/' && Astro.url.searchParams.get('tag') === (link.href.split('tag=')[1] ?? '')} /></li>
+            ))}
+          </ul>
         </li>
+      ) : (
+        <li><ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} /></li>
       ))}
     </ul>
   </nav>
@@ -62,6 +80,16 @@ const isCurrent = (href: string) => current.startsWith(href);
 
     btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
     menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+    const shopToggle = menu.querySelector<HTMLButtonElement>('.mobile-shop-toggle');
+    const shopSubmenu = menu.querySelector<HTMLUListElement>('#mobile-shop-submenu');
+    if (shopToggle && shopSubmenu) {
+      shopToggle.addEventListener('click', () => {
+        const expanded = shopToggle.getAttribute('aria-expanded') !== 'true';
+        shopToggle.setAttribute('aria-expanded', String(expanded));
+        shopToggle.setAttribute('aria-label', expanded ? 'Hide shop categories' : 'Show shop categories');
+        shopSubmenu.hidden = !expanded;
+      });
+    }
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && menu.classList.contains('is-open')) {
         setOpen(false);
