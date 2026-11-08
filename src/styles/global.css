@@ -25,7 +25,6 @@
   --heading-weight: 500;
   --heading-tracking: -0.02em;
   /* Sophie's own hand-drawn lines (public/marks/lines) used as underlines */
-  --line-underline: url('/marks/lines/line-16.png');
   --line-title: url('/marks/lines/line-08.png');
   /* Irregular corners so boxes look drawn rather than ruled */
   --hand-radius: 255px 12px 225px 14px / 14px 225px 12px 255px;
@@ -255,38 +254,27 @@ h3 {
 }
 
 /* ---------- Menu links (ScratchLink.astro) ----------
- * Hover: one of Sophie's hand-drawn lines draws in from the right under the word.
+ * Header menu, burger menu and shop filters: a plain, thin underline on hover and under
+ * the current page. (Sophie's drawn lines are kept for the landing page.)
  */
 
 .scratch {
-  position: relative;
   display: inline-block;
-  text-decoration: none;
   color: var(--text);
   font-family: var(--font-heading);
   white-space: nowrap;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s;
 }
 
-.scratch:hover {
+.scratch:hover,
+.scratch:focus-visible,
+.scratch.is-current {
   color: var(--text);
-}
-
-.scratch::after {
-  content: '';
-  position: absolute;
-  left: -0.06em;
-  right: -0.06em;
-  bottom: -0.2em;
-  height: 0.26em;
-  background: var(--line-underline) no-repeat center / 100% 100%;
-  clip-path: inset(0 0 0 100%);
-  transition: clip-path 0.55s cubic-bezier(0.65, 0, 0.25, 1);
-}
-
-.scratch:hover::after,
-.scratch:focus-visible::after,
-.scratch.is-current::after {
-  clip-path: inset(0 0 0 0);
+  text-decoration-color: currentColor;
 }
 
 /* ---------- Landing ----------
