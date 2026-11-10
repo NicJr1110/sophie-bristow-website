@@ -55,7 +55,7 @@ export async function sendEmail(env: Env, email: Email): Promise<void> {
  */
 export function layout(inner: string, origin?: string): string {
   const logo = origin
-    ? `<div style="text-align:right;margin-top:28px"><img src="${escapeHtml(origin)}/sb-logo.png" width="52" height="64" alt="Sophie Bristow" style="display:inline-block;border:0;width:52px;height:64px"></div>`
+    ? `<div style="text-align:right;margin-top:28px"><img src="${escapeHtml(origin)}/sb-email.png" width="52" height="64" alt="Sophie Bristow" style="display:inline-block;border:0;width:52px;height:64px"></div>`
     : '';
   return `<!doctype html><html><body style="margin:0;padding:24px;background:#f5f4f1;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;line-height:1.5">
 <div style="max-width:560px;margin:0 auto;background:#fff;padding:28px;border:1px solid #e3e1dc">${inner}${logo}</div>

@@ -53,7 +53,7 @@ test('shop switch: closed to the public while off, open with preview cookie or w
   const off = { comingSoon: false, previewKey: 'abc123def456', showShop: false };
   const offMissing = { comingSoon: false, previewKey: 'abc123def456' }; // field never set → off
   const onShop = { ...off, showShop: true };
-  for (const path of ['/shop/', '/shop', '/artwork/', '/artwork', '/api/checkout', '/thank-you/', '/checkout-cancelled/']) {
+  for (const path of ['/shop/', '/shop', '/shop-options/', '/shop-options', '/artwork/', '/artwork', '/api/checkout', '/thank-you/', '/checkout-cancelled/']) {
     assert.equal(shopAccess(u(path), null, off), 'closed', path);
     assert.equal(shopAccess(u(path), null, offMissing), 'closed', path);
     assert.equal(shopAccess(u(path), 'sb_preview=abc123def456', off), 'allow', path);

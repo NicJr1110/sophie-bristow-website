@@ -9,12 +9,12 @@ export const SANITY = {
   apiVersion: '2025-02-19',
 };
 
-// Menu order everywhere: Flash, Mark Making, Shop, Bio, Contact.
+// Menu order everywhere: Flash, Mark Making, Shop, About (the bio page), Contact.
 export const NAV = [
   { href: '/flash/', label: 'Flash' },
   { href: '/mark-making/', label: 'Mark Making' },
   { href: '/shop/', label: 'Shop' },
-  { href: '/bio/', label: 'Bio' },
+  { href: '/bio/', label: 'About' },
   { href: '/contact/', label: 'Contact' },
 ] as const;
 

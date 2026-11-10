@@ -1,22 +1,22 @@
 ---
 import { SITE_NAME, USE_MONOGRAM } from '../lib/config';
 import { getNav, getShopTags } from '../lib/content';
+import Boil from './Boil.astro';
 import ScratchLink from './ScratchLink.astro';
 
 interface Props {
   current: string;
+  /** Shown next to the logo on burger-menu screens. */
   title?: string;
-  subtitle?: string;
 }
-const { current, title, subtitle } = Astro.props;
-const [NAV, SHOP_TAGS] = await Promise.all([getNav(), getShopTags()]);
-const artworkTag = SHOP_TAGS.find((tag) => /artwork/i.test(tag.title) || /artwork/i.test(tag.slug));
-const giftTag = SHOP_TAGS.find((tag) => /gift/i.test(tag.title) || /gift/i.test(tag.slug));
-const shopLinks = [
-  { label: 'Artworks', href: `/shop/?tag=${artworkTag?.slug ?? 'artwork'}` },
-  { label: 'Gift cards', href: `/shop/?tag=${giftTag?.slug ?? 'gift-cards'}` },
-];
-const mobileShopLinks = [...shopLinks, { label: 'All', href: '/shop/' }];
+const { current, title } = Astro.props;
+const [NAV, tags] = await Promise.all([getNav(), getShopTags()]);
+
+// Shop categories come straight from the shop tags, so a tag Sophie adds just appears.
+// On laptops "Shop" itself links to everything; the burger menu's Shop only opens the list,
+// so it gets an "all" link at the end.
+const shopLinks = tags.map((t) => ({ label: t.title, href: `/shop/?tag=${t.slug}`, tag: t.slug }));
+const mobileShopLinks = [...shopLinks, { label: 'all', href: '/shop/', tag: '' }];
 const isCurrent = (href: string) => current.startsWith(href);
 ---
 
@@ -26,30 +26,38 @@ const isCurrent = (href: string) => current.startsWith(href);
   </a>
   {title && <span class="header-page-title">{title}</span>}
 
-  <!-- Large screens: horizontal menu centred under the name -->
+  <!-- Laptops: the menu runs across beside the logo -->
   <nav class="nav-desktop" aria-label="Main">
     <ul>
-      {NAV.map((item) => item.href === '/shop/' ? (
-        <li class="desktop-shop-item">
-          <div class="desktop-shop-heading">
-            <ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} />
-            <button class="shop-disclosure-toggle desktop-shop-toggle" type="button" aria-expanded="false" aria-controls="desktop-shop-submenu" aria-label="Show shop categories">
-              <span aria-hidden="true"></span>
-            </button>
-          </div>
-          <ul id="desktop-shop-submenu" class="desktop-shop-submenu" hidden>
-            {shopLinks.map((link) => (
-              <li><ScratchLink href={link.href} label={link.label} current={Astro.url.pathname === '/shop/' && Astro.url.searchParams.get('tag') === (link.href.split('tag=')[1] ?? '')} /></li>
-            ))}
-          </ul>
-        </li>
-      ) : (
-        <li><ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} /></li>
-      ))}
+      {NAV.map((item) =>
+        item.href === '/shop/' && shopLinks.length > 0 ? (
+          <li class="desktop-shop-item">
+            <div class="desktop-shop-heading">
+              <ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} />
+              <button
+                class="shop-disclosure-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="desktop-shop-submenu"
+                aria-label="Show shop categories"
+              >
+                <span aria-hidden="true"></span>
+              </button>
+            </div>
+            <ul id="desktop-shop-submenu" class="desktop-shop-submenu" hidden>
+              {shopLinks.map((link) => (
+                <li><ScratchLink {...link} /></li>
+              ))}
+            </ul>
+          </li>
+        ) : (
+          <li><ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} /></li>
+        ),
+      )}
     </ul>
   </nav>
 
-  <!-- Medium/small screens: burger opens a full-screen menu that drops down from the top -->
+  <!-- Smaller screens: the burger opens a drawer from the right -->
   <button class="burger" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
@@ -58,102 +66,120 @@ const isCurrent = (href: string) => current.startsWith(href);
 <div id="mobile-menu" class="mobile-menu" inert>
   <nav aria-label="Main">
     <ul>
-      {NAV.map((item) => item.href === '/shop/' ? (
-        <li class="mobile-shop-item">
-          <div class="mobile-shop-heading">
-            <button class="shop-disclosure-toggle mobile-shop-toggle mobile-shop-label" type="button" aria-expanded="false" aria-controls="mobile-shop-submenu" aria-label="Show shop categories">
-              Shop <span aria-hidden="true"></span>
+      {NAV.map((item) =>
+        item.href === '/shop/' && shopLinks.length > 0 ? (
+          <li class="mobile-shop-item">
+            <button
+              class="shop-disclosure-toggle mobile-shop-label"
+              type="button"
+              aria-expanded="false"
+              aria-controls="mobile-shop-submenu"
+            >
+              {item.label}
+              <span aria-hidden="true"></span>
             </button>
-          </div>
-          <ul id="mobile-shop-submenu" class="mobile-shop-submenu" hidden>
-            {mobileShopLinks.map((link) => (
-              <li><ScratchLink href={link.href} label={link.label} current={Astro.url.pathname === '/shop/' && Astro.url.searchParams.get('tag') === (link.href.split('tag=')[1] ?? '')} /></li>
-            ))}
-          </ul>
-        </li>
-      ) : (
-        <li><ScratchLink href={item.href} label={item.href === '/bio/' ? 'About' : item.label} current={isCurrent(item.href)} /></li>
-      ))}
+            <ul id="mobile-shop-submenu" class="mobile-shop-submenu" hidden>
+              {mobileShopLinks.map((link) => (
+                <li><ScratchLink {...link} /></li>
+              ))}
+            </ul>
+          </li>
+        ) : (
+          <li><ScratchLink href={item.href} label={item.label} current={isCurrent(item.href)} /></li>
+        ),
+      )}
     </ul>
   </nav>
-  <span class="mobile-menu-flower boil-art" aria-hidden="true">
-    {Array.from({ length: 6 }, (_, i) => (
-      <img src={`/marks/flowers/flower-${String(i + 1).padStart(2, '0')}.png`} alt="" width="120" height="120" />
-    ))}
-  </span>
+  <!-- Boils on hover with a mouse; tap to start and stop it on touch screens -->
+  <Boil set="flower" play="hover" class="mobile-menu-flower" />
 </div>
 
 <script>
+  const LINE_COUNT = 17; // public/marks/lines/line-01..17.png
+  const LAPTOP = matchMedia('(min-width: 1025px)');
+
   const btn = document.querySelector<HTMLButtonElement>('.burger');
   const menu = document.getElementById('mobile-menu');
 
+  /* ---- Shop category lists (laptop dropdown and burger menu) ---- */
+  const shopToggles = Array.from(document.querySelectorAll<HTMLButtonElement>('.shop-disclosure-toggle'));
+  const setShopOpen = (toggle: HTMLButtonElement, open: boolean) => {
+    toggle.setAttribute('aria-expanded', String(open));
+    // The burger menu's toggle is labelled by its "Shop" text; the laptop arrow needs a label.
+    if (toggle.hasAttribute('aria-label')) {
+      toggle.setAttribute('aria-label', open ? 'Hide shop categories' : 'Show shop categories');
+    }
+    const list = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+    if (list) list.hidden = !open;
+  };
+  const closeShopLists = () => shopToggles.forEach((t) => setShopOpen(t, false));
+
+  shopToggles.forEach((toggle) =>
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setShopOpen(toggle, toggle.getAttribute('aria-expanded') !== 'true');
+    }),
+  );
+  // Clicking anywhere else closes the laptop dropdown.
+  document.addEventListener('click', (e) => {
+    if (!(e.target instanceof Element && e.target.closest('.desktop-shop-item'))) {
+      shopToggles.filter((t) => t.closest('.desktop-shop-item')).forEach((t) => setShopOpen(t, false));
+    }
+  });
+
+  /* ---- Burger drawer ---- */
   if (btn && menu) {
+    let linesLoaded = false;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const lineUrl = (n: number) => `/marks/lines/line-${pad(n)}.png`;
+
     const setOpen = (open: boolean) => {
       btn.setAttribute('aria-expanded', String(open));
       btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
       menu.classList.toggle('is-open', open);
       menu.inert = !open;
       document.documentElement.classList.toggle('menu-open', open);
+      if (!open) closeShopLists();
+      // Load Sophie's lines the first time the drawer opens, ready for the hover underlines.
+      if (open && !linesLoaded) {
+        linesLoaded = true;
+        for (let i = 1; i <= LINE_COUNT; i++) new Image().src = lineUrl(i);
+      }
     };
 
     btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
     menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
-    const shopToggles = document.querySelectorAll<HTMLButtonElement>('.shop-disclosure-toggle');
-    shopToggles.forEach((shopToggle) => {
-      const submenuId = shopToggle.getAttribute('aria-controls');
-      const shopSubmenu = submenuId ? document.getElementById(submenuId) : null;
-      if (!shopSubmenu) return;
-      shopToggle.addEventListener('click', (event) => {
-        event.stopPropagation();
-        const expanded = shopToggle.getAttribute('aria-expanded') !== 'true';
-        // Keep the desktop and mobile disclosures in sync.
-        shopToggles.forEach((otherToggle) => {
-          const otherId = otherToggle.getAttribute('aria-controls');
-          const otherMenu = otherId ? document.getElementById(otherId) : null;
-          otherToggle.setAttribute('aria-expanded', 'false');
-          otherToggle.setAttribute('aria-label', 'Show shop categories');
-          if (otherMenu) otherMenu.hidden = true;
-        });
-        shopToggle.setAttribute('aria-expanded', String(expanded));
-        shopToggle.setAttribute('aria-label', expanded ? 'Hide shop categories' : 'Show shop categories');
-        shopSubmenu.hidden = !expanded;
-      });
+    LAPTOP.addEventListener('change', (e) => e.matches && setOpen(false));
+
+    // Each link gets one of Sophie's lines, picked at random, as its underline.
+    menu.querySelectorAll<HTMLAnchorElement>('a.scratch').forEach((link) => {
+      const draw = () => link.style.setProperty('--line', `url('${lineUrl(1 + Math.floor(Math.random() * LINE_COUNT))}')`);
+      link.addEventListener('mouseenter', draw);
+      link.addEventListener('focus', draw);
     });
-    document.addEventListener('click', (event) => {
-      if (!(event.target instanceof Element) || !event.target.closest('.desktop-shop-item')) {
-        const desktopToggle = document.querySelector<HTMLButtonElement>('.desktop-shop-toggle');
-        const desktopSubmenu = document.getElementById('desktop-shop-submenu');
-        if (desktopToggle) {
-          desktopToggle.setAttribute('aria-expanded', 'false');
-          desktopToggle.setAttribute('aria-label', 'Show shop categories');
-        }
-        if (desktopSubmenu) desktopSubmenu.hidden = true;
-      }
+
+    // Touch screens can't hover, so a tap starts and stops the flower.
+    const flower = menu.querySelector<HTMLElement>('.mobile-menu-flower');
+    flower?.addEventListener('click', () => {
+      if (!matchMedia('(hover: hover)').matches) flower.classList.toggle('is-playing');
     });
+
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && menu.classList.contains('is-open')) {
+      if (e.key !== 'Escape') return;
+      if (menu.classList.contains('is-open')) {
         setOpen(false);
         btn.focus();
       }
     });
-    // The flower boils on hover with a mouse/trackpad, and toggles on tap on touch screens.
-    const menuFlower = menu.querySelector<HTMLElement>('.mobile-menu-flower');
-    const canHoverFlower = matchMedia('(hover: hover) and (pointer: fine)');
-    if (menuFlower) {
-      menuFlower.addEventListener('click', () => {
-        if (!canHoverFlower.matches) menuFlower.classList.toggle('is-animating');
-      });
-    }
-    // Reuse Sophie's hand-drawn line artwork for mobile-menu underlines.
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const pickLine = () => `/marks/lines/line-${pad(1 + Math.floor(Math.random() * 17))}.png`;
-    for (let i = 1; i <= 17; i++) new Image().src = `/marks/lines/line-${pad(i)}.png`;
-    menu.querySelectorAll<HTMLAnchorElement>('a.scratch').forEach((link) => {
-      const draw = () => link.style.setProperty('--line', `url('${pickLine()}')`);
-      link.addEventListener('mouseenter', draw);
-      link.addEventListener('focus', draw);
-    });
-    // Close if the screen grows past the burger breakpoint
-    matchMedia('(min-width: 1024px)').addEventListener('change', (e) => e.matches && setOpen(false));
   }
+
+  // Escape closes the laptop dropdown and returns focus to its arrow.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const open = shopToggles.find((t) => t.closest('.desktop-shop-item') && t.getAttribute('aria-expanded') === 'true');
+    if (open) {
+      setShopOpen(open, false);
+      open.focus();
+    }
+  });
 </script>

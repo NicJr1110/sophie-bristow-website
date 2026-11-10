@@ -1,15 +1,22 @@
 ---
-// A menu link with a thin crayon scratch that draws in from the right on hover
-// (and stays under the current page's link).
+// A menu link: a thin underline on hover and under the current page (in the burger menu,
+// one of Sophie's drawn lines instead). `tag` marks shop category links so the shop page
+// can highlight the one being shown.
 interface Props {
   href: string;
   label: string;
   current?: boolean;
   class?: string;
+  tag?: string;
 }
-const { href, label, current = false, class: className } = Astro.props;
+const { href, label, current = false, class: className, tag } = Astro.props;
 ---
 
-<a href={href} class:list={['scratch', className, { 'is-current': current }]} aria-current={current ? 'page' : undefined}>
+<a
+  href={href}
+  class:list={['scratch', className, { 'is-current': current }]}
+  aria-current={current ? 'page' : undefined}
+  data-tag={tag}
+>
   {label}
 </a>

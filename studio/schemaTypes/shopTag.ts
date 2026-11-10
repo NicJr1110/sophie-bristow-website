@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-/** A shop category, e.g. "artwork" or "gift cards". Shown under Shop on the landing page and as filters on the shop. */
+/** A shop category, e.g. "artwork" or "gift cards". Shown in the Shop menus, as a card on the shop chooser page, and as filters on the shop. */
 export const shopTag = defineType({
   name: 'shopTag',
   title: 'Shop tag',
@@ -19,6 +19,13 @@ export const shopTag = defineType({
       description: 'Used in the link, e.g. /shop/?tag=gift-cards. Click Generate.',
       options: { source: 'title', maxLength: 40 },
       validation: (r) => r.required(),
+    }),
+    defineField({
+      name: 'subtitle',
+      title: 'Card subtitle',
+      type: 'string',
+      description: 'One short line shown under this tag on the shop page that lets people choose, e.g. "Give the gift of art."',
+      validation: (r) => r.max(90),
     }),
     defineField({
       name: 'order',

@@ -6,28 +6,21 @@ import { getSettings } from '../lib/content';
 
 interface Props {
   title?: string;
-  subtitle?: string;
   description?: string;
-  /** Landing page hides the header (menu sits in the middle of the page instead). */
+  /** The landing page and shop chooser bring their own header (SimplePageShell). */
   showHeader?: boolean;
-  /** Show the flower in the bottom-right corner (off on the landing page). */
+  /** The flower in the bottom-right corner. Pages with their own artwork turn it off. */
   showSplash?: boolean;
-  /** Use the full-width editorial page gutters on the shop gallery. */
-  widePage?: boolean;
 }
 
 const {
   title,
-  subtitle,
   description = 'Tattoo design, artwork and mark making by Sophie Bristow.',
   showHeader = true,
   showSplash = true,
-  widePage = false,
 } = Astro.props;
 const { backgroundUrl } = await getSettings();
 const isDefaultSplash = backgroundUrl === '/splash-flower.png';
-const excludedSplashPaths = ['/', '/contact/', '/shop/'];
-const shouldShowSplash = showSplash && !excludedSplashPaths.includes(Astro.url.pathname);
 const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
 const year = new Date().getFullYear();
 ---
@@ -37,31 +30,34 @@ const year = new Date().getFullYear();
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#eeede9" />
+    <meta name="theme-color" content="#ffffff" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://cdn.sanity.io" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Abel&display=swap"
-    />
-    {/* <link rel="preload" href="/paper.jpg" as="image" /> */}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abel&display=swap" />
   </head>
-  <body class:list={{ 'is-landing': !showHeader, 'is-wide': widePage }}>
-    {shouldShowSplash && <div class="splash" aria-hidden="true">
-      {isDefaultSplash ? (
-        <img src="/splash-flower.png" srcset="/splash-flower-sm.png 450w, /splash-flower.png 900w"
-          sizes="(min-width: 1024px) 22vh, (min-width: 768px) 22vh, 40vw" alt="" decoding="async" />
-      ) : (
-        <img src={backgroundUrl} alt="" decoding="async" />
-      )}
-    </div>}
+  <body class:list={{ 'is-landing': !showHeader }}>
+    {showSplash && (
+      <div class="splash" aria-hidden="true">
+        {isDefaultSplash ? (
+          <img
+            src="/splash-flower.png"
+            srcset="/splash-flower-sm.png 450w, /splash-flower.png 900w"
+            sizes="(min-width: 1025px) 34vw, 42vw"
+            alt=""
+            decoding="async"
+          />
+        ) : (
+          <img src={backgroundUrl} alt="" decoding="async" />
+        )}
+      </div>
+    )}
 
     <div class="page">
-      {showHeader && <Header current={Astro.url.pathname} title={title} subtitle={subtitle} />}
+      {showHeader && <Header current={Astro.url.pathname} title={title} />}
       <main class="channel" id="main">
         <slot />
       </main>
@@ -73,12 +69,13 @@ const year = new Date().getFullYear();
       )}
     </div>
     <script>
-      // Reveal substantial content as it enters the viewport, with a graceful fallback.
+      // Content fades up as it scrolls into view. Only added by script, so without it
+      // (or with reduced motion) everything simply shows.
       const revealTargets = document.querySelectorAll<HTMLElement>(
         '.simple-choice-card, .grid > li, .bio > *, .enquiry-pick > *, .intro, .shop-tags',
       );
 
-      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
         const revealObserver = new IntersectionObserver((entries, observer) => {
           entries.forEach((entry) => {
             if (!entry.isIntersecting) return;
@@ -89,8 +86,9 @@ const year = new Date().getFullYear();
 
         revealTargets.forEach((element, index) => {
           element.setAttribute('data-reveal', '');
+          // Cards and tiles arrive in a short stagger.
           if (element.matches('.simple-choice-card, .grid > li')) {
-            element.style.setProperty('--reveal-delay', `${Math.min(index % 6, 5) * 45}ms`);
+            element.style.setProperty('--reveal-delay', `${(index % 6) * 45}ms`);
           }
           revealObserver.observe(element);
         });

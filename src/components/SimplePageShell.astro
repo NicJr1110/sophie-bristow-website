@@ -1,31 +1,49 @@
 ---
+// The editorial frame for the landing page and the shop chooser: Sophie's name and mark at
+// the top, the page's cards in the middle, Shop bottom-left and Contact (with boiling grass)
+// bottom-right. On the landing page, the grass first plays large in the middle of the
+// screen, then travels down into the Contact link (once per browser session).
+import { SITE_NAME } from '../lib/config';
+import Boil from './Boil.astro';
+
 interface Props {
   shopHref?: string;
   shopLabel?: string;
   showShopLink?: boolean;
-  variant?: 'default' | 'gallery' | 'landing';
+  /** The landing page plays the grass intro. */
+  landing?: boolean;
 }
-const {
-  shopHref = '/shop-options/',
-  shopLabel = 'SHOP',
-  showShopLink = true,
-  variant = 'default',
-} = Astro.props;
+const { shopHref = '/shop-options/', shopLabel = 'Shop', showShopLink = true, landing = false } = Astro.props;
 ---
-<div class:list={['simple-site-page', { 'simple-shop-gallery': variant === 'gallery', 'simple-landing': variant === 'landing', 'landing-intro-pending': variant === 'landing' }]}>
-  {variant === 'landing' && <div class="simple-grass-intro boil-art" aria-hidden="true">
-    {Array.from({ length: 5 }, (_, i) => (
-      <img src={`/marks/flowers/grass-${String(i + 1).padStart(2, '0')}.png`} alt="" width="84" height="64" />
-    ))}
-  </div>}
+
+{landing && (
+  <script is:inline>
+    // Decide before the page paints whether the intro will play, so the content can wait for
+    // it. Without JavaScript (or with reduced motion, or once seen) nothing is hidden.
+    (function () {
+      var key = 'sophie-bristow:landing-intro-seen';
+      try {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches || sessionStorage.getItem(key)) return;
+        sessionStorage.setItem(key, '1');
+      } catch (e) {}
+      document.documentElement.classList.add('landing-intro');
+      // Safety net: never leave the page hidden if the intro script doesn't run.
+      setTimeout(function () {
+        document.documentElement.classList.remove('landing-intro');
+      }, 6000);
+    })();
+  </script>
+)}
+
+<div class:list={['simple-site-page', { 'simple-landing': landing }]}>
+  {landing && <Boil set="grass" class="simple-grass-intro" />}
+
   <header class="simple-brand">
     <div class="simple-brand-copy">
-      <h1>SOPHIE BRISTOW</h1>
-      <p>ARTIST BASED IN BRISTOL</p>
+      <h1>{SITE_NAME}</h1>
+      <p>Artist based in Bristol</p>
     </div>
-
-
-    <a class="simple-brand-home" href="/" aria-label="Sophie Bristow home">
+    <a class="simple-brand-home" href="/" aria-label={`${SITE_NAME} home`}>
       <img class="simple-brand-mark" src="/sb-logo.png" alt="" width="326" height="400" />
     </a>
   </header>
@@ -35,102 +53,56 @@ const {
   </div>
 
   <nav class="simple-bottom-links" aria-label="More">
-    {showShopLink && <a class="simple-text-link simple-shop-link" href={shopHref}>
-      <svg class="simple-shop-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2.5 3h2.2l2.1 11.1a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 1.9-1.5L21 7H6" /><circle cx="9.5" cy="19.5" r="1.25" /><circle cx="18" cy="19.5" r="1.25" /></svg>
-      <span>{shopLabel}</span>
-    </a>}
-    <div class="simple-bottom-right">
-      <a class="simple-text-link simple-contact-link" href="/contact/">
-        <span class="simple-grass boil-art" aria-hidden="true">
-          {Array.from({ length: 5 }, (_, i) => (
-            <img src={`/marks/flowers/grass-${String(i + 1).padStart(2, '0')}.png`} alt="" width="84" height="64" />
-          ))}
-        </span>
-        <span>CONTACT</span>
+    {showShopLink && (
+      <a class="simple-text-link simple-shop-link" href={shopHref}>
+        <svg class="simple-shop-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M2.5 3h2.2l2.1 11.1a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 1.9-1.5L21 7H6" />
+          <circle cx="9.5" cy="19.5" r="1.25" />
+          <circle cx="18" cy="19.5" r="1.25" />
+        </svg>
+        <span>{shopLabel}</span>
       </a>
-    </div>
+    )}
+    <a class="simple-text-link simple-contact-link" href="/contact/">
+      <Boil set="grass" play="hover" class="simple-grass" />
+      <span>Contact</span>
+    </a>
   </nav>
 </div>
+
 <script>
-  const page = document.querySelector<HTMLElement>('.simple-site-page.simple-landing');
-  const intro = page?.querySelector<HTMLElement>('.simple-grass-intro');
-  const contactGrass = page?.querySelector<HTMLElement>('.simple-contact-link .simple-grass');
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // The landing intro (does nothing on other pages, or when the intro isn't playing): the
+  // grass boils in the middle of the screen, then travels into the Contact link
+  // (laptops) or fades out (smaller screens), and the rest of the page arrives.
+  const PLAY_FOR = 2300; // ms of boiling before it moves
+  const root = document.documentElement;
+  const intro = document.querySelector<HTMLElement>('.simple-grass-intro');
+  const target = document.querySelector<HTMLElement>('.simple-contact-link .simple-grass');
 
-  const introSeenKey = 'sophie-bristow:landing-intro-seen';
-  let hasSeenIntro = false;
+  const finish = () => root.classList.remove('landing-intro');
 
-  try {
-    // sessionStorage lasts for this browsing session, not across future visits.
-    // It prevents the animation replaying when the visitor returns home mid-session.
-    hasSeenIntro = window.sessionStorage.getItem(introSeenKey) === '1';
-    if (!hasSeenIntro) window.sessionStorage.setItem(introSeenKey, '1');
-  } catch {
-    // If browser storage is unavailable, allow the intro rather than blocking the page.
-  }
-
-  if (page && intro && contactGrass && !reduceMotion && !hasSeenIntro) {
-    const finishIntro = () => {
-      intro.hidden = true;
-      intro.style.willChange = '';
-      page.classList.remove('landing-intro-pending');
-      page.classList.add('landing-intro-complete');
-    };
-
-    // On tablets and phones, use a fade instead of positional travel. This
-    // avoids responsive layout differences shifting the Contact target.
-    if (window.matchMedia('(max-width: 1024px)').matches) {
-      window.setTimeout(() => {
-        intro.querySelectorAll<HTMLImageElement>('img').forEach((frame) => {
-          frame.style.animationPlayState = 'paused';
-        });
-        const fade = intro.animate(
-          [{ opacity: 1 }, { opacity: 0 }],
-          { duration: 500, easing: 'ease-out', fill: 'forwards' },
-        );
-        fade.onfinish = finishIntro;
-      }, 2300);
-    } else {
-      const startWidth = Math.min(190, Math.max(150, window.innerWidth * 0.22));
-      const startHeight = startWidth * (64 / 84);
-      const startLeft = (window.innerWidth - startWidth) / 2;
-      const startTop = (window.innerHeight - startHeight) / 2;
-
-      intro.style.left = startLeft + 'px';
-      intro.style.top = startTop + 'px';
-      intro.style.width = startWidth + 'px';
-      intro.style.height = startHeight + 'px';
-      intro.style.transformOrigin = 'top left';
-      intro.style.willChange = 'transform';
-
-      const startRect = intro.getBoundingClientRect();
-      const target = contactGrass.getBoundingClientRect();
-      const travelX = target.left - startRect.left;
-      const travelY = target.top - startRect.top;
-      const scaleX = target.width / startRect.width;
-      const scaleY = target.height / startRect.height;
-
-      window.setTimeout(() => {
-        intro.querySelectorAll<HTMLImageElement>('img').forEach((frame) => {
-          frame.style.animationPlayState = 'paused';
-        });
-
-        const motion = intro.animate([
-          { transform: 'translate(0, 0) scale(1, 1)' },
-          { transform: 'translate3d(' + travelX + 'px, ' + travelY + 'px, 0) scale(' + scaleX + ', ' + scaleY + ')' },
-        ], {
-          duration: 1650,
-          easing: 'cubic-bezier(.4, 0, .2, 1)',
-          fill: 'forwards',
-        });
-
-        motion.onfinish = finishIntro;
-      }, 2300);
-    }
-  } else if (page) {
-    page.classList.remove('landing-intro-pending');
-    page.classList.add('landing-intro-complete');
-    if (intro) intro.hidden = true;
+  if (!root.classList.contains('landing-intro') || !intro || !target) {
+    finish();
+  } else {
+    setTimeout(() => {
+      intro.style.animationPlayState = 'paused';
+      const motion = matchMedia('(min-width: 1025px)').matches
+        ? (() => {
+            // Fly from the middle into the Contact grass, landing at exactly its size.
+            const from = intro.getBoundingClientRect();
+            const to = target.getBoundingClientRect();
+            return intro.animate(
+              [
+                { transform: 'none' },
+                {
+                  transform: `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${to.width / from.width})`,
+                },
+              ],
+              { duration: 1650, easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'forwards' },
+            );
+          })()
+        : intro.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500, easing: 'ease-out', fill: 'forwards' });
+      motion.onfinish = finish;
+    }, PLAY_FOR);
   }
 </script>
-

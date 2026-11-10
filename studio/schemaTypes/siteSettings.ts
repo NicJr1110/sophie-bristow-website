@@ -11,7 +11,6 @@ export const siteSettings = defineType({
   groups: [
     { name: 'launch', title: 'Coming soon', default: true },
     { name: 'shop', title: 'Shop' },
-    { name: 'menu', title: 'Landing page & shop chooser' },
     { name: 'look', title: 'Look' },
     { name: 'away', title: 'Away mode' },
   ],
@@ -60,10 +59,6 @@ export const siteSettings = defineType({
       description:
         'Off: the Shop page and its menu link are hidden, and nothing can be bought. Turn on and publish once Stripe is live. The menu updates after the site rebuilds (a minute or two).',
     }),
-    defineField({ name: 'flashSubtitle', title: 'Flash subtitle', type: 'string', group: 'menu', initialValue: 'Browse available artworks ready for purchase.', description: 'Short description shown beneath FLASH on the landing page.' }),
-    defineField({ name: 'markMakingSubtitle', title: 'Mark Making subtitle', type: 'string', group: 'menu', initialValue: 'Commission a unique artwork created specifically for your space.', description: 'Short description shown beneath MARK MAKING on the landing page.' }),
-    defineField({ name: 'artworksSubtitle', title: 'Artworks subtitle', type: 'string', group: 'menu', initialValue: 'Browse our collection of original artworks.', description: 'Short description shown beneath ARTWORKS on the shop chooser page.' }),
-    defineField({ name: 'giftCardsSubtitle', title: 'Gift cards subtitle', type: 'string', group: 'menu', initialValue: 'Give the gift of art.', description: 'Short description shown beneath GIFT CARDS on the shop chooser page.' }),
     defineField({
       name: 'background',
       title: 'Background splash image',

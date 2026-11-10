@@ -13,7 +13,7 @@ const gallery = await getGallery(docId, title);
 ---
 
 <Base title={gallery.title}>
-  <h1 class="page-title page-title--nav">{gallery.title}</h1>
+  <h1 class="sr-only">{gallery.title}</h1>
   {gallery.intro && <p class="intro">{gallery.intro}</p>}
   <Gallery items={gallery.items} />
 </Base>

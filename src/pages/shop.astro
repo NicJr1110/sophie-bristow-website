@@ -1,20 +1,16 @@
 ---
- // Shop gallery uses the same page template as Flash and Mark Making, with shop-specific filters and checkout.
+// The shop: the same gallery as Flash and Mark Making, plus tag filters, Buy buttons and
+// live sold status. ?tag= is read in the browser (the page is built once, ahead of time).
 import Base from '../layouts/Base.astro';
 import Gallery from '../components/Gallery.astro';
 import { getArtworkGallery, getShopTags } from '../lib/content';
 
 const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
-const selectedSlug = Astro.url.searchParams.get('tag') ?? '';
-const selectedTag = tags.find((tag) => tag.slug === selectedSlug);
-const categoryTitle = selectedSlug
-  ? (selectedTag?.title ?? selectedSlug.replace(/[-_]+/g, ' '))
-  : 'all';
 ---
 
-<Base title="Shop" subtitle={categoryTitle}>
-  <h1 class="page-title page-title--nav">Shop</h1>
-  <p class="shop-category-subtitle" data-shop-subtitle>{categoryTitle}</p>
+<Base title="Shop" showSplash={false}>
+  <h1 class="sr-only">Shop</h1>
+  <p class="shop-category-subtitle" data-shop-subtitle>all</p>
   {gallery.intro && <p class="intro">{gallery.intro}</p>}
   {tags.length > 0 && (
     <nav class="shop-tags" aria-label="Filter the shop">
@@ -29,38 +25,32 @@ const categoryTitle = selectedSlug
 </Base>
 
 <script>
-  // Filter by ?tag= (from the landing page's shop links, or the tag links above the grid).
-  const categoryNames = new Map<string, string>([
-    ...Array.from(document.querySelectorAll<HTMLAnchorElement>('.shop-tags a[data-tag]'))
-      .filter((a) => a.dataset.tag)
-      .map((a) => [a.dataset.tag!, a.textContent?.trim() ?? a.dataset.tag!] as [string, string]),
-    ['', 'all'],
-  ]);
-  const updateCategoryTitle = (tag: string) => {
-    const label = tag ? (categoryNames.get(tag) ?? tag.replace(/[-_]+/g, ' ')) : 'all';
-    document.querySelectorAll<HTMLElement>('[data-shop-subtitle]').forEach((el) => {
-      el.textContent = label;
-    });
-  };
+  // Filter by ?tag= (from the menus, the shop chooser, or the tag links above the grid).
+  // Every link with data-tag on the page (these filters and the header's shop lists) shows
+  // which category is current, and the subtitle names it.
+  const tagLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[data-tag]'));
+  const nameOf = (tag: string) =>
+    tag ? (tagLinks.find((a) => a.dataset.tag === tag)?.textContent?.trim() ?? tag.replace(/[-_]+/g, ' ')) : 'all';
+
   const filterByTag = () => {
     const tag = new URLSearchParams(location.search).get('tag') ?? '';
-    updateCategoryTitle(tag);
+    document.querySelectorAll<HTMLElement>('[data-shop-subtitle]').forEach((el) => (el.textContent = nameOf(tag)));
     document.querySelectorAll<HTMLLIElement>('[data-gallery] > li').forEach((li) => {
       li.hidden = Boolean(tag) && !(li.dataset.tags ?? '').split(' ').includes(tag);
     });
-    document.querySelectorAll<HTMLAnchorElement>('.shop-tags a').forEach((a) => {
+    for (const a of tagLinks) {
       const on = a.dataset.tag === tag;
       a.classList.toggle('is-current', on);
       if (on) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
-    });
+    }
   };
   filterByTag();
-  window.addEventListener('popstate', filterByTag);
+  addEventListener('popstate', filterByTag);
   document.querySelectorAll<HTMLAnchorElement>('.shop-tags a').forEach((a) =>
     a.addEventListener('click', (e) => {
       e.preventDefault();
-      history.replaceState(null, '', a.href);
+      history.pushState(null, '', a.href);
       filterByTag();
     }),
   );

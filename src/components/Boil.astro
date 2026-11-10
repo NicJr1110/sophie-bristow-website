@@ -1,0 +1,27 @@
+---
+// One of Sophie's drawings "boiling": its frames flick past like stop-motion.
+// Each set is a single image strip in public/marks/boil/, frames side by side and lined up
+// on a shared base, so it's one download and the drawing never jumps around.
+// Size it with `width` (or `height`) in CSS; the shape comes from the strip.
+// play="hover": still until the drawing, or the link/button it sits in, is hovered or
+// focused, or it gets the `is-playing` class.
+const SETS = {
+  grass: { frames: 5, width: 406, height: 300 },
+  flower: { frames: 6, width: 250, height: 600 },
+} as const;
+
+interface Props {
+  set: keyof typeof SETS;
+  play?: 'always' | 'hover';
+  class?: string;
+}
+const { set, play = 'always', class: className } = Astro.props;
+const { frames, width, height } = SETS[set];
+---
+
+<span
+  class:list={['boil', className]}
+  data-play={play}
+  aria-hidden="true"
+  style={`--boil-src: url('/marks/boil/${set}.png'); --boil-frames: ${frames}; --boil-ratio: ${width} / ${height};`}
+></span>

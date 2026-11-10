@@ -7,6 +7,15 @@ export const galleryPage = defineType({
   fields: [
     defineField({ name: 'title', type: 'string', validation: (r) => r.required() }),
     defineField({
+      name: 'subtitle',
+      title: 'Card subtitle',
+      type: 'string',
+      description: 'One short line shown under this page\'s name on the landing page.',
+      validation: (r) => r.max(90),
+      // The shop's cards take their subtitles from the shop tags instead
+      hidden: ({ document }) => Boolean(document?._id?.endsWith('page-artwork')),
+    }),
+    defineField({
       name: 'introText',
       title: 'Intro text',
       type: 'text',

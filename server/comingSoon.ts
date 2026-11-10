@@ -57,7 +57,7 @@ export function hasPreview(cookieHeader: string | null, s: ComingSoonSettings): 
   return Boolean(key && readCookie(cookieHeader, PREVIEW_COOKIE) === key);
 }
 
-const SHOP_PATHS = [/^\/shop(\/|$)/, /^\/artwork(\/|$)/, /^\/api\/checkout(\/|$)/, /^\/thank-you(\/|$)/, /^\/checkout-cancelled(\/|$)/];
+const SHOP_PATHS = [/^\/shop(\/|$)/, /^\/shop-options(\/|$)/, /^\/artwork(\/|$)/, /^\/api\/checkout(\/|$)/, /^\/thank-you(\/|$)/, /^\/checkout-cancelled(\/|$)/];
 
 /**
  * Shop switch ("Show shop" in Site settings). When off, the shop pages and checkout are closed

@@ -1,29 +1,25 @@
 ---
+// Shop chooser: a card for each shop tag (e.g. Artworks, Gift cards), straight from the Studio.
 import Base from '../layouts/Base.astro';
 import SimplePageShell from '../components/SimplePageShell.astro';
 import { getSettings, getShopTags } from '../lib/content';
 
-const settings = await getSettings();
-if (!settings.showShop) return Astro.redirect('/');
-
-const tags = await getShopTags();
-const artworkSlug = tags.find((tag) => /artwork/i.test(tag.title + ' ' + tag.slug))?.slug ?? 'artwork';
-const giftCardSlug = tags.find((tag) => /gift.?cards?/i.test(tag.title + ' ' + tag.slug))?.slug ?? 'gift-cards';
+const [{ showShop }, tags] = await Promise.all([getSettings(), getShopTags()]);
+// Shop switched off, or nothing tagged yet: the full shop (or the home page) instead.
+if (!showShop) return Astro.redirect('/');
+if (tags.length === 0) return Astro.redirect('/shop/');
 ---
 
 <Base title="Shop" showHeader={false} showSplash={false}>
-  <SimplePageShell shopHref="/shop/" shopLabel="SHOP ALL">
+  <SimplePageShell shopHref="/shop/" shopLabel="Shop all">
     <section class="simple-choice-grid" aria-label="Choose what to shop">
-      <a class="simple-choice-card" href={'/shop/?tag=' + artworkSlug}>
-        <h2>ARTWORKS</h2>
-        <p>{settings.artworksSubtitle}</p>
-        <span class="simple-choice-browse">BROWSE</span>
-      </a>
-      <a class="simple-choice-card" href={'/shop/?tag=' + giftCardSlug}>
-        <h2>GIFT CARDS</h2>
-        <p>{settings.giftCardsSubtitle}</p>
-        <span class="simple-choice-browse">BROWSE</span>
-      </a>
+      {tags.map((t) => (
+        <a class="simple-choice-card" href={`/shop/?tag=${t.slug}`}>
+          <h2>{t.title}</h2>
+          {t.subtitle && <p>{t.subtitle}</p>}
+          <span class="simple-choice-browse">Browse</span>
+        </a>
+      ))}
     </section>
   </SimplePageShell>
 </Base>

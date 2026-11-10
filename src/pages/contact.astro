@@ -4,6 +4,7 @@
 //   2. The form: "name" and "email" on underlined lines, then a message area. Each enquiry
 //      type has its own auto-reply template and inbox in Sanity.
 import Base from '../layouts/Base.astro';
+import Boil from '../components/Boil.astro';
 import { getEnquiryTypes } from '../lib/content';
 
 const enquiryTypes = await getEnquiryTypes();
@@ -14,27 +15,23 @@ const LINE_COUNT = 17;
 ---
 
 <Base title="Contact" showSplash={false}>
-  <h1 class="page-title page-title--nav">Contact</h1>
+  <h1 class="sr-only">Contact</h1>
 
   {choose && (
     <div class="enquiry-pick">
-      <nav class="landing-nav" aria-label="What's it about?">
-        <ul class="landing-list">
+      <nav class="drawn-menu" aria-label="What's it about?">
+        <ul class="drawn-list">
           {enquiryTypes.map((t) => (
-            <li class="landing-item">
-              <button class="landing-link" type="button" data-type={t.id} data-label={t.label}>
+            <li class="drawn-item">
+              <button class="drawn-link" type="button" data-type={t.id} data-label={t.label}>
                 {t.label.toLowerCase()}
               </button>
             </li>
           ))}
         </ul>
       </nav>
-      <!-- One of Sophie's grass drawings, large, at the foot of the page -->
-      <span class="enquiry-grass boil-art" aria-hidden="true">
-        {Array.from({ length: 5 }, (_, i) => (
-          <img src={`/marks/flowers/grass-${String(i + 1).padStart(2, '0')}.png`} alt="" width="347" height="312" />
-        ))}
-      </span>
+      <!-- One of Sophie's grass drawings, large, at the foot of the page; it boils on hover -->
+      <Boil set="grass" play="hover" class="enquiry-grass" />
     </div>
   )}
 
@@ -62,12 +59,8 @@ const LINE_COUNT = 17;
       <textarea id="contact-message" name="message" rows="9" required maxlength="2000" placeholder="start typing here…"
       ></textarea>
       <span class="char-count" aria-live="polite">0 / 2000</span>
-      <!-- Laptop only: one of Sophie's flowers stands beside the message area, outside the form's centred column -->
-      <span class="lined-flower boil-art" aria-hidden="true">
-          {Array.from({ length: 6 }, (_, i) => (
-            <img src={`/marks/flowers/flower-${String(i + 1).padStart(2, '0')}.png`} alt="" width="358" height="892" />
-          ))}
-        </span>
+      <!-- Wide screens only: Sophie's flower boils beside the message area, outside the content column -->
+      <Boil set="flower" class="lined-flower" />
     </div>
 
     <!-- Honeypot: hidden from people, bots fill it in -->
@@ -87,7 +80,7 @@ const LINE_COUNT = 17;
 </Base>
 
 <script define:vars={{ LINE_COUNT }}>
-  // Hovering an enquiry type draws one of Sophie's lines under it (as on the landing page).
+  // Hovering an enquiry type draws one of Sophie's lines under it, picked at random.
   const pad = (n) => String(n).padStart(2, '0');
   let last = 0;
   const nextLine = () => {
@@ -97,7 +90,7 @@ const LINE_COUNT = 17;
     last = n;
     return `url('/marks/lines/line-${pad(n)}.png')`;
   };
-  document.querySelectorAll('.enquiry-pick .landing-item').forEach((li) => {
+  document.querySelectorAll('.enquiry-pick .drawn-item').forEach((li) => {
     const draw = () => {
       if (li.classList.contains('is-drawn')) return;
       li.style.setProperty('--line', nextLine());

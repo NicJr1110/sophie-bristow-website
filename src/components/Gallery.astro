@@ -11,8 +11,9 @@ const { items, shop = false } = Astro.props;
 
 const gbp = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
 const formatPrice = (p?: number) => (typeof p === 'number' ? gbp.format(p).replace(/\.00$/, '') : '');
-// Rendered tile width: ~280px in the large channel, ~31vw at medium, ~46vw on phones.
-const sizes = '(min-width: 1024px) 290px, (min-width: 768px) 31vw, 47vw';
+// Rendered tile width: a third of the content column (up to ~470px on wide laptops),
+// ~31vw at medium, ~47vw on phones.
+const sizes = '(min-width: 1025px) min(470px, 31vw), (min-width: 768px) 31vw, 47vw';
 ---
 
 {items.length === 0 && <p class="empty">Nothing here yet. Check back soon.</p>}

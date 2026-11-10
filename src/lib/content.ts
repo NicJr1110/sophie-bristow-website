@@ -34,26 +34,22 @@ async function query<T>(groq: string, params: Record<string, unknown> = {}): Pro
 
 /* ---------- Site settings ---------- */
 
-export type Settings = { backgroundUrl: string; showShop: boolean; flashSubtitle: string; markMakingSubtitle: string; artworksSubtitle: string; giftCardsSubtitle: string };
-const DEFAULT_MENU_SUBTITLES = {
-  flashSubtitle: 'Browse available artworks ready for purchase.',
-  markMakingSubtitle: 'Commission a unique artwork created specifically for your space.',
-  artworksSubtitle: 'Browse our collection of original artworks.',
-  giftCardsSubtitle: 'Give the gift of art.',
-};
+export type Settings = { backgroundUrl: string; showShop: boolean };
 let settingsPromise: Promise<Settings> | null = null;
 
 export function getSettings(): Promise<Settings> {
   settingsPromise ??= (async () => {
     // Without Sanity (fresh clone) show everything, so the whole site can be worked on.
-    if (!hasSanity) return { backgroundUrl: '/splash-flower.png', showShop: true, ...DEFAULT_MENU_SUBTITLES };
-    const s = await query<{ background?: SanityImage; showShop?: boolean; flashSubtitle?: string; markMakingSubtitle?: string; artworksSubtitle?: string; giftCardsSubtitle?: string } | null>(
-      `*[_id == $id][0]{ background, showShop, flashSubtitle, markMakingSubtitle, artworksSubtitle, giftCardsSubtitle }`,
+    if (!hasSanity) return { backgroundUrl: '/splash-flower.png', showShop: true };
+    const s = await query<{ background?: SanityImage; showShop?: boolean } | null>(
+      `*[_id == $id][0]{ background, showShop }`,
       { id: DOC_IDS.settings },
     );
-    const url = sanityImageUrl(s?.background, { w: 1600 });
-    // Shop is off unless Sophie has switched it on.
-    return { backgroundUrl: url || '/splash-flower.png', showShop: true, flashSubtitle: s?.flashSubtitle ?? DEFAULT_MENU_SUBTITLES.flashSubtitle, markMakingSubtitle: s?.markMakingSubtitle ?? DEFAULT_MENU_SUBTITLES.markMakingSubtitle, artworksSubtitle: s?.artworksSubtitle ?? DEFAULT_MENU_SUBTITLES.artworksSubtitle, giftCardsSubtitle: s?.giftCardsSubtitle ?? DEFAULT_MENU_SUBTITLES.giftCardsSubtitle };
+    return {
+      backgroundUrl: sanityImageUrl(s?.background, { w: 1600 }) || '/splash-flower.png',
+      // Shop is off unless Sophie has switched it on ("Show shop" in Site settings).
+      showShop: s?.showShop === true,
+    };
   })();
   return settingsPromise;
 }
@@ -62,6 +58,48 @@ export function getSettings(): Promise<Settings> {
 export async function getNav() {
   const { showShop } = await getSettings();
   return NAV.filter((item) => showShop || item.href !== '/shop/');
+}
+
+/* ---------- Landing page choices ---------- */
+
+export type Choice = { label: string; href: string; subtitle: string };
+
+// Shown until Sophie writes her own (Flash page / Mark Making page → "Card subtitle" in the Studio).
+const DEFAULT_SUBTITLES = {
+  flash: 'Browse available artworks ready for purchase.',
+  markMaking: 'Commission a unique artwork created specifically for your space.',
+};
+
+/** The two cards on the landing page: Flash and Mark Making, each with a short subtitle. */
+export async function getLandingChoices(): Promise<Choice[]> {
+  const doc = hasSanity
+    ? await query<{
+        flash?: string;
+        markMaking?: string;
+        // Earlier versions kept these two in Site settings; still read so nothing is lost.
+        legacy?: { flashSubtitle?: string; markMakingSubtitle?: string };
+      } | null>(
+        `{
+          "flash": *[_id == $flash][0].subtitle,
+          "markMaking": *[_id == $markMaking][0].subtitle,
+          "legacy": *[_id == $settings][0]{ flashSubtitle, markMakingSubtitle }
+        }`,
+        { flash: DOC_IDS.flash, markMaking: DOC_IDS.markMaking, settings: DOC_IDS.settings },
+      )
+    : null;
+  const label = (href: string) => NAV.find((n) => n.href === href)?.label ?? '';
+  return [
+    {
+      label: label('/flash/'),
+      href: '/flash/',
+      subtitle: doc?.flash || doc?.legacy?.flashSubtitle || DEFAULT_SUBTITLES.flash,
+    },
+    {
+      label: label('/mark-making/'),
+      href: '/mark-making/',
+      subtitle: doc?.markMaking || doc?.legacy?.markMakingSubtitle || DEFAULT_SUBTITLES.markMaking,
+    },
+  ];
 }
 
 /* ---------- Galleries (Flash, Mark Making) ---------- */
@@ -132,20 +170,20 @@ export async function getArtworkGallery(): Promise<Gallery> {
 
 /* ---------- Shop tags ---------- */
 
-export type ShopTag = { title: string; slug: string };
+export type ShopTag = { title: string; slug: string; subtitle?: string };
 
 /** Shop tags in display order, only those used by at least one published shop item. */
 export async function getShopTags(): Promise<ShopTag[]> {
   if (!hasSanity) {
     return [
-      { title: 'artwork', slug: 'artwork' },
-      { title: 'gift cards', slug: 'gift-cards' },
+      { title: 'artwork', slug: 'artwork', subtitle: 'Original artworks.' },
+      { title: 'gift cards', slug: 'gift-cards', subtitle: 'Give the gift of art.' },
     ];
   }
   return query<ShopTag[]>(
     `*[_type == "shopTag" && !(_id in path("drafts.**")) && defined(slug.current)
        && count(*[_type == "artwork" && !(_id in path("drafts.**")) && references(^._id)]) > 0
-     ] | order(order asc, title asc){ title, "slug": slug.current }`,
+     ] | order(order asc, title asc){ title, "slug": slug.current, subtitle }`,
   );
 }
 

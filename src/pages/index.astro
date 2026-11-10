@@ -1,24 +1,23 @@
 ---
+// Landing: Sophie's name and mark, then two cards (Flash and Mark Making). Shop and Contact
+// sit at the bottom; the grass intro plays once per browser session (SimplePageShell).
 import Base from '../layouts/Base.astro';
 import SimplePageShell from '../components/SimplePageShell.astro';
-import { getSettings } from '../lib/content';
+import { getLandingChoices, getSettings } from '../lib/content';
 
-const settings = await getSettings();
+const [{ showShop }, choices] = await Promise.all([getSettings(), getLandingChoices()]);
 ---
 
-<Base showHeader={false}>
-  <SimplePageShell showShopLink={settings.showShop} variant="landing">
+<Base showHeader={false} showSplash={false}>
+  <SimplePageShell showShopLink={showShop} landing>
     <section class="simple-choice-grid" aria-label="Explore Sophie’s work">
-      <a class="simple-choice-card" href="/flash/">
-        <h2>FLASH</h2>
-        <p>{settings.flashSubtitle}</p>
-        <span class="simple-choice-browse">BROWSE</span>
-      </a>
-      <a class="simple-choice-card" href="/mark-making/">
-        <h2>MARK MAKING</h2>
-        <p>{settings.markMakingSubtitle}</p>
-        <span class="simple-choice-browse">BROWSE</span>
-      </a>
+      {choices.map((c) => (
+        <a class="simple-choice-card" href={c.href}>
+          <h2>{c.label}</h2>
+          {c.subtitle && <p>{c.subtitle}</p>}
+          <span class="simple-choice-browse">Browse</span>
+        </a>
+      ))}
     </section>
   </SimplePageShell>
 </Base>
