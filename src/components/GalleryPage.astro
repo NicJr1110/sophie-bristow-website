@@ -1,15 +1,15 @@
 ---
-// Shared template for Flash and Mark Making (spec §6).
+// Shared template for Flash and Mark Making (spec §6). The page's name comes from Site text.
 import Base from '../layouts/Base.astro';
 import Gallery from './Gallery.astro';
-import { getGallery } from '../lib/content';
+import { getGallery, getSiteText, pageName } from '../lib/content';
 
 interface Props {
   docId: string;
-  title: string;
+  href: '/flash/' | '/mark-making/';
 }
-const { docId, title } = Astro.props;
-const gallery = await getGallery(docId, title);
+const { docId, href } = Astro.props;
+const gallery = await getGallery(docId, pageName(await getSiteText(), href));
 ---
 
 <Base title={gallery.title}>

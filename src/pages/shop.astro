@@ -3,24 +3,37 @@
 // live sold status. ?tag= is read in the browser (the page is built once, ahead of time).
 import Base from '../layouts/Base.astro';
 import Gallery from '../components/Gallery.astro';
-import { getArtworkGallery, getShopTags } from '../lib/content';
+import { getArtworkGallery, getShopTags, getSiteText, pageName } from '../lib/content';
 
-const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
+const [gallery, tags, text] = await Promise.all([getArtworkGallery(), getShopTags(), getSiteText()]);
+const name = pageName(text, '/shop/');
 ---
 
-<Base title="Shop" showSplash={false}>
-  <h1 class="sr-only">Shop</h1>
-  <p class="shop-category-subtitle" data-shop-subtitle>all</p>
+<Base title={name} showSplash={false}>
+  <h1 class="sr-only">{name}</h1>
+  <p class="shop-category-subtitle" data-shop-subtitle>{text.allLabel}</p>
   {gallery.intro && <p class="intro">{gallery.intro}</p>}
   {tags.length > 0 && (
     <nav class="shop-tags" aria-label="Filter the shop">
       {tags.map((t) => (
         <a class="scratch" href={`/shop/?tag=${t.slug}`} data-tag={t.slug}>{t.title}</a>
       ))}
-      <a class="scratch" href="/shop/" data-tag="">all</a>
+      <a class="scratch" href="/shop/" data-tag="">{text.allLabel}</a>
     </nav>
   )}
-  <p class="shop-message" role="status" aria-live="polite" hidden></p>
+  <!-- The wording the script below uses (Studio → Site text → Shop) -->
+  <p
+    class="shop-message"
+    role="status"
+    aria-live="polite"
+    hidden
+    data-all={text.allLabel}
+    data-buy={text.buyLabel}
+    data-sold={text.soldLabel}
+    data-buying={text.buyingLabel}
+    data-just-sold={text.justSoldMessage}
+    data-error={text.shopErrorMessage}
+  ></p>
   <Gallery items={gallery.items} shop />
 </Base>
 
@@ -29,8 +42,9 @@ const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
   // Every link with data-tag on the page (these filters and the header's shop lists) shows
   // which category is current, and the subtitle names it.
   const tagLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[data-tag]'));
+  const words = document.querySelector<HTMLElement>('.shop-message')!.dataset;
   const nameOf = (tag: string) =>
-    tag ? (tagLinks.find((a) => a.dataset.tag === tag)?.textContent?.trim() ?? tag.replace(/[-_]+/g, ' ')) : 'all';
+    tag ? (tagLinks.find((a) => a.dataset.tag === tag)?.textContent?.trim() ?? tag.replace(/[-_]+/g, ' ')) : (words.all ?? '');
 
   const filterByTag = () => {
     const tag = new URLSearchParams(location.search).get('tag') ?? '';
@@ -60,7 +74,7 @@ const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
 
   const setButton = (btn: HTMLButtonElement, status: 'available' | 'sold') => {
     btn.disabled = status !== 'available';
-    btn.textContent = status === 'available' ? 'Buy' : 'Sold';
+    btn.textContent = (status === 'available' ? words.buy : words.sold) ?? '';
   };
 
   const say = (text: string) => {
@@ -89,7 +103,7 @@ const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
       if (!id) return;
       say('');
       btn.disabled = true;
-      btn.textContent = 'One moment…';
+      btn.textContent = words.buying ?? '';
       try {
         const res = await fetch('/api/checkout', {
           method: 'POST',
@@ -103,13 +117,13 @@ const [gallery, tags] = await Promise.all([getArtworkGallery(), getShopTags()]);
         }
         if (res.status === 409) {
           setButton(btn, 'sold');
-          say('Sorry, that piece has just sold.');
+          say(words.justSold ?? '');
           return;
         }
         throw new Error(data.error ?? 'checkout_failed');
       } catch {
         setButton(btn, 'available');
-        say('Oops, something appears to have gone wrong. Please try again later.');
+        say(words.error ?? '');
       }
     });
   }

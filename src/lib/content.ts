@@ -1,6 +1,7 @@
 import { DOC_IDS, NAV, SANITY } from './config';
 import { picFromSanity, picPlaceholder, sanityImageUrl, type Pic, type SanityImage } from './images';
 import { portableTextToHtml } from './portableText';
+import { SITE_TEXT_DEFAULTS, type SiteText } from '../../studio/siteTextDefaults';
 
 export type ArtStatus = 'available' | 'sold';
 
@@ -56,10 +57,36 @@ export function getSettings(): Promise<Settings> {
   return settingsPromise;
 }
 
-/** Menu items, without Shop while the shop is switched off. */
-export async function getNav() {
-  const { showShop } = await getSettings();
-  return NAV.filter((item) => showShop || item.href !== '/shop/');
+/* ---------- Site text (Studio → Site text) ---------- */
+
+export type { SiteText };
+let textPromise: Promise<SiteText> | null = null;
+
+/** The site's wording: Sophie's version from the Studio, with the starting wording for anything left empty. */
+export function getSiteText(): Promise<SiteText> {
+  textPromise ??= (async () => {
+    const doc = hasSanity
+      ? await query<Partial<Record<keyof SiteText, unknown>> | null>(`*[_id == $id][0]`, { id: DOC_IDS.siteText })
+      : null;
+    const text = { ...SITE_TEXT_DEFAULTS };
+    for (const key of Object.keys(text) as (keyof SiteText)[]) {
+      const value = doc?.[key];
+      if (typeof value === 'string' && value.trim()) text[key] = value.trim();
+    }
+    return text;
+  })();
+  return textPromise;
+}
+
+export type NavItem = { href: string; label: string };
+
+/** The page name for a menu link, e.g. pageName(text, '/flash/') → "Flash". */
+export const pageName = (text: SiteText, href: string) => text[NAV.find((n) => n.href === href)?.text ?? 'navFlash'];
+
+/** Menu items with Sophie's page names, without Shop while the shop is switched off. */
+export async function getNav(): Promise<NavItem[]> {
+  const [{ showShop }, text] = await Promise.all([getSettings(), getSiteText()]);
+  return NAV.filter((item) => showShop || item.href !== '/shop/').map((item) => ({ href: item.href, label: text[item.text] }));
 }
 
 /* ---------- Landing page choices ---------- */
@@ -89,7 +116,8 @@ export async function getLandingChoices(): Promise<Choice[]> {
         { flash: DOC_IDS.flash, markMaking: DOC_IDS.markMaking, settings: DOC_IDS.settings },
       )
     : null;
-  const label = (href: string) => NAV.find((n) => n.href === href)?.label ?? '';
+  const text = await getSiteText();
+  const label = (href: string) => pageName(text, href);
   return [
     {
       label: label('/flash/'),
@@ -125,10 +153,11 @@ export function enquireHref(pageId: string, key: string, enquiryType?: string): 
   return `/contact/?${p}`;
 }
 
-export async function getGallery(docId: string, fallbackTitle: string): Promise<Gallery> {
-  if (!hasSanity) return sampleGallery(docId, fallbackTitle);
+/** A gallery page's images and intro. `title` is the page's name (from Site text). */
+export async function getGallery(docId: string, title: string): Promise<Gallery> {
+  if (!hasSanity) return sampleGallery(docId, title);
   const doc = await query<GalleryDoc | null>(
-    `*[_id == $id][0]{ title, introText, "enquiryType": enquiryType._ref, images }`,
+    `*[_id == $id][0]{ introText, "enquiryType": enquiryType._ref, images }`,
     { id: docId },
   );
   const items: GalleryItem[] = [];
@@ -136,16 +165,17 @@ export async function getGallery(docId: string, fallbackTitle: string): Promise<
     const pic = picFromSanity(img, img.title ?? '');
     if (pic) items.push({ id: img._key, title: img.title, pic, enquireHref: enquireHref(docId, img._key, doc?.enquiryType) });
   }
-  return { title: doc?.title || fallbackTitle, intro: doc?.introText ?? '', items };
+  return { title, intro: doc?.introText ?? '', items };
 }
 
 export type Piece = { ref: string; page: string; title: string; thumb: string };
 
 /** Every Flash and Mark Making image, for the contact form's "about this piece" reference. */
 export async function getEnquirePieces(): Promise<Piece[]> {
+  const text = await getSiteText();
   const pages = [
-    { id: DOC_IDS.flash, title: NAV.find((n) => n.href === '/flash/')?.label ?? 'Flash' },
-    { id: DOC_IDS.markMaking, title: NAV.find((n) => n.href === '/mark-making/')?.label ?? 'Mark Making' },
+    { id: DOC_IDS.flash, title: pageName(text, '/flash/') },
+    { id: DOC_IDS.markMaking, title: pageName(text, '/mark-making/') },
   ];
   const pieces: Piece[] = [];
   for (const page of pages) {
@@ -153,7 +183,7 @@ export async function getEnquirePieces(): Promise<Piece[]> {
     for (const item of gallery.items) {
       pieces.push({
         ref: pieceRef(page.id, item.id),
-        page: gallery.title,
+        page: page.title,
         title: item.title || item.pic.alt || 'Untitled',
         thumb: item.pic.thumb(160),
       });

@@ -3,9 +3,9 @@
 // sit at the bottom; the grass intro plays once per browser session (SimplePageShell).
 import Base from '../layouts/Base.astro';
 import SimplePageShell from '../components/SimplePageShell.astro';
-import { getLandingChoices, getSettings } from '../lib/content';
+import { getLandingChoices, getSettings, getSiteText } from '../lib/content';
 
-const [{ showShop }, choices] = await Promise.all([getSettings(), getLandingChoices()]);
+const [{ showShop }, choices, text] = await Promise.all([getSettings(), getLandingChoices(), getSiteText()]);
 ---
 
 <Base showHeader={false} showSplash={false}>
@@ -15,7 +15,7 @@ const [{ showShop }, choices] = await Promise.all([getSettings(), getLandingChoi
         <a class="simple-choice-card" href={c.href}>
           <h2>{c.label}</h2>
           {c.subtitle && <p>{c.subtitle}</p>}
-          <span class="simple-choice-browse">Browse</span>
+          <span class="simple-choice-browse">{text.browseLabel}</span>
         </a>
       ))}
     </section>

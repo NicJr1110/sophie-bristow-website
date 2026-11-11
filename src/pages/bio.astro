@@ -1,11 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getBio } from '../lib/content';
+import { getBio, getSiteText, pageName } from '../lib/content';
 
-const bio = await getBio();
+const [bio, text] = await Promise.all([getBio(), getSiteText()]);
 ---
 
-<Base title="About">
+<Base title={pageName(text, '/bio/')}>
+  <h1 class="sr-only">{pageName(text, '/bio/')}</h1>
   <article class="bio">
     {bio.photo && (
       <img

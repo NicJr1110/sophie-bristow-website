@@ -7,9 +7,10 @@
 // already chosen and a thumbnail shows which piece will be sent to Sophie with the message.
 import Base from '../layouts/Base.astro';
 import Boil from '../components/Boil.astro';
-import { getEnquirePieces, getEnquiryTypes } from '../lib/content';
+import { getEnquirePieces, getEnquiryTypes, getSiteText, pageName } from '../lib/content';
 
-const [enquiryTypes, pieces] = await Promise.all([getEnquiryTypes(), getEnquirePieces()]);
+const [enquiryTypes, pieces, text] = await Promise.all([getEnquiryTypes(), getEnquirePieces(), getSiteText()]);
+const name = pageName(text, '/contact/');
 // Thumbnails and names for the "about this piece" reference, keyed by piece. "<" is escaped
 // so nothing in a title can close the script tag.
 const piecesJson = JSON.stringify(Object.fromEntries(pieces.map((p) => [p.ref, p]))).replace(/</g, '\\u003c');
@@ -19,8 +20,8 @@ const only = enquiryTypes.length === 1 ? enquiryTypes[0] : null;
 const LINE_COUNT = 17;
 ---
 
-<Base title="Contact" showSplash={false}>
-  <h1 class="sr-only">Contact</h1>
+<Base title={name} showSplash={false}>
+  <h1 class="sr-only">{name}</h1>
   <script type="application/json" id="enquire-pieces" set:html={piecesJson}></script>
 
   <!-- The piece they pressed Enquire on (filled in by the script below) -->
@@ -30,7 +31,7 @@ const LINE_COUNT = 17;
       <small class="lined-ref-page"></small>
       <span class="lined-ref-title"></span>
     </p>
-    <button class="lined-ref-remove" type="button">remove</button>
+    <button class="lined-ref-remove" type="button">{text.removeLabel}</button>
   </div>
 
   {choose && (
@@ -57,23 +58,23 @@ const LINE_COUNT = 17;
 
     {choose && (
       <p class="lined-about">
-        <span>About: <b class="lined-about-label"></b></span>
-        <button class="lined-change" type="button">change</button>
+        <span>{text.aboutLabel} <b class="lined-about-label"></b></span>
+        <button class="lined-change" type="button">{text.changeLabel}</button>
       </p>
     )}
 
     <label class="lined-row">
-      <span>name</span>
+      <span>{text.nameLabel}</span>
       <input name="name" type="text" required maxlength="200" autocomplete="name" />
     </label>
     <label class="lined-row">
-      <span>email</span>
+      <span>{text.emailLabel}</span>
       <input name="email" type="email" required maxlength="254" autocomplete="email" />
     </label>
 
     <div class="lined-message">
       <label class="sr-only" for="contact-message">Message</label>
-      <textarea id="contact-message" name="message" rows="9" required maxlength="2000" placeholder="start typing here…"
+      <textarea id="contact-message" name="message" rows="9" required maxlength="2000" placeholder={text.messagePlaceholder}
       ></textarea>
       <span class="char-count" aria-live="polite">0 / 2000</span>
       <!-- Wide screens only: Sophie's flower boils beside the message area, outside the content column -->
@@ -85,13 +86,13 @@ const LINE_COUNT = 17;
       <label>Leave this empty <input name="website" type="text" tabindex="-1" autocomplete="off" /></label>
     </div>
 
-    <button class="button" type="submit">Send</button>
-    <p class="form-error" role="alert" hidden>Oops, something appears to have gone wrong. Please try again later.</p>
+    <button class="button" type="submit" data-sending={text.sendingLabel}>{text.sendLabel}</button>
+    <p class="form-error" role="alert" hidden>{text.contactErrorMessage}</p>
   </form>
 
   <div class="form-success" role="status" tabindex="-1" hidden>
-    <p class="form-success-title">Sent</p>
-    <p class="form-success-note">Thank you very much, Sophie will be in touch with you shortly.</p>
+    <p class="form-success-title">{text.sentTitle}</p>
+    <p class="form-success-note">{text.sentMessage}</p>
     <img class="form-success-flowers" src="/splash-flower-sm.png" alt="" width="450" height="532" />
   </div>
 </Base>
@@ -198,8 +199,9 @@ const LINE_COUNT = 17;
     e.preventDefault();
     if (!form.reportValidity()) return;
     error.hidden = true;
+    const sendLabel = submit.textContent;
     submit.disabled = true;
-    submit.textContent = 'Sending…';
+    submit.textContent = submit.dataset.sending ?? '';
 
     try {
       const res = await fetch('/api/contact', {
@@ -218,7 +220,7 @@ const LINE_COUNT = 17;
       error.hidden = false; // Failure: keep what they typed
     } finally {
       submit.disabled = false;
-      submit.textContent = 'Send';
+      submit.textContent = sendLabel;
     }
   });
 </script>

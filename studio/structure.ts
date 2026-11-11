@@ -1,7 +1,7 @@
 import type { StructureResolver } from 'sanity/structure';
 
 // Must match DOC_IDS in src/lib/config.ts
-export const SINGLETON_TYPES = new Set(['siteSettings', 'bio', 'galleryPage']);
+export const SINGLETON_TYPES = new Set(['siteSettings', 'bio', 'galleryPage', 'siteText']);
 
 const single = (S: Parameters<StructureResolver>[0], title: string, type: string, id: string) =>
   S.listItem().title(title).id(id).child(S.document().schemaType(type).documentId(id).title(title));
@@ -31,5 +31,6 @@ export const structure: StructureResolver = (S) =>
         ),
       S.divider(),
       single(S, 'Bio', 'bio', 'bio'),
+      single(S, 'Site text (page names, buttons, messages)', 'siteText', 'siteText'),
       single(S, 'Site settings', 'siteSettings', 'siteSettings'),
     ]);

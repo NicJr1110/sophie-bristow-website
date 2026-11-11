@@ -1,12 +1,15 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getSiteText } from '../lib/content';
+
+const text = await getSiteText();
 ---
 
-<Base title="Payment cancelled">
+<Base title={text.cancelledTitle}>
   <div class="notice">
-    <h1 class="page-title">Payment cancelled</h1>
-    <p>No payment was taken.</p>
-    <p><a href="/shop/">Back to the shop</a></p>
+    <h1 class="page-title">{text.cancelledTitle}</h1>
+    <p>{text.cancelledMessage}</p>
+    <p><a href="/shop/">{text.shopLink}</a></p>
   </div>
 </Base>
 

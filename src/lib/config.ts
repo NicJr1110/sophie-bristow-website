@@ -10,16 +10,18 @@ export const SANITY = {
 };
 
 // Menu order everywhere: Flash, Mark Making, Shop, About (the bio page), Contact.
+// The names come from Site text in the Studio (see getNav in content.ts).
 export const NAV = [
-  { href: '/flash/', label: 'Flash' },
-  { href: '/mark-making/', label: 'Mark Making' },
-  { href: '/shop/', label: 'Shop' },
-  { href: '/bio/', label: 'About' },
-  { href: '/contact/', label: 'Contact' },
+  { href: '/flash/', text: 'navFlash' },
+  { href: '/mark-making/', text: 'navMarkMaking' },
+  { href: '/shop/', text: 'navShop' },
+  { href: '/bio/', text: 'navAbout' },
+  { href: '/contact/', text: 'navContact' },
 ] as const;
 
 // Fixed Sanity document IDs (singletons), matching studio/structure.ts
 export const DOC_IDS = {
+  siteText: 'siteText',
   flash: 'page-flash',
   markMaking: 'page-mark-making',
   artwork: 'page-artwork',

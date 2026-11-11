@@ -1,11 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getSiteText } from '../lib/content';
+
+const text = await getSiteText();
 ---
 
-<Base title="Thank you">
+<Base title={text.thankYouTitle}>
   <div class="notice">
-    <h1 class="page-title">Thank you</h1>
-    <p>Your payment went through and the piece is yours. A receipt is on its way to your inbox, and Sophie will be in touch about delivery.</p>
-    <p><a href="/shop/">Back to the shop</a></p>
+    <h1 class="page-title">{text.thankYouTitle}</h1>
+    <p>{text.thankYouMessage}</p>
+    <p><a href="/shop/">{text.shopLink}</a></p>
   </div>
 </Base>

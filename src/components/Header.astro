@@ -1,6 +1,6 @@
 ---
 import { SITE_NAME, USE_MONOGRAM } from '../lib/config';
-import { getNav, getShopTags } from '../lib/content';
+import { getNav, getShopTags, getSiteText } from '../lib/content';
 import Boil from './Boil.astro';
 import ScratchLink from './ScratchLink.astro';
 
@@ -10,13 +10,13 @@ interface Props {
   title?: string;
 }
 const { current, title } = Astro.props;
-const [NAV, tags] = await Promise.all([getNav(), getShopTags()]);
+const [NAV, tags, text] = await Promise.all([getNav(), getShopTags(), getSiteText()]);
 
 // Shop categories come straight from the shop tags, so a tag Sophie adds just appears.
 // On laptops "Shop" itself links to everything; the burger menu's Shop only opens the list,
 // so it gets an "all" link at the end.
 const shopLinks = tags.map((t) => ({ label: t.title, href: `/shop/?tag=${t.slug}`, tag: t.slug }));
-const mobileShopLinks = [...shopLinks, { label: 'all', href: '/shop/', tag: '' }];
+const mobileShopLinks = [...shopLinks, { label: text.allLabel, href: '/shop/', tag: '' }];
 const isCurrent = (href: string) => current.startsWith(href);
 ---
 

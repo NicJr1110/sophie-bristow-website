@@ -5,7 +5,9 @@ export const galleryPage = defineType({
   title: 'Gallery page',
   type: 'document',
   fields: [
-    defineField({ name: 'title', type: 'string', validation: (r) => r.required() }),
+    // The page's name now lives in Site text → Page names (one place for the menus, tab titles
+    // and landing cards). Kept here, hidden, so earlier content isn't lost.
+    defineField({ name: 'title', type: 'string', hidden: true }),
     defineField({
       name: 'subtitle',
       title: 'Card subtitle',

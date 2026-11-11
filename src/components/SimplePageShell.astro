@@ -4,6 +4,7 @@
 // bottom-right. On the landing page, the grass first plays large in the middle of the
 // screen, then travels down into the Contact link (once per browser session).
 import { SITE_NAME } from '../lib/config';
+import { getSiteText, pageName } from '../lib/content';
 import Boil from './Boil.astro';
 
 interface Props {
@@ -13,7 +14,8 @@ interface Props {
   /** The landing page plays the grass intro. */
   landing?: boolean;
 }
-const { shopHref = '/shop-options/', shopLabel = 'Shop', showShopLink = true, landing = false } = Astro.props;
+const text = await getSiteText();
+const { shopHref = '/shop-options/', shopLabel = pageName(text, '/shop/'), showShopLink = true, landing = false } = Astro.props;
 ---
 
 {landing && (
@@ -41,7 +43,7 @@ const { shopHref = '/shop-options/', shopLabel = 'Shop', showShopLink = true, la
   <header class="simple-brand">
     <div class="simple-brand-copy">
       <h1>{SITE_NAME}</h1>
-      <p>Artist based in Bristol</p>
+      <p>{text.tagline}</p>
     </div>
     <a class="simple-brand-home" href="/" aria-label={`${SITE_NAME} home`}>
       <img class="simple-brand-mark" src="/sb-logo.png" alt="" width="326" height="400" />
@@ -65,7 +67,7 @@ const { shopHref = '/shop-options/', shopLabel = 'Shop', showShopLink = true, la
     )}
     <a class="simple-text-link simple-contact-link" href="/contact/">
       <Boil set="grass" play="hover" class="simple-grass" />
-      <span>Contact</span>
+      <span>{pageName(text, '/contact/')}</span>
     </a>
   </nav>
 </div>
