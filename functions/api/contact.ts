@@ -1,10 +1,11 @@
-// POST /api/contact { enquiryType, name, email, message, website } (spec §8)
+// POST /api/contact { enquiryType, name, email, message, website, piece? } (spec §8)
 // Emails Sophie (reply-to = sender), then sends the sender the auto-reply template
 // mapped to their enquiry type in Sanity (or the away message if away mode is on).
 import { json, siteOrigin, type Env } from '../../server/env';
 import { sanityQuery } from '../../server/sanity';
 import { escapeHtml, formatUkDate, layout, oneLine, sendEmail, textToHtml } from '../../server/email';
 import { pickAutoReply, pickRecipient, type AwaySettings, type EnquiryLookup } from '../../server/autoReply';
+import { parsePieceRef, pieceForEmail, type PieceLookup, type PieceRef } from '../../server/piece';
 
 const MAX_MESSAGE = 2000;
 const RATE_LIMIT_PER_HOUR = 5;
@@ -22,6 +23,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const email = oneLine(String(data.email ?? '')).slice(0, 254);
   const message = String(data.message ?? '').trim();
   const enquiryTypeId = String(data.enquiryType ?? '');
+  // Optional: the Flash / Mark Making image they pressed Enquire on (anything malformed is ignored)
+  const pieceRef = parsePieceRef(data.piece);
   if (!name || !EMAIL_RE.test(email) || !message || message.length > MAX_MESSAGE) {
     return json({ error: 'invalid' }, 400);
   }
@@ -32,7 +35,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   if (await isRateLimited(env, request)) return json({ error: 'rate_limited' }, 429);
 
-  const { settings, enquiry } = await lookup(env, enquiryTypeId);
+  const { settings, enquiry, piece: found } = await lookup(env, enquiryTypeId, pieceRef);
+  const piece = pieceForEmail(found);
   // If Sophie deleted a type just before the site rebuilt, still deliver the message.
   const enquiryLabel = enquiry?.label ?? 'General';
   // Each enquiry type can go to its own inbox (e.g. Tattoo → tattoo Gmail); otherwise the main one.
@@ -43,14 +47,15 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const date = formatUkDate();
   const notification = {
     replyTo: email,
-    subject: `New message from ${name} (${enquiryLabel})`,
-    text: `Enquiry type: ${enquiryLabel}\nName: ${name}\nEmail: ${email}\nDate: ${date}\n\nMessage:\n${message}\n\nJust hit reply to answer ${name}.`,
+    subject: `New message from ${name} (${enquiryLabel}${piece ? `, ${piece.name}` : ''})`,
+    text: `Enquiry type: ${enquiryLabel}\nName: ${name}\nEmail: ${email}\nDate: ${date}\n${piece ? `\n${piece.text}\n` : ''}\nMessage:\n${message}\n\nJust hit reply to answer ${name}.`,
     html: layout(
       `<h2 style="margin-top:0">New message from ${escapeHtml(name)}</h2>
        <p><strong>Enquiry type:</strong> ${escapeHtml(enquiryLabel)}<br>
           <strong>Name:</strong> ${escapeHtml(name)}<br>
           <strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a><br>
           <strong>Date:</strong> ${escapeHtml(date)}</p>
+       ${piece?.html ?? ''}
        <div style="border-left:3px solid #d9d6d0;padding-left:14px">${textToHtml(message)}</div>
        <p style="color:#6b6b6b;font-size:13px">Just hit reply to answer ${escapeHtml(name)}.</p>`,
       origin,
@@ -87,20 +92,26 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   return json({ ok: true });
 };
 
-async function lookup(env: Env, enquiryTypeId: string): Promise<{ settings: AwaySettings; enquiry: EnquiryLookup }> {
-  if (!env.PUBLIC_SANITY_PROJECT_ID) return { settings: null, enquiry: null };
-  const result = await sanityQuery<{ settings: AwaySettings; enquiry: EnquiryLookup }>(
+type Lookup = { settings: AwaySettings; enquiry: EnquiryLookup; piece: PieceLookup };
+
+async function lookup(env: Env, enquiryTypeId: string, piece: PieceRef | null): Promise<Lookup> {
+  const none: Lookup = { settings: null, enquiry: null, piece: null };
+  if (!env.PUBLIC_SANITY_PROJECT_ID) return none;
+  return sanityQuery<Lookup>(
     env,
     `{
       "settings": *[_id == "siteSettings"][0]{ awayMode, awayReplySubject, awayReplyBody },
-      "enquiry": *[_type == "enquiryType" && _id == $id][0]{ label, sendTo, template->{ subject, body } }
+      "enquiry": *[_type == "enquiryType" && _id == $id][0]{ label, sendTo, template->{ subject, body } },
+      "piece": *[_type == "galleryPage" && _id == $page][0]{
+        "page": title,
+        "image": images[_key == $key][0]{ title, alt, "url": asset->url }
+      }
     }`,
-    { id: enquiryTypeId },
+    { id: enquiryTypeId, page: piece?.page ?? '', key: piece?.key ?? '' },
   ).catch((err) => {
     console.error('sanity lookup failed', err);
-    return { settings: null, enquiry: null };
+    return none;
   });
-  return result;
 }
 
 /** ~5 submissions per IP per hour, using the optional RATE_LIMIT KV namespace. */

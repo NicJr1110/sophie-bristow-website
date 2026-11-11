@@ -708,6 +708,47 @@ h3 {
   transform: scale(1.025);
 }
 
+/* Laptops: Enquire appears in the tile's corner on hover. Touch screens use the enlarged view. */
+.tile {
+  position: relative;
+}
+
+.tile-enquire {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 7px 14px;
+  border-radius: var(--hand-radius);
+  background: rgb(255 255 255 / 0.94);
+  color: var(--text);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.15);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s var(--ease);
+}
+
+.tile-enquire:hover {
+  color: var(--text);
+}
+
+.tile:hover .tile-enquire,
+.tile-enquire:focus-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (hover: none) {
+  .tile-enquire {
+    display: none;
+  }
+}
+
 .tile-meta {
   display: flex;
   align-items: center;
@@ -773,9 +814,16 @@ h3 {
   margin: -12px 0 20px;
 }
 
-/* ---------- Lightbox ---------- */
+/* ---------- Enlarged view (Gallery.astro) ----------
+ * A strip of pictures that snaps to each one: swipe on touch screens (the neighbours peek in
+ * at the edges), arrows and keys on laptops. Count and caption bottom-left, Enquire
+ * bottom-right in reach of the thumb.
+ */
 
 .lightbox {
+  /* Each picture's width: most of the screen, leaving the neighbours peeking in */
+  --slide: 82vw;
+  --foot: calc(96px + env(safe-area-inset-bottom));
   width: 100vw;
   height: 100vh;
   height: 100dvh;
@@ -784,34 +832,59 @@ h3 {
   margin: 0;
   padding: 0;
   border: 0;
-  background: rgb(15 15 15 / 0.94);
+  overflow: hidden;
+  background: rgb(15 15 15 / 0.97);
   color: #fff;
+}
+
+/* With a mouse, leave room in the margins for the arrows */
+@media (hover: hover) {
+  .lightbox {
+    --slide: min(82vw, calc(100vw - 168px));
+  }
 }
 
 .lightbox::backdrop {
   background: transparent;
 }
 
-.lightbox figure {
-  margin: 0;
-  height: 100%;
+.lb-track {
+  position: absolute;
+  inset: 64px 0 var(--foot);
   display: flex;
-  flex-direction: column;
+  gap: 14px;
+  padding: 0 calc((100vw - var(--slide)) / 2);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  outline: none;
+}
+
+.lb-track::-webkit-scrollbar {
+  display: none;
+}
+
+.lb-slide {
+  flex: 0 0 var(--slide);
+  margin: 0;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 60px 16px 24px;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
 }
 
-.lb-img {
+.lb-slide img {
   max-width: 100%;
-  max-height: calc(100dvh - 140px);
+  max-height: 100%;
   object-fit: contain;
+  transition: opacity 0.3s ease;
 }
 
-.lb-caption {
-  font-size: 0.9rem;
-  opacity: 0.8;
+/* The neighbours, dimmed: a hint there's more to either side */
+.lb-slide:not(.is-current) img {
+  opacity: 0.4;
 }
 
 .lb-btn {
@@ -833,22 +906,160 @@ h3 {
 }
 
 .lb-close {
-  top: 10px;
+  top: max(10px, env(safe-area-inset-top));
   right: 10px;
 }
 
+/* Arrows sit in the dark margins on a soft backing, so they never get lost on a light scan.
+   Touch screens swipe instead. */
 .lb-prev,
 .lb-next {
-  top: 50%;
+  top: calc(64px + (100dvh - 64px - var(--foot)) / 2);
   transform: translateY(-50%);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.35);
 }
 
 .lb-prev {
-  left: 4px;
+  left: 14px;
 }
 
 .lb-next {
-  right: 4px;
+  right: 14px;
+}
+
+@media (hover: none) {
+  .lb-prev,
+  .lb-next {
+    display: none;
+  }
+}
+
+.lightbox.is-single :is(.lb-prev, .lb-next, .lb-dots) {
+  display: none;
+}
+
+.lb-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--foot) - 22px);
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  pointer-events: none;
+}
+
+.lb-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.3;
+  transition: opacity 0.2s;
+}
+
+.lb-dots i.is-on {
+  opacity: 0.95;
+}
+
+/* First visit on a touch screen: a brief "swipe" pill */
+.lb-hint {
+  position: absolute;
+  left: 50%;
+  top: calc(64px + (100dvh - 64px - var(--foot)) / 2);
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgb(20 20 20 / 0.72);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  pointer-events: none;
+  animation: hint-in 1.2s var(--ease) both;
+}
+
+.lb-hint svg {
+  width: 30px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@keyframes hint-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.lb-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 max(18px, env(safe-area-inset-right)) 0 max(18px, env(safe-area-inset-left));
+}
+
+.lb-text {
+  min-width: 0;
+}
+
+.lb-count {
+  margin: 0 0 3px;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  opacity: 0.6;
+}
+
+.lb-caption {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  opacity: 0.8;
+}
+
+.lb-enquire {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 24px;
+  border-radius: var(--hand-radius);
+  background: var(--accent-text);
+  color: var(--text);
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
+  transition: transform 220ms var(--ease);
+}
+
+.lb-enquire:hover {
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.lb-enquire svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* ---------- About (bio) ---------- */
@@ -955,6 +1166,54 @@ h3 {
   margin: auto 18px 0 0;
   width: clamp(167px, 24vw, 289px);
   opacity: 0.92;
+}
+
+/* From "Enquire" on an image: the piece that goes to Sophie with the message */
+.lined-ref {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 2vh 0 0;
+  padding: 0 0 14px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lined-ref img {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  box-shadow:
+    0 1px 1.5px rgb(60 45 30 / 0.14),
+    0 4px 10px -3px rgb(60 45 30 / 0.17);
+}
+
+.lined-ref p {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.lined-ref small {
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lined-ref-remove {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
 /* Step 2: no boxes, no fills, just thin lines */

@@ -3,11 +3,16 @@
 //   1. What's it about? The enquiry types as a big lowercase list, like the landing menu.
 //   2. The form: "name" and "email" on underlined lines, then a message area. Each enquiry
 //      type has its own auto-reply template and inbox in Sanity.
+// Arriving from "Enquire" on a Flash or Mark Making image (?piece=…&about=…), the type is
+// already chosen and a thumbnail shows which piece will be sent to Sophie with the message.
 import Base from '../layouts/Base.astro';
 import Boil from '../components/Boil.astro';
-import { getEnquiryTypes } from '../lib/content';
+import { getEnquirePieces, getEnquiryTypes } from '../lib/content';
 
-const enquiryTypes = await getEnquiryTypes();
+const [enquiryTypes, pieces] = await Promise.all([getEnquiryTypes(), getEnquirePieces()]);
+// Thumbnails and names for the "about this piece" reference, keyed by piece. "<" is escaped
+// so nothing in a title can close the script tag.
+const piecesJson = JSON.stringify(Object.fromEntries(pieces.map((p) => [p.ref, p]))).replace(/</g, '\\u003c');
 // With one type (or none) there's nothing to choose, so go straight to the form.
 const choose = enquiryTypes.length > 1;
 const only = enquiryTypes.length === 1 ? enquiryTypes[0] : null;
@@ -16,6 +21,17 @@ const LINE_COUNT = 17;
 
 <Base title="Contact" showSplash={false}>
   <h1 class="sr-only">Contact</h1>
+  <script type="application/json" id="enquire-pieces" set:html={piecesJson}></script>
+
+  <!-- The piece they pressed Enquire on (filled in by the script below) -->
+  <div class="lined-ref" hidden>
+    <img alt="" width="64" height="64" />
+    <p>
+      <small class="lined-ref-page"></small>
+      <span class="lined-ref-title"></span>
+    </p>
+    <button class="lined-ref-remove" type="button">remove</button>
+  </div>
 
   {choose && (
     <div class="enquiry-pick">
@@ -37,6 +53,7 @@ const LINE_COUNT = 17;
 
   <form id="contact-form" class="lined-form" method="post" action="/api/contact" hidden={choose}>
     <input type="hidden" name="enquiryType" value={only?.id ?? ''} />
+    <input type="hidden" name="piece" value="" />
 
     {choose && (
       <p class="lined-about">
@@ -117,9 +134,40 @@ const LINE_COUNT = 17;
   const submit = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
   const message = form.querySelector<HTMLTextAreaElement>('textarea[name=message]')!;
   const count = form.querySelector<HTMLElement>('.char-count')!;
+  const pieceInput = form.querySelector<HTMLInputElement>('input[name=piece]')!;
+  const ref = document.querySelector<HTMLElement>('.lined-ref')!;
+
+  type Piece = { ref: string; page: string; title: string; thumb: string };
+  const pieces: Record<string, Piece> = JSON.parse(document.getElementById('enquire-pieces')?.textContent || '{}');
+
+  /** Change one value in the address, keeping the others (so the piece survives step changes). */
+  const withParam = (name: string, value: string | null) => {
+    const p = new URLSearchParams(location.search);
+    if (value === null) p.delete(name);
+    else p.set(name, value);
+    const q = p.toString();
+    return q ? `?${q}` : location.pathname;
+  };
+
+  // "About this piece": shown when they came from Enquire on an image Sophie still has.
+  const showPiece = () => {
+    const piece = pieces[new URLSearchParams(location.search).get('piece') ?? ''];
+    ref.hidden = !piece;
+    pieceInput.value = piece?.ref ?? '';
+    if (!piece) return;
+    ref.querySelector('img')!.src = piece.thumb;
+    ref.querySelector('.lined-ref-page')!.textContent = piece.page;
+    ref.querySelector('.lined-ref-title')!.textContent = piece.title;
+  };
+  ref.querySelector('.lined-ref-remove')!.addEventListener('click', () => {
+    history.replaceState(null, '', withParam('piece', null));
+    showPiece();
+    form.querySelector<HTMLTextAreaElement>('textarea')?.focus();
+  });
 
   // Step 1 → step 2. The choice goes in the URL (?about=…) so Back returns to the list.
   const showStep = () => {
+    showPiece();
     if (!pick) return;
     const id = new URLSearchParams(location.search).get('about');
     const btn = id ? pick.querySelector<HTMLButtonElement>(`[data-type="${CSS.escape(id)}"]`) : null;
@@ -131,13 +179,13 @@ const LINE_COUNT = 17;
   };
   pick?.querySelectorAll<HTMLButtonElement>('[data-type]').forEach((btn) =>
     btn.addEventListener('click', () => {
-      history.pushState(null, '', `?about=${encodeURIComponent(btn.dataset.type!)}`);
+      history.pushState(null, '', withParam('about', btn.dataset.type!));
       showStep();
       form.querySelector<HTMLInputElement>('input[name=name]')?.focus();
     }),
   );
   form.querySelector('.lined-change')?.addEventListener('click', () => {
-    history.pushState(null, '', location.pathname);
+    history.pushState(null, '', withParam('about', null));
     showStep();
     pick?.querySelector<HTMLButtonElement>(`[data-type="${CSS.escape(typeInput.value || '')}"]`)?.focus();
   });
@@ -162,6 +210,7 @@ const LINE_COUNT = 17;
       if (!res.ok) throw new Error(String(res.status));
       // Happy path: the form goes, leaving "Sent", the thank-you and the flowers.
       form.hidden = true;
+      ref.hidden = true;
       success.hidden = false;
       window.scrollTo({ top: 0 });
       success.focus({ preventScroll: true });

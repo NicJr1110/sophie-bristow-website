@@ -8,6 +8,8 @@ export type GalleryItem = {
   id: string;
   title?: string;
   pic: Pic;
+  /** Flash / Mark Making: link to the contact form about this piece. */
+  enquireHref?: string;
   // Shop only
   price?: number;
   tags?: string[];
@@ -107,18 +109,57 @@ export async function getLandingChoices(): Promise<Choice[]> {
 type GalleryDoc = {
   title?: string;
   introText?: string;
+  enquiryType?: string;
   images?: (SanityImage & { _key: string; title?: string })[];
 };
 
+/** A gallery image as the contact form refers to it: "<page id>:<image key>", e.g. "page-flash:3f9a1c". */
+export const pieceRef = (pageId: string, key: string) => `${pageId}:${key}`;
+export const PIECE_REF_RE = /^(page-[a-z0-9-]{1,40}):([A-Za-z0-9_-]{1,64})$/;
+
+/** The contact link for a piece, with the page's enquiry type (Studio → page → "Enquiry type") chosen. */
+export function enquireHref(pageId: string, key: string, enquiryType?: string): string {
+  const p = new URLSearchParams();
+  if (enquiryType) p.set('about', enquiryType);
+  p.set('piece', pieceRef(pageId, key));
+  return `/contact/?${p}`;
+}
+
 export async function getGallery(docId: string, fallbackTitle: string): Promise<Gallery> {
   if (!hasSanity) return sampleGallery(docId, fallbackTitle);
-  const doc = await query<GalleryDoc | null>(`*[_id == $id][0]{ title, introText, images }`, { id: docId });
+  const doc = await query<GalleryDoc | null>(
+    `*[_id == $id][0]{ title, introText, "enquiryType": enquiryType._ref, images }`,
+    { id: docId },
+  );
   const items: GalleryItem[] = [];
   for (const img of doc?.images ?? []) {
     const pic = picFromSanity(img, img.title ?? '');
-    if (pic) items.push({ id: img._key, title: img.title, pic });
+    if (pic) items.push({ id: img._key, title: img.title, pic, enquireHref: enquireHref(docId, img._key, doc?.enquiryType) });
   }
   return { title: doc?.title || fallbackTitle, intro: doc?.introText ?? '', items };
+}
+
+export type Piece = { ref: string; page: string; title: string; thumb: string };
+
+/** Every Flash and Mark Making image, for the contact form's "about this piece" reference. */
+export async function getEnquirePieces(): Promise<Piece[]> {
+  const pages = [
+    { id: DOC_IDS.flash, title: NAV.find((n) => n.href === '/flash/')?.label ?? 'Flash' },
+    { id: DOC_IDS.markMaking, title: NAV.find((n) => n.href === '/mark-making/')?.label ?? 'Mark Making' },
+  ];
+  const pieces: Piece[] = [];
+  for (const page of pages) {
+    const gallery = await getGallery(page.id, page.title);
+    for (const item of gallery.items) {
+      pieces.push({
+        ref: pieceRef(page.id, item.id),
+        page: gallery.title,
+        title: item.title || item.pic.alt || 'Untitled',
+        thumb: item.pic.thumb(160),
+      });
+    }
+  }
+  return pieces;
 }
 
 /* ---------- Artwork (shop) ---------- */
@@ -227,7 +268,7 @@ export async function getEnquiryTypes(): Promise<EnquiryType[]> {
  * Generic stock images, only used when no Sanity project is configured (e.g. a fresh clone).
  */
 
-function sampleGallery(_docId: string, title: string): Gallery {
+function sampleGallery(docId: string, title: string): Gallery {
   const slug = title.toLowerCase().replace(/\s+/g, '-');
   return {
     title,
@@ -236,6 +277,7 @@ function sampleGallery(_docId: string, title: string): Gallery {
       id: `${slug}-${i}`,
       title: '',
       pic: picPlaceholder(`${slug}-${i}`, `${title} placeholder ${i + 1}`),
+      enquireHref: enquireHref(docId, `${slug}-${i}`),
     })),
   };
 }

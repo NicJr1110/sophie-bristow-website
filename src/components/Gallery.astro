@@ -11,8 +11,7 @@ const { items, shop = false } = Astro.props;
 
 const gbp = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
 const formatPrice = (p?: number) => (typeof p === 'number' ? gbp.format(p).replace(/\.00$/, '') : '');
-// Rendered tile width: a third of the content column (up to ~470px on wide laptops),
-// ~31vw at medium, ~47vw on phones.
+// A third of the content column (up to ~470px on wide laptops), ~31vw at medium, ~47vw on phones.
 const sizes = '(min-width: 1025px) min(470px, 31vw), (min-width: 768px) 31vw, 47vw';
 ---
 
@@ -24,10 +23,10 @@ const sizes = '(min-width: 1025px) min(470px, 31vw), (min-width: 768px) 31vw, 47
       <button
         class="tile-open"
         type="button"
-        data-index={i}
         data-full={item.pic.full(FULL_WIDTH)}
         data-alt={item.pic.alt}
         data-caption={item.title ?? ''}
+        data-enquire={item.enquireHref}
         aria-label={`View ${item.pic.alt || item.title || 'image'} larger`}
       >
         <img
@@ -42,18 +41,20 @@ const sizes = '(min-width: 1025px) min(470px, 31vw), (min-width: 768px) 31vw, 47
         />
       </button>
 
+      {/* Laptops: a quiet shortcut in the corner on hover (touch screens use the enlarged view) */}
+      {item.enquireHref && (
+        <a class="tile-enquire" href={item.enquireHref} aria-label={`Enquire about ${item.title || item.pic.alt || 'this piece'}`}>
+          Enquire
+        </a>
+      )}
+
       {shop && (
         <div class="tile-meta">
           <div class="tile-text">
             <span class="tile-title">{item.title}</span>
             <span class="tile-price">{formatPrice(item.price)}</span>
           </div>
-          <button
-            class="buy"
-            type="button"
-            data-artwork-id={item.id}
-            disabled={item.status !== 'available'}
-          >
+          <button class="buy" type="button" data-artwork-id={item.id} disabled={item.status !== 'available'}>
             {item.status === 'available' ? 'Buy' : 'Sold'}
           </button>
         </div>
@@ -62,63 +63,152 @@ const sizes = '(min-width: 1025px) min(470px, 31vw), (min-width: 768px) 31vw, 47
   ))}
 </ul>
 
+<!--
+  Enlarged view: the pictures sit side by side in a strip that snaps to each one, so on touch
+  screens you swipe between them (neighbours peek in at the edges); arrows and the keyboard
+  do the same on laptops. Enquire sits bottom-right, in reach of the thumb.
+-->
 <dialog class="lightbox" aria-label="Image viewer">
+  <div class="lb-track" tabindex="-1"></div>
   <button class="lb-btn lb-close" type="button" aria-label="Close">&times;</button>
   <button class="lb-btn lb-prev" type="button" aria-label="Previous image">&lsaquo;</button>
-  <figure>
-    <img class="lb-img" alt="" />
-    <figcaption class="lb-caption"></figcaption>
-  </figure>
   <button class="lb-btn lb-next" type="button" aria-label="Next image">&rsaquo;</button>
+  <div class="lb-dots" aria-hidden="true"></div>
+  <p class="lb-hint" aria-hidden="true" hidden>
+    <svg viewBox="0 0 30 16"><path d="M7 3 2 8l5 5M23 3l5 5-5 5M2 8h26"></path></svg>
+    Swipe
+  </p>
+  <div class="lb-foot">
+    <div class="lb-text">
+      <p class="lb-count" aria-live="polite"></p>
+      <p class="lb-caption"></p>
+    </div>
+    <a class="lb-enquire" href="/contact/" hidden>
+      Enquire
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"></path></svg>
+    </a>
+  </div>
 </dialog>
 
 <script>
+  const HINT_KEY = 'sophie-bristow:swipe-hint-seen';
+  const MAX_DOTS = 12; // more than this and the dots become a long row; the count is enough
+
   const dialog = document.querySelector<HTMLDialogElement>('dialog.lightbox');
   const tiles = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-gallery] .tile-open'));
 
   if (dialog && tiles.length) {
-    const img = dialog.querySelector<HTMLImageElement>('.lb-img')!;
+    const track = dialog.querySelector<HTMLElement>('.lb-track')!;
+    const dots = dialog.querySelector<HTMLElement>('.lb-dots')!;
+    const count = dialog.querySelector<HTMLElement>('.lb-count')!;
     const caption = dialog.querySelector<HTMLElement>('.lb-caption')!;
-    let current: HTMLButtonElement | null = null;
-    // Only step through tiles that are showing (the shop can be filtered by tag).
-    const visible = () => tiles.filter((t) => !t.closest('li')?.hidden);
+    const enquire = dialog.querySelector<HTMLAnchorElement>('.lb-enquire')!;
+    const hint = dialog.querySelector<HTMLElement>('.lb-hint')!;
+    const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
 
-    const show = (t: HTMLButtonElement) => {
-      current = t;
-      img.src = t.dataset.full ?? '';
-      img.alt = t.dataset.alt ?? '';
-      caption.textContent = t.dataset.caption ?? '';
+    let shown: HTMLButtonElement[] = []; // the tiles in the strip (the shop can be filtered)
+    let current = 0;
+    let openedAt = 0;
+    let opener: HTMLButtonElement | null = null;
+
+    const slides = () => Array.from(track.children) as HTMLElement[];
+
+    // Load the picture on screen and its neighbours; the rest wait until they're near.
+    const load = (i: number) => {
+      for (const j of [i - 1, i, i + 1]) {
+        const img = slides()[j]?.querySelector('img');
+        if (img && !img.src) img.src = img.dataset.src ?? '';
+      }
     };
 
-    const step = (by: number) => {
-      const list = visible();
-      const i = current ? list.indexOf(current) : 0;
-      show(list[(i + by + list.length) % list.length]);
+    const update = (i: number) => {
+      current = Math.max(0, Math.min(i, shown.length - 1));
+      const tile = shown[current];
+      slides().forEach((s, j) => s.classList.toggle('is-current', j === current));
+      Array.from(dots.children).forEach((d, j) => d.classList.toggle('is-on', j === current));
+      count.textContent = shown.length > 1 ? `${current + 1} / ${shown.length}` : '';
+      caption.textContent = tile.dataset.caption ?? '';
+      enquire.hidden = !tile.dataset.enquire;
+      if (tile.dataset.enquire) enquire.href = tile.dataset.enquire;
+      if (current !== openedAt) hint.hidden = true; // they've moved on: they know
+      load(current);
+    };
+    // The hint goes as soon as they touch the pictures (jumping to the tapped one doesn't count).
+    track.addEventListener('pointerdown', () => (hint.hidden = true));
+
+    const goTo = (i: number, behavior: ScrollBehavior = smooth()) => {
+      const slide = slides()[(i + shown.length) % shown.length];
+      track.scrollTo({ left: slide.offsetLeft - (track.clientWidth - slide.clientWidth) / 2, behavior });
     };
 
-    tiles.forEach((t) =>
-      t.addEventListener('click', () => {
-        show(t);
-        dialog.showModal();
-      }),
-    );
+    // Which picture is in the middle after a swipe or scroll
+    const nearest = () => {
+      const mid = track.scrollLeft + track.clientWidth / 2;
+      let best = 0;
+      slides().forEach((s, j) => {
+        const d = Math.abs(s.offsetLeft + s.clientWidth / 2 - mid);
+        const b = Math.abs(slides()[best].offsetLeft + slides()[best].clientWidth / 2 - mid);
+        if (d < b) best = j;
+      });
+      return best;
+    };
+    let scrollTimer = 0;
+    track.addEventListener('scroll', () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(() => update(nearest()), 60);
+    });
 
+    const open = (tile: HTMLButtonElement) => {
+      opener = tile;
+      shown = tiles.filter((t) => !t.closest('li')?.hidden);
+      track.replaceChildren(
+        ...shown.map((t, j) => {
+          const slide = document.createElement('figure');
+          slide.className = 'lb-slide';
+          slide.setAttribute('aria-label', `${j + 1} of ${shown.length}`);
+          const img = document.createElement('img');
+          img.alt = t.dataset.alt ?? '';
+          img.dataset.src = t.dataset.full ?? '';
+          img.decoding = 'async';
+          slide.append(img);
+          return slide;
+        }),
+      );
+      dots.replaceChildren(...(shown.length > 1 && shown.length <= MAX_DOTS ? shown.map(() => document.createElement('i')) : []));
+      dialog.classList.toggle('is-single', shown.length < 2);
+      dialog.showModal();
+      const i = shown.indexOf(tile);
+      openedAt = i;
+      update(i);
+      goTo(i, 'auto');
+
+      // Touch screens: a one-off "swipe" hint the first time in a visit.
+      let seen = true;
+      try {
+        seen = Boolean(sessionStorage.getItem(HINT_KEY));
+        sessionStorage.setItem(HINT_KEY, '1');
+      } catch {}
+      hint.hidden = seen || shown.length < 2 || !matchMedia('(hover: none)').matches;
+      if (!hint.hidden) setTimeout(() => (hint.hidden = true), 2200);
+    };
+
+    tiles.forEach((t) => t.addEventListener('click', () => open(t)));
     dialog.querySelector('.lb-close')!.addEventListener('click', () => dialog.close());
-    dialog.querySelector('.lb-prev')!.addEventListener('click', () => step(-1));
-    dialog.querySelector('.lb-next')!.addEventListener('click', () => step(1));
-
-    // Click on the dark backdrop (not the image or buttons) closes it. Escape is native to <dialog>.
+    dialog.querySelector('.lb-prev')!.addEventListener('click', () => goTo(current - 1));
+    dialog.querySelector('.lb-next')!.addEventListener('click', () => goTo(current + 1));
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') goTo(current - 1);
+      if (e.key === 'ArrowRight') goTo(current + 1);
+    });
+    // A tap or click on the dark space around the picture closes it. Escape is native to <dialog>.
     dialog.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
-      if (target === dialog || target.tagName === 'FIGURE') dialog.close();
-    });
-    dialog.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') step(-1);
-      if (e.key === 'ArrowRight') step(1);
+      if (target === dialog || target.classList.contains('lb-slide') || target === track) dialog.close();
     });
     dialog.addEventListener('close', () => {
-      img.removeAttribute('src');
-      current?.focus();
+      track.replaceChildren();
+      hint.hidden = true;
+      opener?.focus();
     });
   }
 </script>

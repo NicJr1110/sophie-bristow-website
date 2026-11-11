@@ -119,3 +119,26 @@ test('enquiries go to the type\'s own inbox, else the main one', () => {
   assert.equal(pickRecipient({ label: 'Typo', sendTo: 'not-an-email' }, main), main);
   assert.equal(pickRecipient(null, main), main);
 });
+
+import { parsePieceRef, pieceForEmail } from '../server/piece.ts';
+
+test('piece reference: only well-formed gallery references are accepted', () => {
+  assert.deepEqual(parsePieceRef('page-flash:3f9a1c'), { page: 'page-flash', key: '3f9a1c' });
+  assert.deepEqual(parsePieceRef('page-mark-making:a_B-9'), { page: 'page-mark-making', key: 'a_B-9' });
+  for (const bad of ['', 'flash:abc', 'page-flash:', 'page-flash:a b', 'drafts.page-flash:abc', 'page-flash:abc"<x>', 42, null]) {
+    assert.equal(parsePieceRef(bad), null, String(bad));
+  }
+});
+
+test('piece in the email: escaped, Sanity images only, nothing if it has gone', () => {
+  const url = 'https://cdn.sanity.io/images/p/production/abc-800x600.jpg';
+  const p = pieceForEmail({ page: 'Flash', image: { title: 'Wolf <& flowers>', url } })!;
+  assert.equal(p.name, 'Flash: Wolf <& flowers>');
+  assert.match(p.html, /Wolf &lt;&amp; flowers&gt;/);
+  assert.match(p.html, /abc-800x600\.jpg\?w=480&amp;auto=format/);
+  assert.match(p.text, /About this piece: Wolf <& flowers> \(Flash\)\nhttps:\/\/cdn\.sanity\.io/);
+  assert.equal(pieceForEmail({ page: 'Flash', image: { title: 'x', url: 'https://evil.example/x.jpg' } }), null);
+  assert.equal(pieceForEmail({ page: 'Flash', image: null }), null);
+  assert.equal(pieceForEmail(null), null);
+  assert.equal(pieceForEmail({ page: 'Flash', image: { alt: 'Snake', url } })!.name, 'Flash: Snake');
+});

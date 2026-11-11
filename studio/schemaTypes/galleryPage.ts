@@ -23,6 +23,15 @@ export const galleryPage = defineType({
       description: 'Shown at the top of the page, above the images.',
     }),
     defineField({
+      name: 'enquiryType',
+      title: 'Enquiry type',
+      type: 'reference',
+      to: [{ type: 'enquiryType' }],
+      description:
+        'When someone presses "Enquire" on one of these images, the contact form opens with this enquiry type already chosen (e.g. Tattoo for Flash). Leave empty to let them choose.',
+      hidden: ({ document }) => Boolean(document?._id?.endsWith('page-artwork')),
+    }),
+    defineField({
       name: 'images',
       title: 'Images',
       type: 'array',
